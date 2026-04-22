@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elephant & Piggie – Today I Will Fly!</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:#1a2a4a;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.4);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .topbar a:hover{background:rgba(255,255,255,0.35);}
+  .stage{flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding:20px;}
+  .book{width:780px;max-width:100%;background:#fffef5;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,0.5);overflow:hidden;min-height:480px;}
+  .page{display:none;min-height:480px;}
+  .page.active{display:flex;}
+  .pg-full{flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;}
+  .pg-comic{flex-direction:row;align-items:stretch;}
+  .panel{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 16px;border-right:3px dashed #ddd;}
+  .panel:last-child{border-right:none;}
+
+  /* Characters */
+  .gerald{font-size:5em;}
+  .piggie{font-size:4.5em;}
+  .name-g{font-size:0.8em;color:#6b9bd2;font-weight:bold;margin-top:4px;}
+  .name-p{font-size:0.8em;color:#ff69b4;font-weight:bold;margin-top:4px;}
+
+  /* Speech bubbles */
+  .bubble-g{background:#e3f2fd;border:3px solid #1e88e5;border-radius:20px;padding:10px 16px;font-size:1.05em;color:#1565c0;margin:8px 0;position:relative;max-width:260px;text-align:center;}
+  .bubble-p{background:#fce4ec;border:3px solid #e91e63;border-radius:20px;padding:10px 16px;font-size:1.05em;color:#880e4f;margin:8px 0;position:relative;max-width:260px;text-align:center;}
+  .bubble-big{font-size:1.3em;padding:14px 20px;}
+  .thought{border-style:dotted!important;background:#f5f5f5!important;color:#555!important;}
+
+  /* Covers and BGs */
+  .cover{background:linear-gradient(160deg,#1565c0,#1e88e5,#42a5f5);}
+  .cover-title{font-size:2.3em;font-weight:bold;color:white;text-shadow:2px 2px 8px rgba(0,0,0,0.3);line-height:1.2;margin:12px 0;}
+  .cover-sub{font-size:1em;color:rgba(255,255,255,0.9);margin-top:8px;}
+  .bg-sky{background:linear-gradient(160deg,#e3f2fd,#bbdefb);}
+  .bg-pink{background:linear-gradient(160deg,#fce4ec,#f8bbd0);}
+  .bg-green{background:linear-gradient(160deg,#e8f5e9,#c8e6c9);}
+  .bg-yellow{background:linear-gradient(160deg,#fffde7,#fff9c4);}
+  .bg-fly{background:linear-gradient(160deg,#e1f5fe,#b3e5fc);}
+  .bg-end{background:linear-gradient(135deg,#1565c0,#e91e63);}
+
+  /* SFX labels */
+  .sfx{font-size:2em;font-weight:900;color:#ff6f00;text-shadow:2px 2px 0 #fff;letter-spacing:2px;margin:6px 0;}
+
+  .bounce{display:inline-block;animation:bounce 1.2s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+  .spin{display:inline-block;animation:spin 2s linear infinite;}
+  @keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+  .wiggle{display:inline-block;animation:wiggle 0.8s ease-in-out infinite;}
+  @keyframes wiggle{0%,100%{transform:rotate(-8deg);}50%{transform:rotate(8deg);}}
+  .fly-anim{display:inline-block;animation:fly 2s ease-in-out infinite;}
+  @keyframes fly{0%,100%{transform:translateY(0) rotate(-5deg);}50%{transform:translateY(-20px) rotate(5deg);}}
+
+  .nav{display:flex;justify-content:center;align-items:center;gap:20px;padding:18px;}
+  .nav-btn{border:none;border-radius:50px;padding:12px 32px;font-size:1.2em;font-family:inherit;cursor:pointer;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.2);transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+  .read-btn{background:#9C27B0;color:white;border:none;border-radius:50px;padding:12px 24px;font-size:1em;font-family:inherit;cursor:pointer;transition:transform 0.15s;}
+  .read-btn:hover{transform:scale(1.05);}
+  .dots{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:0 20px 14px;}
+  .dot{width:10px;height:10px;border-radius:50%;background:#ccc;cursor:pointer;transition:background 0.3s;}
+  .dot.active{background:#1e88e5;transform:scale(1.4);}
+  .dot.done{background:#90caf9;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🐘 Elephant & Piggie – Today I Will Fly!</span>
+  <span id="pageIndicator" style="color:white;font-size:0.95em">Page 1 of 13</span>
+</div>
+<div class="stage"><div class="book">
+
+  <!-- 1. COVER -->
+  <div class="page active pg-full cover">
+    <div style="display:flex;gap:20px;justify-content:center;align-items:flex-end">
+      <div style="text-align:center"><span class="gerald bounce">🐘</span><div class="name-g" style="color:white">Gerald</div></div>
+      <div style="text-align:center"><span class="piggie fly-anim">🐷</span><div class="name-p" style="color:white">Piggie</div></div>
+    </div>
+    <div class="cover-title">Elephant & Piggie<br><span style="font-size:0.8em">Today I Will Fly!</span></div>
+    <div class="cover-sub">Inspired by Mo Willems • A comic-style adventure!</div>
+  </div>
+
+  <!-- 2. TODAY I WILL FLY -->
+  <div class="page pg-comic bg-sky">
+    <div class="panel">
+      <div class="piggie bounce">🐷</div>
+      <div class="name-p">Piggie</div>
+      <div class="bubble-p bubble-big">Today I will <strong>FLY!</strong> ✈️</div>
+    </div>
+    <div class="panel">
+      <div class="gerald">🐘</div>
+      <div class="name-g">Gerald</div>
+      <div class="bubble-g bubble-big">You cannot fly.</div>
+    </div>
+  </div>
+
+  <!-- 3. YES I WILL -->
+  <div class="page pg-comic bg-pink">
+    <div class="panel">
+      <div class="piggie">🐷</div>
+      <div class="name-p">Piggie</div>
+      <div class="bubble-p">Yes. I. Will!</div>
+    </div>
+    <div class="panel">
+      <div class="gerald">🐘</div>
+      <div class="name-g">Gerald</div>
+      <div class="bubble-g">You do not have<br><strong>wings.</strong><br>🐷 + 🚫🪶 = 🚫✈️</div>
+    </div>
+  </div>
+
+  <!-- 4. PIGGIE TRIES TO JUMP -->
+  <div class="page pg-full bg-yellow">
+    <div class="sfx">3... 2... 1...</div>
+    <div style="font-size:5em" class="bounce">🐷</div>
+    <div class="sfx">JUMP!</div>
+    <div style="font-size:5em">🐷</div>
+    <div style="font-size:1.3em;color:#e65100;font-weight:bold;margin-top:8px">THUD! 💥</div>
+    <div style="font-size:1.1em;color:#555;margin-top:8px"><em>Piggie did not fly.</em></div>
+  </div>
+
+  <!-- 5. BIRD APPEARS -->
+  <div class="page pg-comic bg-sky">
+    <div class="panel">
+      <div style="font-size:5em">🐦</div>
+      <div style="font-size:0.85em;font-weight:bold;color:#1565c0;margin-top:4px">Bird</div>
+      <div class="bubble-g" style="border-color:#1565c0">I can help!<br>I will throw you<br>into the sky! 💪</div>
+    </div>
+    <div class="panel">
+      <div class="piggie">🐷</div>
+      <div class="name-p">Piggie</div>
+      <div class="bubble-p">Yes please! 🙏</div>
+      <div class="gerald" style="font-size:3em">🐘</div>
+      <div class="bubble-g thought">Oh no...</div>
+    </div>
+  </div>
+
+  <!-- 6. BIRD THROWS PIGGIE -->
+  <div class="page pg-full bg-sky">
+    <div class="sfx">WHOOOOSH! 💨</div>
+    <div style="font-size:5em" class="fly-anim">🐷</div>
+    <div style="font-size:3em;margin:10px 0">⬆️⬆️⬆️</div>
+    <div style="font-size:5em">🐘😱</div>
+    <div class="bubble-g" style="border-color:#1e88e5;background:#e3f2fd;display:inline-block;margin-top:10px;padding:10px 16px;border-radius:16px;border-width:3px;border-style:solid;font-size:1.1em;color:#1565c0">
+      Oh my goodness! 😱
+    </div>
+  </div>
+
+  <!-- 7. PIGGIE FALLS -->
+  <div class="page pg-full bg-pink">
+    <div style="font-size:5em">🐷</div>
+    <div style="font-size:3em;margin:10px 0">⬇️⬇️⬇️</div>
+    <div class="sfx">BONK! 💥</div>
+    <div style="font-size:3em;margin-top:8px">🐘🐦😬</div>
+    <div style="font-size:1.2em;color:#880e4f;margin-top:10px;font-weight:bold">
+      Piggie did not fly. Again.
+    </div>
+  </div>
+
+  <!-- 8. DOG WANTS TO HELP -->
+  <div class="page pg-comic bg-green">
+    <div class="panel">
+      <div style="font-size:5em">🐕</div>
+      <div style="font-size:0.85em;font-weight:bold;color:#2e7d32;margin-top:4px">Dog</div>
+      <div class="bubble-g" style="border-color:#2e7d32;background:#e8f5e9;color:#1b5e20">
+        I can help! I will<br>give you a BIG push! 🚀
+      </div>
+    </div>
+    <div class="panel">
+      <div class="piggie bounce">🐷</div>
+      <div class="name-p">Piggie</div>
+      <div class="bubble-p">OK! Let's try!</div>
+      <div class="gerald" style="font-size:3em">🐘</div>
+      <div class="bubble-g thought">I cannot watch...</div>
+    </div>
+  </div>
+
+  <!-- 9. BIG PUSH! -->
+  <div class="page pg-full bg-sky">
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;font-size:3.5em;margin-bottom:10px">
+      <span>🐕</span><span>➡️</span><span class="fly-anim">🐷</span><span>💨</span>
+    </div>
+    <div class="sfx">WEEEEEE! 🎉</div>
+    <div style="font-size:5em;margin-top:10px">🐘😮</div>
+    <div class="bubble-g" style="border-color:#1e88e5;background:#e3f2fd;display:inline-block;margin-top:10px;padding:10px 20px;border-radius:16px;border-width:3px;border-style:solid;font-size:1.2em;color:#1565c0">
+      She is... flying?! 🤔
+    </div>
+  </div>
+
+  <!-- 10. BIRD LIFTS PIGGIE -->
+  <div class="page pg-full bg-fly">
+    <div style="font-size:5em" class="fly-anim">🐦</div>
+    <div style="font-size:4em" class="fly-anim" style="animation-delay:0.3s">🐷</div>
+    <div class="sfx" style="color:#0277bd">I AM FLYING!!!</div>
+    <div style="font-size:2.5em;margin-top:10px">☁️ ☁️ 🌈 ☁️</div>
+    <div style="font-size:1.2em;color:#01579b;font-weight:bold;margin-top:10px">
+      The bird picked up Piggie<br>and flew through the sky!
+    </div>
+  </div>
+
+  <!-- 11. GERALD AMAZED -->
+  <div class="page pg-comic bg-sky">
+    <div class="panel">
+      <div class="fly-anim" style="font-size:4em">🐷✈️</div>
+      <div class="name-p">Piggie</div>
+      <div class="bubble-p bubble-big"><strong>I AM FLYING!</strong><br>🎉🎉🎉</div>
+    </div>
+    <div class="panel">
+      <div class="gerald bounce">🐘</div>
+      <div class="name-g">Gerald</div>
+      <div class="bubble-g bubble-big">She IS flying!<br>I cannot believe it!</div>
+    </div>
+  </div>
+
+  <!-- 12. GERALD WANTS TO TRY -->
+  <div class="page pg-comic bg-yellow">
+    <div class="panel">
+      <div class="piggie bounce">🐷</div>
+      <div class="name-p">Piggie</div>
+      <div class="bubble-p">Now YOU try,<br>Gerald! 😄</div>
+    </div>
+    <div class="panel">
+      <div class="gerald wiggle">🐘</div>
+      <div class="name-g">Gerald</div>
+      <div class="bubble-g">I... um...<br>hmm...<br><em>maybe tomorrow!</em> 😅</div>
+      <div style="font-size:1.5em;margin-top:8px">🐦🐕😄</div>
+    </div>
+  </div>
+
+  <!-- 13. THE END -->
+  <div class="page pg-full bg-end">
+    <div style="display:flex;gap:16px;justify-content:center;font-size:4em;margin-bottom:12px">
+      <span class="bounce">🐘</span><span>❤️</span><span class="bounce" style="animation-delay:0.3s">🐷</span>
+    </div>
+    <div style="font-size:3em;font-weight:bold;color:white;text-shadow:2px 2px 6px rgba(0,0,0,0.3);margin:12px 0">The End!</div>
+    <div style="font-size:1.1em;color:rgba(255,255,255,0.9);margin-bottom:20px">
+      Good friends cheer for each other! 🎉<br>
+      <em>And sometimes pigs really DO fly!</em> 🐷✈️
+    </div>
+    <a href="../../index.html" style="background:white;color:#1565c0;padding:12px 28px;border-radius:30px;text-decoration:none;font-size:1.1em;font-weight:bold;">🏠 Back to Home</a>
+  </div>
+
+</div></div>
+<div class="dots" id="dots"></div>
+<div class="nav">
+  <button class="nav-btn prev" id="prevBtn" onclick="changePage(-1)" disabled>◀ Prev</button>
+  <button class="read-btn" onclick="readPage()">🔊 Read Aloud</button>
+  <button class="nav-btn next" id="nextBtn" onclick="changePage(1)">Next ▶</button>
+</div>
+<script>
+const pages=document.querySelectorAll('.page'),totalPages=pages.length;let current=0;
+const dotsEl=document.getElementById('dots');
+pages.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);d.style.cursor='pointer';dotsEl.appendChild(d);});
+function updateUI(){pages.forEach((p,i)=>p.classList.toggle('active',i===current));document.querySelectorAll('.dot').forEach((d,i)=>{d.className='dot'+(i===current?' active':i<current?' done':'');});document.getElementById('prevBtn').disabled=current===0;document.getElementById('nextBtn').disabled=current===totalPages-1;document.getElementById('pageIndicator').textContent=`Page ${current+1} of ${totalPages}`;}
+function changePage(dir){current=Math.max(0,Math.min(totalPages-1,current+dir));updateUI();}
+function goTo(i){current=i;updateUI();}
+const pageTexts=["Elephant and Piggie! Today I Will Fly!","Today I will fly! said Piggie. You cannot fly, said Gerald.","Yes I will! said Piggie. You do not have wings, said Gerald.","Piggie jumped as high as she could. Three, two, one, jump! Thud! Piggie did not fly.","A bird appeared. I can help! I will throw you into the sky! Yes please! said Piggie.","Whoooosh! The bird threw Piggie into the sky! Oh my goodness! said Gerald.","But Piggie came falling back down. Bonk! Piggie did not fly again.","A dog appeared. I can help! I will give you a big push! Oh no, thought Gerald.","Weeee! The dog pushed Piggie. She is flying? said Gerald.","The bird flew up and carried Piggie through the sky! I am flying! shouted Piggie!","I am flying! said Piggie. She IS flying! I cannot believe it! said Gerald.","Now YOU try Gerald! said Piggie. I... um... maybe tomorrow! said Gerald.","The End! Good friends cheer for each other. And sometimes pigs really do fly!"];
+function readPage(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(pageTexts[current]);u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')changePage(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')changePage(-1);});
+updateUI();
+</script>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Environment</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#1b5e20,#2e7d32,#388e3c);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.25);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .tabs{display:flex;gap:8px;padding:12px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:9px 20px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.12);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#1b5e20;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.3);}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+  .score-row{display:flex;gap:16px;color:white;font-size:1em;justify-content:center;}
+  .sc-box{background:rgba(255,255,255,0.2);border-radius:14px;padding:8px 20px;text-align:center;}
+  .sc-box .val{font-size:1.5em;font-weight:bold;display:block;}
+  .card{width:800px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.35);padding:24px 28px;}
+
+  /* TOPIC CARDS */
+  .topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin:12px 0;}
+  .topic-card{border-radius:18px;padding:18px;text-align:center;cursor:pointer;transition:all 0.2s;border:3px solid transparent;}
+  .topic-card:hover,.topic-card.sel{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+  .tc-icon{font-size:2.8em;margin-bottom:8px;}
+  .tc-name{font-size:1em;font-weight:bold;}
+
+  /* DETAIL BOX */
+  .env-detail{border-radius:20px;padding:20px;margin:12px 0;border-left:5px solid #4caf50;}
+  .ed-title{font-size:1.4em;font-weight:bold;margin-bottom:8px;}
+  .ed-desc{font-size:0.95em;color:#333;line-height:1.6;margin-bottom:12px;}
+  .fact-list{display:flex;flex-direction:column;gap:8px;}
+  .fact-item{background:rgba(255,255,255,0.7);border-radius:12px;padding:10px 14px;font-size:0.9em;color:#333;display:flex;gap:10px;align-items:flex-start;}
+  .fact-icon{font-size:1.4em;flex-shrink:0;}
+
+  /* 3Rs GAME */
+  .bin-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px 0;}
+  .bin{border-radius:16px;padding:14px 10px;text-align:center;cursor:default;min-height:120px;border:3px dashed #ccc;transition:all 0.2s;}
+  .bin.highlight{border-color:#4caf50;background:rgba(76,175,80,0.1);}
+  .bin-icon{font-size:2.5em;margin-bottom:6px;}
+  .bin-name{font-size:0.95em;font-weight:bold;}
+  .bin-items{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:8px;}
+  .bin-item{font-size:1.4em;}
+  .item-pool{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:12px;background:#f5f5f5;border-radius:14px;margin-bottom:12px;min-height:60px;}
+  .sort-item{font-size:1.8em;cursor:pointer;padding:8px;border-radius:10px;border:2px solid #ccc;background:white;transition:all 0.2s;}
+  .sort-item:hover{border-color:#4caf50;background:#e8f5e9;transform:scale(1.1);}
+  .sort-item.selected{border-color:#f57f17;background:#fff3e0;}
+
+  /* PLEDGE */
+  .pledge-list{display:flex;flex-direction:column;gap:10px;margin:14px 0;}
+  .pledge-item{display:flex;gap:12px;align-items:center;padding:12px 16px;border-radius:14px;cursor:pointer;transition:all 0.2s;border:2px solid transparent;}
+  .pledge-item:hover{transform:translateX(6px);}
+  .pledge-item.ticked{border-color:#4caf50;}
+  .pledge-cb{width:28px;height:28px;border-radius:8px;border:3px solid #4caf50;display:flex;align-items:center;justify-content:center;font-size:1.1em;flex-shrink:0;transition:all 0.2s;}
+  .pledge-cb.ticked{background:#4caf50;}
+  .pledge-text{font-size:0.95em;color:#333;flex:1;}
+
+  /* QUIZ */
+  .q-emoji{font-size:3.5em;text-align:center;margin:10px 0;}
+  .q-text{font-size:1.2em;font-weight:bold;color:#333;text-align:center;margin-bottom:14px;}
+  .q-opts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .q-opt{padding:12px 22px;border-radius:50px;border:2px solid #c8e6c9;background:white;font-family:inherit;font-size:1.05em;cursor:pointer;color:#333;transition:all 0.2s;}
+  .q-opt:hover{border-color:#388e3c;background:#e8f5e9;}
+  .q-opt.correct{border-color:#4caf50;background:#c8f7c5;}
+  .q-opt.wrong{border-color:#e53935;background:#ffcdd2;}
+  .feedback{font-size:1.2em;font-weight:bold;text-align:center;min-height:36px;margin-top:10px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  .action-btn{border:none;border-radius:50px;padding:11px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🌍 My Environment</span>
+  <span style="color:white;font-size:0.9em">EVS</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="setMode('learn',this)">🌿 Our Environment</button>
+  <button class="tab" onclick="setMode('sort',this)">♻️ 3Rs Sort</button>
+  <button class="tab" onclick="setMode('pledge',this)">🌱 My Pledge</button>
+  <button class="tab" onclick="setMode('quiz',this)">🧩 Quiz</button>
+</div>
+<div class="main">
+  <div class="score-row" id="scoreRow" style="display:none">
+    <div class="sc-box"><span class="val" id="sRight">0</span>✅</div>
+    <div class="sc-box"><span class="val" id="sWrong">0</span>❌</div>
+    <div class="sc-box"><span class="val" id="sStreak">0</span>🔥</div>
+  </div>
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+const topics = [
+  {icon:'🌍', name:'Our Planet Earth', color:'#1565c0', bg:'#e3f2fd',
+   desc:'Earth is our home! It has land, water, air and is full of amazing living things. We must take care of it.',
+   facts:[
+     {i:'🌊', t:'71% of Earth is covered by water — that\'s more water than land!'},
+     {i:'🌿', t:'There are over 3 trillion trees on Earth — that\'s 3,000,000,000,000!'},
+     {i:'🌡️', t:'Earth is the ONLY known planet with life on it.'},
+     {i:'🌈', t:'The atmosphere protects us from the sun and makes our air breathable.'},
+   ]},
+  {icon:'💧', name:'Water', color:'#0277bd', bg:'#e1f5fe',
+   desc:'Water is precious! We need it to drink, cook, grow food and stay clean. All living things need water to survive.',
+   facts:[
+     {i:'💧', t:'Only 3% of Earth\'s water is fresh water that we can drink!'},
+     {i:'🚰', t:'Turning off the tap while brushing teeth saves 6 litres of water a minute!'},
+     {i:'🌧️', t:'Rainwater is collected and cleaned before it comes out of our taps.'},
+     {i:'🐟', t:'Animals and plants in rivers and lakes need clean water to survive.'},
+   ]},
+  {icon:'🌳', name:'Forests & Trees', color:'#2e7d32', bg:'#e8f5e9',
+   desc:'Trees are the lungs of our planet! They produce the oxygen we breathe, provide homes for animals, and cool our Earth.',
+   facts:[
+     {i:'🌬️', t:'A single large tree produces enough oxygen for 2 people for a whole year!'},
+     {i:'🐦', t:'Forests are home to 80% of all land animals and plants.'},
+     {i:'🌡️', t:'Trees help cool cities by providing shade and releasing water vapour.'},
+     {i:'🪵', t:'Deforestation — cutting too many trees — harms our planet. We must plant more!'},
+   ]},
+  {icon:'🌡️', name:'Climate & Weather', color:'#e65100', bg:'#fff3e0',
+   desc:'Our climate is changing because of pollution. This causes more floods, droughts and extreme weather. We can help stop it!',
+   facts:[
+     {i:'🔥', t:'The Earth is getting warmer because of greenhouse gases like CO₂.'},
+     {i:'🚗', t:'Cars, factories and burning fuel release CO₂ into the air.'},
+     {i:'☀️', t:'Using solar and wind energy instead of coal helps our planet!'},
+     {i:'🌱', t:'Planting trees and recycling helps reduce climate change.'},
+   ]},
+  {icon:'🗑️', name:'Pollution', color:'#c62828', bg:'#ffebee',
+   desc:'Pollution is when harmful things get into our air, water or land. We must reduce pollution to keep our planet healthy!',
+   facts:[
+     {i:'🏭', t:'Air pollution from factories and cars causes breathing problems and acid rain.'},
+     {i:'🐠', t:'Plastic in the ocean kills millions of sea animals every year.'},
+     {i:'🧪', t:'Chemical pollution from farms can get into rivers and harm wildlife.'},
+     {i:'🚲', t:'Walking or cycling instead of driving helps reduce air pollution!'},
+   ]},
+  {icon:'♻️', name:'Reduce, Reuse, Recycle', color:'#00695c', bg:'#e0f2f1',
+   desc:'The 3 Rs help us make less rubbish! REDUCE what we use, REUSE things again, RECYCLE materials into new products.',
+   facts:[
+     {i:'📦', t:'Recycling one glass bottle saves enough energy to power a TV for 20 minutes!'},
+     {i:'♻️', t:'Paper, plastic, glass and metal can all be recycled.'},
+     {i:'🛍️', t:'Using a reusable bag instead of plastic saves hundreds of bags a year!'},
+     {i:'🌿', t:'Food scraps can be composted to make great garden soil.'},
+   ]},
+];
+
+const sortItems = [
+  {emoji:'🍌', label:'Banana peel', bin:'compost'},
+  {emoji:'📰', label:'Newspaper', bin:'recycle'},
+  {emoji:'🧃', label:'Juice carton', bin:'recycle'},
+  {emoji:'💡', label:'Old light bulb', bin:'rubbish'},
+  {emoji:'🥫', label:'Tin can', bin:'recycle'},
+  {emoji:'🌿', label:'Grass clippings', bin:'compost'},
+  {emoji:'🧴', label:'Plastic bottle', bin:'recycle'},
+  {emoji:'🍕', label:'Pizza box (dirty)', bin:'rubbish'},
+  {emoji:'📦', label:'Cardboard box', bin:'recycle'},
+  {emoji:'🍎', label:'Apple core', bin:'compost'},
+  {emoji:'👕', label:'Old t-shirt', bin:'reuse'},
+  {emoji:'🧸', label:'Old toy', bin:'reuse'},
+];
+
+const pledges = [
+  {icon:'💧', text:'I will turn off the tap while brushing my teeth.'},
+  {icon:'💡', text:'I will switch off lights when I leave a room.'},
+  {icon:'♻️', text:'I will put rubbish in the right recycling bin.'},
+  {icon:'🌱', text:'I will help plant a tree or grow a plant.'},
+  {icon:'🚶', text:'I will walk or cycle instead of going by car when I can.'},
+  {icon:'🛍️', text:'I will use a reusable bag instead of plastic bags.'},
+  {icon:'🍱', text:'I will not waste food — I will eat what is on my plate!'},
+  {icon:'🐝', text:'I will help look after local wildlife and nature.'},
+  {icon:'🚿', text:'I will take shorter showers to save water.'},
+  {icon:'🗣️', text:'I will tell my friends and family how to care for our planet.'},
+];
+
+const quizQs = [
+  {q:'What percentage of Earth is covered by water?', opts:['30%','50%','71%','90%'], ans:'71%', emoji:'🌊'},
+  {q:'What do trees produce that we breathe?', opts:['Carbon dioxide','Oxygen','Nitrogen','Steam'], ans:'Oxygen', emoji:'🌳'},
+  {q:'What does RECYCLE mean?', opts:['Throw away','Use again','Turn into new products','Buy new things'], ans:'Turn into new products', emoji:'♻️'},
+  {q:'Which bin should you put a banana peel in?', opts:['Recycle','Rubbish','Compost','Reuse'], ans:'Compost', emoji:'🍌'},
+  {q:'What causes the Earth to get warmer?', opts:['Planting trees','Greenhouse gases','Rain','Wind'], ans:'Greenhouse gases', emoji:'🌡️'},
+  {q:'How can we help save water?', opts:['Leave tap running','Take longer showers','Turn off tap when brushing teeth','Use more plastic'], ans:'Turn off tap when brushing teeth', emoji:'💧'},
+  {q:'What happens when plastic ends up in the ocean?', opts:['It disappears','It feeds fish','It harms sea animals','It cleans water'], ans:'It harms sea animals', emoji:'🐠'},
+  {q:'What is the BEST way to travel to reduce pollution?', opts:['By plane','By car','By cycling or walking','By bus'], ans:'By cycling or walking', emoji:'🚲'},
+  {q:'What can you do with an old t-shirt instead of throwing it away?', opts:['Burn it','Recycle','Reuse or donate it','Leave it on the ground'], ans:'Reuse or donate it', emoji:'👕'},
+  {q:'Which of these helps fight climate change?', opts:['Burning coal','Cutting down forests','Using solar energy','Wasting water'], ans:'Using solar energy', emoji:'☀️'},
+];
+
+let mode = 'learn';
+let selTopic = 0;
+let sortedItems = {};
+let sortSelected = null;
+let tickedPledges = new Set();
+let qIdx = 0, qRight = 0, qWrong = 0, qStreak = 0, qAnswered = false;
+
+function setMode(m, tab) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('scoreRow').style.display = m === 'quiz' ? 'flex' : 'none';
+  render();
+}
+
+function render() {
+  if (mode === 'learn') renderLearn();
+  else if (mode === 'sort') renderSort();
+  else if (mode === 'pledge') renderPledge();
+  else renderQuiz();
+}
+
+function renderLearn() {
+  const t = topics[selTopic];
+  const grid = topics.map((tp, i) => `
+    <div class="topic-card ${i===selTopic?'sel':''}" style="background:${tp.bg};border-color:${i===selTopic?tp.color:'transparent'}" onclick="selTopic=${i};renderLearn()">
+      <div class="tc-icon">${tp.icon}</div>
+      <div class="tc-name" style="color:${tp.color}">${tp.name}</div>
+    </div>`).join('');
+
+  const facts = t.facts.map(f => `
+    <div class="fact-item">
+      <div class="fact-icon">${f.i}</div>
+      <div>${f.t}</div>
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#1b5e20;margin-bottom:12px">🌍 Our Environment</div>
+    <div class="topic-grid">${grid}</div>
+    <div class="env-detail" style="background:${t.bg};border-left-color:${t.color}">
+      <div class="ed-title" style="color:${t.color}">${t.icon} ${t.name}</div>
+      <div class="ed-desc">${t.desc}</div>
+      <div class="fact-list">${facts}</div>
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:${t.color}" onclick="speak('${t.name}. ${t.desc}')">🔊 Read</button>
+      <button class="action-btn" style="background:#607D8B" onclick="selTopic=(selTopic+1)%${topics.length};renderLearn()">Next ▶</button>
+    </div>
+  `;
+}
+
+function renderSort() {
+  const bins = [
+    {id:'recycle', name:'Recycle ♻️', icon:'♻️', color:'#1565c0', bg:'#e3f2fd'},
+    {id:'compost', name:'Compost 🌿', icon:'🌿', color:'#2e7d32', bg:'#e8f5e9'},
+    {id:'reuse',   name:'Reuse 👕', icon:'🔁', color:'#e65100', bg:'#fff3e0'},
+    {id:'rubbish', name:'Rubbish 🗑️', icon:'🗑️', color:'#607d8b', bg:'#f5f5f5'},
+  ];
+
+  const unsorted = sortItems.filter((_,i) => sortedItems[i] === undefined);
+  const poolHTML = unsorted.length
+    ? unsorted.map((item,_) => {
+        const oi = sortItems.indexOf(item);
+        return `<div class="sort-item ${sortSelected===oi?'selected':''}" onclick="selectSortItem(${oi})" title="${item.label}">${item.emoji}</div>`;
+      }).join('')
+    : '<span style="color:#aaa">All sorted! 🎉</span>';
+
+  const binsHTML = bins.map(b => {
+    const placed = sortItems.filter((_,i) => sortedItems[i] === b.id);
+    return `<div class="bin" style="background:${b.bg};border-color:${b.color}">
+      <div class="bin-icon">${b.icon}</div>
+      <div class="bin-name" style="color:${b.color}">${b.name}</div>
+      <div class="bin-items">${placed.map(p=>`<span class="bin-item" title="${p.label}">${p.emoji}</span>`).join('')}</div>
+      ${sortSelected!==null?`<div style="margin-top:8px"><button style="padding:6px 14px;border-radius:20px;border:2px solid ${b.color};background:white;color:${b.color};font-family:inherit;font-size:0.85em;cursor:pointer;font-weight:bold" onclick="dropInBin('${b.id}')">Put here!</button></div>`:''}
+    </div>`;
+  }).join('');
+
+  const allDone = Object.keys(sortedItems).length === sortItems.length;
+  const correctCount = Object.entries(sortedItems).filter(([i,b])=>sortItems[i].bin===b).length;
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#1b5e20;margin-bottom:6px">♻️ Sort the Rubbish into the Right Bin!</div>
+    <div style="font-size:0.9em;color:#888;text-align:center;margin-bottom:12px">Tap an item, then tap the correct bin button!</div>
+    <div style="font-size:0.9em;font-weight:bold;color:#555;margin-bottom:6px">📦 Items to sort — tap one:</div>
+    <div class="item-pool">${poolHTML}</div>
+    <div class="bin-row">${binsHTML}</div>
+    <div class="feedback" id="feedback"></div>
+    ${allDone?`<div style="font-size:1.2em;font-weight:bold;color:#2e7d32;text-align:center;margin-top:10px">🎉 All sorted! ${correctCount}/${sortItems.length} correct!</div>`:''}
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="sortedItems={};sortSelected=null;renderSort()">🔄 Reset</button>
+    </div>
+  `;
+}
+
+function selectSortItem(idx) {
+  sortSelected = (sortSelected === idx) ? null : idx;
+  renderSort();
+}
+
+function dropInBin(binId) {
+  if (sortSelected === null) return;
+  const item = sortItems[sortSelected];
+  const fb = document.getElementById('feedback');
+  if (item.bin === binId) {
+    sortedItems[sortSelected] = binId;
+    qRight++; qStreak++;
+    speak('Correct! Well sorted!');
+    if (fb) { fb.textContent = '✅ Correct! ' + item.label + ' goes in ' + binId + '!'; fb.style.color = '#2e7d32'; }
+  } else {
+    qWrong++; qStreak = 0;
+    speak('Oops! Try a different bin.');
+    if (fb) { fb.textContent = '❌ Oops! Try a different bin for ' + item.label; fb.style.color = '#c62828'; }
+  }
+  sortSelected = null;
+  document.getElementById('sRight') && (document.getElementById('sRight').textContent = qRight);
+  document.getElementById('sWrong') && (document.getElementById('sWrong').textContent = qWrong);
+  document.getElementById('sStreak') && (document.getElementById('sStreak').textContent = qStreak);
+  setTimeout(() => renderSort(), 800);
+}
+
+function renderPledge() {
+  const pledgeHTML = pledges.map((p, i) => `
+    <div class="pledge-item ${tickedPledges.has(i)?'ticked':''}" style="background:${tickedPledges.has(i)?'#e8f5e9':'#f9f9f9'}" onclick="togglePledge(${i})">
+      <div class="pledge-cb ${tickedPledges.has(i)?'ticked':''}">${tickedPledges.has(i)?'✅':''}</div>
+      <div style="font-size:1.5em">${p.icon}</div>
+      <div class="pledge-text">${p.text}</div>
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#1b5e20;margin-bottom:6px;text-align:center">🌱 My Planet Pledge</div>
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-bottom:14px">Tick the promises you will make to help our planet! 🌍</div>
+    <div class="pledge-list">${pledgeHTML}</div>
+    ${tickedPledges.size>0?`
+    <div style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:16px;padding:14px;margin-top:12px;text-align:center">
+      <div style="font-size:1.8em">🌟</div>
+      <div style="font-size:1.1em;font-weight:bold;color:#1b5e20">You made ${tickedPledges.size} pledge${tickedPledges.size>1?'s':''}!</div>
+      <div style="font-size:0.9em;color:#333;margin-top:4px">Every small action helps our planet. You are an Earth Hero! 🦸</div>
+    </div>`:''}
+    <div class="btn-row">
+      <button class="action-btn" style="background:#2e7d32" onclick="speak('I promise to help protect our planet Earth!')">🔊 Read My Pledge</button>
+    </div>
+  `;
+}
+
+function togglePledge(i) {
+  if (tickedPledges.has(i)) tickedPledges.delete(i);
+  else { tickedPledges.add(i); speak(pledges[i].text); }
+  renderPledge();
+}
+
+function renderQuiz() {
+  if (qIdx >= quizQs.length) qIdx = 0;
+  const q = quizQs[qIdx]; qAnswered = false;
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-bottom:6px">Question ${qIdx+1} of ${quizQs.length}</div>
+    <div class="q-emoji">${q.emoji}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="q-opts" id="opts">
+      ${q.opts.map(o=>`<button class="q-opt" onclick="checkQ(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}')">  ${o}</button>`).join('')}
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="qIdx=0;renderQuiz()">🔄 Restart</button>
+    </div>
+  `;
+}
+
+function checkQ(btn, val, ans) {
+  if (qAnswered) return; qAnswered = true;
+  document.querySelectorAll('#opts .q-opt').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('feedback');
+  if (val===ans) {
+    btn.classList.add('correct'); qRight++; qStreak++;
+    fb.textContent='✅ Brilliant! '+ans+' is right! 🌟'; fb.style.color='#2e7d32';
+    speak('Brilliant! Correct!');
+    setTimeout(()=>{qIdx++;renderQuiz();},1800);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('#opts .q-opt').forEach(b=>{if(b.textContent.trim()===ans)b.classList.add('correct');});
+    qWrong++; qStreak=0;
+    fb.textContent='❌ The answer is: '+ans; fb.style.color='#c62828';
+    setTimeout(()=>{qIdx++;renderQuiz();},2200);
+  }
+  document.getElementById('sRight').textContent=qRight;
+  document.getElementById('sWrong').textContent=qWrong;
+  document.getElementById('sStreak').textContent=qStreak;
+}
+
+function speak(text) {
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=0.85;u.pitch=1.1;
+  window.speechSynthesis.speak(u);
+}
+
+render();
+</script>
+</body>
+</html>

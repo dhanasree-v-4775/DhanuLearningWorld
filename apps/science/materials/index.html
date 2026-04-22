@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Everyday Materials</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#263238,#37474f,#455a64);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.3);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .tabs{display:flex;gap:8px;padding:12px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:9px 20px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.12);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#263238;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.3);}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+  .score-row{display:flex;gap:16px;color:white;font-size:1em;justify-content:center;}
+  .sc-box{background:rgba(255,255,255,0.2);border-radius:14px;padding:8px 20px;text-align:center;}
+  .sc-box .val{font-size:1.5em;font-weight:bold;display:block;}
+  .card{width:780px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.4);padding:24px 28px;}
+
+  /* MATERIAL BROWSER */
+  .mat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin:10px 0;}
+  .mat-card{border-radius:16px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;border:2px solid transparent;}
+  .mat-card:hover,.mat-card.sel{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,0.15);}
+  .mat-icon{font-size:2.2em;margin-bottom:6px;}
+  .mat-name{font-size:0.95em;font-weight:bold;}
+
+  /* DETAIL */
+  .mat-detail{border-radius:20px;padding:20px;margin:12px 0;}
+  .md-top{display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;}
+  .md-icon{font-size:3.5em;}
+  .md-info .md-name{font-size:1.6em;font-weight:bold;}
+  .md-props{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;}
+  .prop-chip{padding:4px 12px;border-radius:20px;font-size:0.82em;font-weight:bold;color:white;}
+  .md-desc{font-size:0.95em;color:#333;line-height:1.6;margin-top:8px;}
+  .md-objects{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .md-obj{background:rgba(255,255,255,0.7);border-radius:10px;padding:6px 12px;font-size:1.3em;text-align:center;}
+
+  /* PROPERTIES MODE */
+  .prop-filter{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px;}
+  .pf-btn{padding:7px 16px;border-radius:50px;border:2px solid #ccc;background:white;font-family:inherit;font-size:0.9em;cursor:pointer;color:#333;transition:all 0.2s;}
+  .pf-btn.active{color:white;font-weight:bold;}
+  .pf-btn:hover{background:#f5f5f5;}
+  .prop-explain{background:#f5f5f5;border-radius:14px;padding:14px;margin-bottom:14px;font-size:0.95em;color:#333;}
+
+  /* SORT ACTIVITY */
+  .sort-object{display:inline-flex;flex-direction:column;align-items:center;gap:4px;padding:10px 14px;border-radius:14px;background:#e8eaf6;border:2px solid #9fa8da;cursor:grab;margin:6px;font-size:0.9em;transition:all 0.2s;}
+  .sort-object:hover{background:#c5cae9;transform:scale(1.05);}
+  .sort-zone{min-height:90px;border-radius:14px;border:3px dashed #bbb;padding:10px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;transition:all 0.2s;margin-top:8px;}
+  .sort-zone.drag-over{border-color:#4caf50;background:#e8f5e9;}
+  .sort-zone .sort-object{background:white;border-color:#4caf50;}
+
+  /* QUIZ */
+  .q-emoji{font-size:3.5em;text-align:center;margin:10px 0;}
+  .q-text{font-size:1.2em;font-weight:bold;color:#333;text-align:center;margin-bottom:14px;}
+  .q-opts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .q-opt{padding:12px 22px;border-radius:50px;border:2px solid #b0bec5;background:white;font-family:inherit;font-size:1.05em;cursor:pointer;color:#333;transition:all 0.2s;}
+  .q-opt:hover{border-color:#455a64;background:#eceff1;}
+  .q-opt.correct{border-color:#4caf50;background:#c8f7c5;}
+  .q-opt.wrong{border-color:#e53935;background:#ffcdd2;}
+  .feedback{font-size:1.2em;font-weight:bold;text-align:center;min-height:36px;margin-top:10px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  .action-btn{border:none;border-radius:50px;padding:11px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+  @keyframes popIn{0%{transform:scale(0);}100%{transform:scale(1);}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🧱 Everyday Materials</span>
+  <span style="color:white;font-size:0.9em">Science</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="setMode('learn',this)">🔍 Learn Materials</button>
+  <button class="tab" onclick="setMode('properties',this)">🏷️ Properties</button>
+  <button class="tab" onclick="setMode('sort',this)">📦 Sort Objects</button>
+  <button class="tab" onclick="setMode('quiz',this)">🧩 Quiz</button>
+</div>
+<div class="main">
+  <div class="score-row" id="scoreRow" style="display:none">
+    <div class="sc-box"><span class="val" id="sRight">0</span>✅</div>
+    <div class="sc-box"><span class="val" id="sWrong">0</span>❌</div>
+    <div class="sc-box"><span class="val" id="sStreak">0</span>🔥</div>
+  </div>
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+const materials = [
+  {icon:'🪵', name:'Wood', color:'#795548', bg:'#efebe9',
+   props:['Hard','Strong','Natural','Can be cut','Waterproof when treated'],
+   propColors:['#e65100','#1565c0','#2e7d32','#6a1b9a','#00838f'],
+   desc:'Wood comes from trees! It is strong, can be carved into shapes, and is used to make many things.',
+   objects:['🪑','🛏️','📚','🖊️','🎻','🏚️','🥄','⚽(bat)'],
+   fun:'The oldest living tree in the world is over 5,000 years old!'},
+  {icon:'🪨', name:'Rock/Stone', color:'#546e7a', bg:'#eceff1',
+   props:['Very hard','Heavy','Natural','Cannot be bent','Strong'],
+   propColors:['#e65100','#1565c0','#2e7d32','#6a1b9a','#c62828'],
+   desc:'Rocks and stones are found in the earth. They are very hard and strong and last a very long time.',
+   objects:['🏛️','🪨','🏔️','🗿','🧱','💎','⚰️(tomb)'],
+   fun:'Diamonds are the hardest rock — even harder than steel!'},
+  {icon:'🔩', name:'Metal', color:'#607d8b', bg:'#eceff1',
+   props:['Hard','Shiny','Conducts heat','Strong','Can be melted'],
+   propColors:['#e65100','#f57f17','#1565c0','#2e7d32','#6a1b9a'],
+   desc:'Metals are shiny materials that come from the ground. They can be shaped when heated and are very strong.',
+   objects:['🍴','🔑','🚗','✈️','🔧','⛓️','🛡️','🔔'],
+   fun:'Metal can conduct electricity — that\'s why wires are made of metal!'},
+  {icon:'🧴', name:'Plastic', color:'#1565c0', bg:'#e3f2fd',
+   props:['Lightweight','Waterproof','Flexible','Man-made','Can be moulded'],
+   propColors:['#e65100','#1565c0','#2e7d32','#6a1b9a','#00838f'],
+   desc:'Plastic is a man-made material that can be shaped into almost anything! It is light and waterproof.',
+   objects:['🪣','🧃','🎮','💻','🧸','🪥','🛍️','🍶'],
+   fun:'Plastic can take 400 years to break down — we should recycle it!'},
+  {icon:'🧊', name:'Glass', color:'#0277bd', bg:'#e1f5fe',
+   props:['Transparent','Fragile','Hard','Smooth','Made from sand'],
+   propColors:['#1565c0','#c62828','#e65100','#2e7d32','#f57f17'],
+   desc:'Glass is made by heating sand to very high temperatures! It is see-through but can break easily.',
+   objects:['🪟','🍷','👓','🔬','🏮','🧪','🖼️','⌚'],
+   fun:'Glass can be melted and made into new glass — it can be recycled forever!'},
+  {icon:'🧶', name:'Fabric', color:'#e91e63', bg:'#fce4ec',
+   props:['Soft','Flexible','Lightweight','Can absorb water','Warm'],
+   propColors:['#e91e63','#9c27b0','#2e7d32','#1565c0','#e65100'],
+   desc:'Fabric is made from fibres — either from plants like cotton, animals like wool, or man-made materials.',
+   objects:['👕','🧣','🛏️','🎒','⛵(sail)','🧸','🎪(tent)'],
+   fun:'A silkworm makes enough silk to wrap around a football field — in one cocoon!'},
+  {icon:'🪄', name:'Rubber', color:'#2e7d32', bg:'#e8f5e9',
+   props:['Stretchy','Waterproof','Bouncy','Flexible','Can be natural or man-made'],
+   propColors:['#e65100','#1565c0','#c62828','#9c27b0','#2e7d32'],
+   desc:'Rubber is stretchy and bouncy! Natural rubber comes from rubber trees. It is waterproof.',
+   objects:['⚽','🎈','🩴','🧤','⛸️(tyres)','🪢','✏️(eraser)'],
+   fun:'A rubber tree is cut to collect its milky sap — this is called latex!'},
+  {icon:'🏺', name:'Clay/Pottery', color:'#bf360c', bg:'#fbe9e7',
+   props:['Soft when wet','Hard when fired','Natural','Can be shaped','Waterproof when glazed'],
+   propColors:['#2e7d32','#e65100','#2e7d32','#6a1b9a','#1565c0'],
+   desc:'Clay comes from the earth and can be shaped when wet. When fired in a kiln, it becomes hard pottery!',
+   objects:['🏺','🪴','🍵','🏔️(bricks)','🎎','🧱','🍶'],
+   fun:'Some pottery found by archaeologists is over 20,000 years old!'},
+];
+
+const properties = [
+  {name:'Hard', icon:'🪨', color:'#e65100', opposite:'Soft', oIcon:'🧶',
+   examples:[{m:'Rock',e:'🪨'},{m:'Metal',e:'🔩'},{m:'Glass',e:'🧊'},{m:'Wood',e:'🪵'}],
+   desc:'Hard materials keep their shape and cannot be easily scratched or dented. They are good for building things.'},
+  {name:'Soft', icon:'🧶', color:'#e91e63', opposite:'Hard', oIcon:'🪨',
+   examples:[{m:'Fabric',e:'🧶'},{m:'Rubber',e:'🪄'},{m:'Foam',e:'🧸'},{m:'Clay (wet)',e:'🏺'}],
+   desc:'Soft materials can be squashed or stretched easily. They are good for cushions, clothes and toys.'},
+  {name:'Shiny', icon:'✨', color:'#f57f17', opposite:'Dull', oIcon:'🪵',
+   examples:[{m:'Metal',e:'🔩'},{m:'Glass',e:'🧊'},{m:'Mirror',e:'🪞'},{m:'Gold',e:'🌟'}],
+   desc:'Shiny materials reflect light and look bright and sparkly! Metals and mirrors are very shiny.'},
+  {name:'Waterproof', icon:'💧', color:'#1565c0', opposite:'Absorbent', oIcon:'🧻',
+   examples:[{m:'Plastic',e:'🧴'},{m:'Glass',e:'🧊'},{m:'Rubber',e:'🪄'},{m:'Metal',e:'🔩'}],
+   desc:'Waterproof materials do not let water pass through them. They are great for making raincoats and bottles!'},
+  {name:'Transparent', icon:'👁️', color:'#00838f', opposite:'Opaque', oIcon:'🪵',
+   examples:[{m:'Glass',e:'🧊'},{m:'Clear plastic',e:'🧴'},{m:'Water',e:'💧'},{m:'Air',e:'💨'}],
+   desc:'Transparent materials let light pass through so you can see through them! Windows are transparent.'},
+  {name:'Flexible', icon:'🪄', color:'#2e7d32', opposite:'Rigid', oIcon:'🪨',
+   examples:[{m:'Rubber',e:'🪄'},{m:'Fabric',e:'🧶'},{m:'Plastic (thin)',e:'🧴'},{m:'Cardboard',e:'📦'}],
+   desc:'Flexible materials can be bent and twisted without breaking. They spring back into shape when you let go.'},
+];
+
+const sortSets = [
+  {
+    title: 'Sort by: Natural or Man-made?',
+    groups: ['🌿 Natural', '🏭 Man-made'],
+    objects: [
+      {icon:'🪵',label:'Wood',correct:0},{icon:'🔩',label:'Metal',correct:0},{icon:'🧴',label:'Plastic',correct:1},
+      {icon:'🪨',label:'Rock',correct:0},{icon:'🧊',label:'Glass',correct:1},{icon:'🧶',label:'Wool',correct:0},
+      {icon:'💎',label:'Diamond',correct:0},{icon:'🪄',label:'Rubber',correct:1},
+    ]
+  },
+  {
+    title: 'Sort by: Waterproof or Absorbent?',
+    groups: ['💧 Waterproof', '🧻 Absorbent'],
+    objects: [
+      {icon:'🧴',label:'Plastic',correct:0},{icon:'🧻',label:'Paper',correct:1},{icon:'🧊',label:'Glass',correct:0},
+      {icon:'🧶',label:'Fabric',correct:1},{icon:'🔩',label:'Metal',correct:0},{icon:'🪵',label:'Wood (dry)',correct:0},
+      {icon:'🪄',label:'Rubber',correct:0},{icon:'🎀',label:'Cotton',correct:1},
+    ]
+  }
+];
+
+const quizQs = [
+  {q:'What material is a window made from?', opts:['Wood','Plastic','Glass','Metal'], ans:'Glass', emoji:'🪟'},
+  {q:'Which material comes from trees?', opts:['Glass','Metal','Plastic','Wood'], ans:'Wood', emoji:'🌳'},
+  {q:'Which material is waterproof?', opts:['Paper','Fabric','Plastic','Cardboard'], ans:'Plastic', emoji:'🧴'},
+  {q:'What is a rubber balloon made from?', opts:['Plastic','Rubber','Glass','Metal'], ans:'Rubber', emoji:'🎈'},
+  {q:'Which material is transparent (see-through)?', opts:['Wood','Metal','Rubber','Glass'], ans:'Glass', emoji:'👁️'},
+  {q:'What material are coins made from?', opts:['Wood','Glass','Metal','Rubber'], ans:'Metal', emoji:'🪙'},
+  {q:'Which material is soft and stretchy?', opts:['Rock','Metal','Glass','Rubber'], ans:'Rubber', emoji:'🪄'},
+  {q:'A clay pot is made harder by...?', opts:['Freezing it','Firing in a kiln','Soaking in water','Painting it'], ans:'Firing in a kiln', emoji:'🏺'},
+  {q:'Which material is NOT waterproof?', opts:['Glass','Plastic','Fabric','Rubber'], ans:'Fabric', emoji:'🧶'},
+  {q:'What is glass made from?', opts:['Metal ore','Sand','Plastic beads','Clay'], ans:'Sand', emoji:'🏖️'},
+];
+
+let mode = 'learn';
+let activeMat = 0;
+let activeProp = 0;
+let activeSortSet = 0;
+let sortedItems = {};
+let qIdx = 0, qRight = 0, qWrong = 0, qStreak = 0, qAnswered = false;
+
+function setMode(m, tab) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('scoreRow').style.display = m === 'quiz' ? 'flex' : 'none';
+  render();
+}
+
+function render() {
+  if (mode === 'learn') renderLearn();
+  else if (mode === 'properties') renderProperties();
+  else if (mode === 'sort') renderSort();
+  else renderQuiz();
+}
+
+function renderLearn() {
+  const m = materials[activeMat];
+  const matGrid = materials.map((mat, i) => `
+    <div class="mat-card ${i===activeMat?'sel':''}" style="background:${mat.bg};border-color:${i===activeMat?mat.color:'transparent'}" onclick="activeMat=${i};renderLearn()">
+      <div class="mat-icon">${mat.icon}</div>
+      <div class="mat-name" style="color:${mat.color}">${mat.name}</div>
+    </div>`).join('');
+
+  const propsHTML = m.props.map((p, i) => `<span class="prop-chip" style="background:${m.propColors[i]}">${p}</span>`).join('');
+  const objsHTML = m.objects.map(o => `<div class="md-obj">${o}</div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div class="mat-grid">${matGrid}</div>
+    <div class="mat-detail" style="background:${m.bg};border-left:5px solid ${m.color}">
+      <div class="md-top">
+        <div class="md-icon">${m.icon}</div>
+        <div class="md-info">
+          <div class="md-name" style="color:${m.color}">${m.name}</div>
+          <div class="md-props">${propsHTML}</div>
+        </div>
+      </div>
+      <div class="md-desc">${m.desc}</div>
+      <div style="font-size:0.9em;font-weight:bold;color:#555;margin:10px 0 6px">Things made from ${m.name.toLowerCase()}:</div>
+      <div class="md-objects">${objsHTML}</div>
+      <div style="background:rgba(255,255,255,0.6);border-radius:10px;padding:8px 12px;font-size:0.9em;color:${m.color};margin-top:10px">💡 Fun Fact: ${m.fun}</div>
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:${m.color}" onclick="speak('${m.name}. ${m.desc}')">🔊 Read</button>
+      <button class="action-btn" style="background:#607D8B" onclick="activeMat=(activeMat+1)%${materials.length};renderLearn()">Next ▶</button>
+    </div>
+  `;
+}
+
+function renderProperties() {
+  const p = properties[activeProp];
+  const filterBtns = properties.map((pr, i) => `
+    <button class="pf-btn ${i===activeProp?'active':''}" style="${i===activeProp?'background:'+pr.color+';border-color:'+pr.color:''}" onclick="activeProp=${i};renderProperties()">${pr.icon} ${pr.name}</button>`).join('');
+
+  const examplesHTML = p.examples.map(e => `
+    <div style="background:white;border-radius:12px;padding:10px;text-align:center;min-width:80px;border:2px solid ${p.color}">
+      <div style="font-size:2em">${e.e}</div>
+      <div style="font-size:0.85em;color:#333;font-weight:bold">${e.m}</div>
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#263238;margin-bottom:12px;text-align:center">🏷️ Material Properties</div>
+    <div class="prop-filter">${filterBtns}</div>
+    <div class="prop-explain" style="border-left:4px solid ${p.color}">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">
+        <div style="font-size:2.5em">${p.icon}</div>
+        <div>
+          <div style="font-size:1.3em;font-weight:bold;color:${p.color}">${p.name}</div>
+          <div style="font-size:0.9em;color:#666">Opposite: ${p.oIcon} ${p.opposite}</div>
+        </div>
+      </div>
+      <div style="font-size:0.95em;color:#333;margin-bottom:12px">${p.desc}</div>
+      <div style="font-size:0.9em;font-weight:bold;color:#555;margin-bottom:8px">Examples of ${p.name.toLowerCase()} materials:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">${examplesHTML}</div>
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:${p.color}" onclick="speak('${p.name}. ${p.desc}')">🔊 Read</button>
+    </div>
+  `;
+}
+
+function renderSort() {
+  const ss = sortSets[activeSortSet];
+  const unsorted = ss.objects.filter((_, i) => sortedItems[i] === undefined);
+  const group0 = ss.objects.filter((_, i) => sortedItems[i] === 0);
+  const group1 = ss.objects.filter((_, i) => sortedItems[i] === 1);
+
+  const unsortedHTML = unsorted.map((obj, _) => {
+    const oi = ss.objects.indexOf(obj);
+    return `<div class="sort-object" draggable="true" id="sobj_${oi}" ondragstart="dragStart(event,${oi})" onclick="clickSort(${oi})">
+      <span style="font-size:1.8em">${obj.icon}</span>
+      <span>${obj.label}</span>
+    </div>`;
+  }).join('');
+
+  const makeZone = (gIdx) => {
+    const items = ss.objects.filter((_, i) => sortedItems[i] === gIdx);
+    return `<div class="sort-zone" ondragover="event.preventDefault()" ondrop="dropSort(event,${gIdx})" onclick="">
+      ${items.map(obj => `<div class="sort-object" style="cursor:default">
+        <span style="font-size:1.8em">${obj.icon}</span>
+        <span>${obj.label}</span>
+      </div>`).join('')}
+    </div>`;
+  };
+
+  const allSorted = Object.keys(sortedItems).length === ss.objects.length;
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px">
+      ${sortSets.map((s,i)=>`<button class="pf-btn ${i===activeSortSet?'active':''}" style="${i===activeSortSet?'background:#455a64;color:white;border-color:#455a64':''}" onclick="activeSortSet=${i};sortedItems={};renderSort()">${s.title.split(':')[1]?.trim()||'Set '+(i+1)}</button>`).join('')}
+    </div>
+    <div style="font-size:1.1em;font-weight:bold;color:#263238;text-align:center;margin-bottom:12px">${ss.title}</div>
+    <div style="font-size:0.9em;color:#888;text-align:center;margin-bottom:12px">Tap or drag each object to the correct group!</div>
+
+    <!-- Objects to sort -->
+    <div style="background:#f5f5f5;border-radius:14px;padding:12px;min-height:80px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:6px;align-items:center" id="unsortedZone">
+      ${unsortedHTML || '<span style="color:#aaa;font-size:1em">All sorted! 🎉</span>'}
+    </div>
+
+    <!-- Target groups -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <div style="font-size:1em;font-weight:bold;color:white;background:#2e7d32;border-radius:10px;padding:8px;text-align:center;margin-bottom:6px">${ss.groups[0]}</div>
+        ${makeZone(0)}
+      </div>
+      <div>
+        <div style="font-size:1em;font-weight:bold;color:white;background:#1565c0;border-radius:10px;padding:8px;text-align:center;margin-bottom:6px">${ss.groups[1]}</div>
+        ${makeZone(1)}
+      </div>
+    </div>
+
+    ${allSorted ? `<div style="font-size:1.2em;font-weight:bold;color:#2e7d32;text-align:center;margin-top:12px">🎉 All sorted! Well done!</div>` : ''}
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="sortedItems={};renderSort()">🔄 Reset</button>
+    </div>
+  `;
+}
+
+let dragObjIdx = null;
+function dragStart(e, idx) { dragObjIdx = idx; }
+function dropSort(e, gIdx) {
+  e.preventDefault();
+  if (dragObjIdx === null) return;
+  const obj = sortSets[activeSortSet].objects[dragObjIdx];
+  sortedItems[dragObjIdx] = gIdx;
+  renderSort();
+  if (gIdx === obj.correct) speak('Correct!');
+  else { speak('Oops! Try another one.'); delete sortedItems[dragObjIdx]; renderSort(); }
+  dragObjIdx = null;
+}
+
+let clickPendingSort = null;
+function clickSort(idx) {
+  if (clickPendingSort === null) {
+    clickPendingSort = idx;
+    document.getElementById('sobj_' + idx)?.classList.add('sel');
+    // show group prompt
+    const ss = sortSets[activeSortSet];
+    const msg = `Is "${ss.objects[idx].label}" ${ss.groups[0]} or ${ss.groups[1]}? Tap a group zone!`;
+    // just highlight; user clicks a group
+    renderSortWithPending(idx);
+    return;
+  }
+}
+
+function renderSortWithPending(pendingIdx) {
+  // re-render with 2 big tap buttons
+  const ss = sortSets[activeSortSet];
+  const obj = ss.objects[pendingIdx];
+  const unsorted = ss.objects.filter((_, i) => sortedItems[i] === undefined && i !== pendingIdx);
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.1em;font-weight:bold;color:#263238;text-align:center;margin-bottom:12px">${ss.title}</div>
+    <div style="text-align:center;font-size:1em;color:#666;margin-bottom:10px">Where does <b>${obj.label} ${obj.icon}</b> go?</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+      <button onclick="confirmSort(${pendingIdx},0)" style="padding:20px;border-radius:16px;border:3px solid #2e7d32;background:#e8f5e9;font-family:inherit;font-size:1.1em;font-weight:bold;color:#2e7d32;cursor:pointer">${ss.groups[0]}</button>
+      <button onclick="confirmSort(${pendingIdx},1)" style="padding:20px;border-radius:16px;border:3px solid #1565c0;background:#e3f2fd;font-family:inherit;font-size:1.1em;font-weight:bold;color:#1565c0;cursor:pointer">${ss.groups[1]}</button>
+    </div>
+    <div id="sortFb" style="font-size:1.1em;font-weight:bold;text-align:center;min-height:30px"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#607D8B" onclick="clickPendingSort=null;renderSort()">← Back</button>
+    </div>
+  `;
+}
+
+function confirmSort(objIdx, gIdx) {
+  const ss = sortSets[activeSortSet];
+  const obj = ss.objects[objIdx];
+  sortedItems[objIdx] = gIdx;
+  clickPendingSort = null;
+  if (gIdx === obj.correct) {
+    speak('Correct! Well done!');
+  } else {
+    speak('Oops! Try again.');
+    delete sortedItems[objIdx];
+  }
+  renderSort();
+}
+
+function renderQuiz() {
+  if (qIdx >= quizQs.length) qIdx = 0;
+  const q = quizQs[qIdx];
+  qAnswered = false;
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-bottom:6px">Question ${qIdx+1} of ${quizQs.length}</div>
+    <div class="q-emoji">${q.emoji}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="q-opts" id="opts">
+      ${q.opts.map(o=>`<button class="q-opt" onclick="checkQ(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}')">  ${o}</button>`).join('')}
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="qIdx=0;renderQuiz()">🔄 Restart</button>
+    </div>
+  `;
+}
+
+function checkQ(btn, val, ans) {
+  if (qAnswered) return;
+  qAnswered = true;
+  document.querySelectorAll('#opts .q-opt').forEach(b => b.disabled = true);
+  const fb = document.getElementById('feedback');
+  if (val === ans) {
+    btn.classList.add('correct'); qRight++; qStreak++;
+    fb.textContent = '✅ Brilliant! ' + ans + ' is right! 🌟';
+    fb.style.color = '#2e7d32';
+    speak('Brilliant! Correct!');
+    setTimeout(() => { qIdx++; renderQuiz(); }, 1800);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('#opts .q-opt').forEach(b => { if (b.textContent.trim() === ans) b.classList.add('correct'); });
+    qWrong++; qStreak = 0;
+    fb.textContent = '❌ The answer is: ' + ans;
+    fb.style.color = '#c62828';
+    setTimeout(() => { qIdx++; renderQuiz(); }, 2200);
+  }
+  document.getElementById('sRight').textContent = qRight;
+  document.getElementById('sWrong').textContent = qWrong;
+  document.getElementById('sStreak').textContent = qStreak;
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.85; u.pitch = 1.1;
+  window.speechSynthesis.speak(u);
+}
+
+render();
+</script>
+</body>
+</html>

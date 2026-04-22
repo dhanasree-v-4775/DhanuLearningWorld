@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Speaking & Listening</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#fc4a1a,#f7b733);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.25);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .topbar a:hover{background:rgba(255,255,255,0.35);}
+
+  .tabs{display:flex;gap:8px;padding:14px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:9px 20px;border-radius:50px;border:2px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.15);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#fc4a1a;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.3);}
+
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+
+  /* ── TONGUE TWISTERS ── */
+  .tt-card{width:700px;max-width:100%;background:white;border-radius:28px;box-shadow:0 16px 50px rgba(0,0,0,0.2);overflow:hidden;}
+  .tt-header{padding:20px 26px 14px;display:flex;align-items:center;gap:14px;border-bottom:2px dashed #ffe0b2;}
+  .tt-emoji{font-size:3.5em;}
+  .tt-meta{flex:1;}
+  .tt-label{font-size:0.8em;background:#fff3e0;color:#e65100;border-radius:20px;padding:3px 12px;display:inline-block;margin-bottom:4px;}
+  .tt-title{font-size:1.3em;font-weight:bold;color:#b71c1c;}
+  .tt-body{padding:22px 26px;}
+  .tt-text{font-size:1.5em;line-height:2;color:#333;text-align:center;font-weight:bold;letter-spacing:1px;}
+  .tt-text .hl{color:#e65100;}
+  .speed-row{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap;}
+  .speed-label{color:#888;font-size:0.9em;}
+  .speed-btn{border:none;border-radius:50px;padding:8px 18px;font-size:0.9em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .speed-btn:hover{transform:scale(1.05);}
+  .speed-btn.slow{background:#4CAF50;}
+  .speed-btn.normal{background:#FF7043;}
+  .speed-btn.fast{background:#E53935;}
+  .tt-tip{background:#fff8e1;border-radius:12px;padding:12px 18px;font-size:0.95em;color:#555;margin-top:14px;border-left:4px solid #ffc107;}
+  .tt-nav{display:flex;gap:10px;justify-content:center;align-items:center;padding:16px 26px;}
+  .tt-nav-btn{border:none;border-radius:50px;padding:10px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .tt-nav-btn:hover{transform:scale(1.05);}
+  .tt-nav-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+  .tt-nav-btn.prev{background:#607D8B;}
+  .tt-nav-btn.next{background:#fc4a1a;}
+
+  /* ── RHYMES ── */
+  .rhyme-card{width:700px;max-width:100%;background:white;border-radius:28px;box-shadow:0 16px 50px rgba(0,0,0,0.2);overflow:hidden;}
+  .rhyme-header{padding:18px 26px 12px;border-bottom:2px dashed #e8f5e9;display:flex;align-items:center;gap:14px;}
+  .rhyme-emoji{font-size:3.5em;}
+  .rhyme-title{font-size:1.3em;font-weight:bold;color:#2e7d32;}
+  .rhyme-body{padding:22px 26px;}
+  .rhyme-text{font-size:1.3em;line-height:2.3;color:#333;text-align:center;}
+  .rhyme-text .rw{color:#1565c0;font-weight:bold;}
+  .rhyme-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:0 26px 20px;}
+  .r-btn{border:none;border-radius:50px;padding:10px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .r-btn:hover{transform:scale(1.05);}
+  .rhyme-nav{display:flex;gap:10px;justify-content:center;align-items:center;padding:0 26px 16px;}
+  .rn-btn{border:none;border-radius:50px;padding:10px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .rn-btn:hover{transform:scale(1.05);}
+  .rn-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+  .rn-btn.prev{background:#607D8B;}
+  .rn-btn.next{background:#4CAF50;}
+
+  /* ── LISTENING ── */
+  .listen-card{width:700px;max-width:100%;background:white;border-radius:28px;box-shadow:0 16px 50px rgba(0,0,0,0.2);padding:26px;}
+  .listen-title{font-size:1.2em;font-weight:bold;color:#1565c0;margin-bottom:16px;border-bottom:2px solid #e3f2fd;padding-bottom:8px;}
+  .listen-emoji{font-size:4em;text-align:center;margin:12px 0;animation:pulse 2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+  .listen-prompt{font-size:1.1em;color:#555;text-align:center;margin-bottom:18px;}
+  .play-btn{display:block;margin:0 auto;background:linear-gradient(135deg,#fc4a1a,#f7b733);color:white;border:none;border-radius:50px;padding:16px 40px;font-size:1.3em;font-family:inherit;cursor:pointer;box-shadow:0 6px 20px rgba(252,74,26,0.4);transition:transform 0.15s;}
+  .play-btn:hover{transform:scale(1.05);}
+  .listen-q-section{margin-top:20px;padding-top:16px;border-top:2px dashed #e3f2fd;}
+  .listen-q{font-size:1.05em;font-weight:bold;color:#333;margin-bottom:10px;}
+  .listen-opts{display:flex;flex-direction:column;gap:8px;}
+  .listen-opt{background:#f5f5f5;border:2px solid #ddd;border-radius:12px;padding:10px 16px;font-size:1em;font-family:inherit;cursor:pointer;text-align:left;color:#333;transition:all 0.2s;}
+  .listen-opt:hover{border-color:#1565c0;background:#e3f2fd;}
+  .listen-opt.correct{background:#c8f7c5;border-color:#2e7d32;color:#1b5e20;}
+  .listen-opt.wrong{background:#ffcdd2;border-color:#c62828;color:#b71c1c;}
+  .listen-feedback{font-size:1.1em;font-weight:bold;text-align:center;min-height:32px;margin-top:10px;}
+  .listen-score{color:white;font-size:1.1em;text-align:right;width:700px;max-width:100%;}
+  .listen-nav{display:flex;gap:10px;justify-content:center;margin-top:16px;align-items:center;}
+  .ln-btn{border:none;border-radius:50px;padding:10px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .ln-btn:hover{transform:scale(1.05);}
+  .ln-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+  .ln-btn.prev{background:#607D8B;}
+  .ln-btn.next{background:#1565c0;}
+
+  /* ── SPEAKING PROMPTS ── */
+  .speak-card{width:700px;max-width:100%;background:white;border-radius:28px;box-shadow:0 16px 50px rgba(0,0,0,0.2);padding:28px;}
+  .speak-title{font-size:1.2em;font-weight:bold;color:#7b1fa2;margin-bottom:14px;border-bottom:2px solid #f3e5f5;padding-bottom:8px;}
+  .speak-emoji{font-size:5em;text-align:center;margin:12px 0;}
+  .speak-prompt-text{font-size:1.4em;color:#333;text-align:center;line-height:1.7;background:#f3e5f5;border-radius:16px;padding:18px;margin:12px 0;}
+  .speak-hint{font-size:1em;color:#888;text-align:center;font-style:italic;margin-bottom:14px;}
+  .speak-starter{background:#e8eaf6;border-radius:12px;padding:14px 18px;font-size:1.1em;color:#3949ab;margin:10px 0;font-weight:bold;text-align:center;}
+  .sp-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:10px;}
+  .sp-btn{border:none;border-radius:50px;padding:11px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .sp-btn:hover{transform:scale(1.05);}
+  .sp-nav{display:flex;gap:10px;justify-content:center;margin-top:14px;align-items:center;}
+  .spn-btn{border:none;border-radius:50px;padding:10px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .spn-btn:hover{transform:scale(1.05);}
+  .spn-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+  .spn-btn.prev{background:#607D8B;}
+  .spn-btn.next{background:#7b1fa2;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🎤 Speaking & Listening</span>
+  <span style="color:white;font-size:0.9em">English</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showMode('tongue',this)">👅 Tongue Twisters</button>
+  <button class="tab" onclick="showMode('rhyme',this)">🎵 Nursery Rhymes</button>
+  <button class="tab" onclick="showMode('listen',this)">👂 Listening</button>
+  <button class="tab" onclick="showMode('speak',this)">🎤 Speaking Prompts</button>
+</div>
+
+<div class="main" id="mainContent">
+
+  <!-- TONGUE TWISTERS -->
+  <div id="tongueMode">
+    <div class="tt-card">
+      <div class="tt-header">
+        <div class="tt-emoji" id="ttEmoji">🐚</div>
+        <div class="tt-meta">
+          <span class="tt-label">Tongue Twister</span>
+          <div class="tt-title" id="ttTitle">She sells seashells</div>
+        </div>
+      </div>
+      <div class="tt-body">
+        <div class="tt-text" id="ttText"></div>
+        <div class="speed-row">
+          <span class="speed-label">Try at different speeds:</span>
+          <button class="speed-btn slow" onclick="speakTT(0.5)">🐢 Slow</button>
+          <button class="speed-btn normal" onclick="speakTT(0.85)">🚶 Normal</button>
+          <button class="speed-btn fast" onclick="speakTT(1.3)">🐆 Fast</button>
+        </div>
+        <div class="tt-tip" id="ttTip"></div>
+      </div>
+      <div class="tt-nav">
+        <button class="tt-nav-btn prev" id="ttPrev" onclick="ttGo(-1)" disabled>◀ Prev</button>
+        <span style="color:#888;font-size:0.95em" id="ttCount">1 / 8</span>
+        <button class="tt-nav-btn next" id="ttNext" onclick="ttGo(1)">Next ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NURSERY RHYMES -->
+  <div id="rhymeMode" style="display:none">
+    <div class="rhyme-card">
+      <div class="rhyme-header">
+        <div class="rhyme-emoji" id="rEmoji">⭐</div>
+        <div>
+          <div class="rhyme-title" id="rTitle">Twinkle Twinkle</div>
+          <span style="font-size:0.8em;color:#888" id="rSubtitle">Classic Nursery Rhyme</span>
+        </div>
+      </div>
+      <div class="rhyme-body">
+        <div class="rhyme-text" id="rText"></div>
+      </div>
+      <div class="rhyme-actions">
+        <button class="r-btn" style="background:#2e7d32" onclick="speakRhyme()">🔊 Read the Rhyme</button>
+        <button class="r-btn" style="background:#1565c0" onclick="speakRhymeSlow()">🐢 Read Slowly</button>
+      </div>
+      <div class="rhyme-nav">
+        <button class="rn-btn prev" id="rPrev" onclick="rGo(-1)" disabled>◀ Prev</button>
+        <span style="color:#888;font-size:0.95em" id="rCount">1 / 6</span>
+        <button class="rn-btn next" id="rNext" onclick="rGo(1)">Next ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LISTENING -->
+  <div id="listenMode" style="display:none;flex-direction:column;align-items:center;gap:12px;width:100%;">
+    <div class="listen-score" id="lScore">Score: 0 / 0 ⭐</div>
+    <div class="listen-card">
+      <div class="listen-title">👂 Listen carefully, then answer!</div>
+      <div class="listen-emoji" id="lEmoji">🎧</div>
+      <div class="listen-prompt" id="lPrompt">Press Play to hear the sentence, then answer the question below.</div>
+      <button class="play-btn" id="playBtn" onclick="playListening()">▶ Play</button>
+      <div class="listen-q-section">
+        <div class="listen-q" id="lQuestion"></div>
+        <div class="listen-opts" id="lOpts"></div>
+        <div class="listen-feedback" id="lFeedback"></div>
+      </div>
+      <div class="listen-nav">
+        <button class="ln-btn prev" id="lPrev" onclick="lGo(-1)" disabled>◀ Prev</button>
+        <span style="color:#888;font-size:0.95em" id="lCount">1 / 8</span>
+        <button class="ln-btn next" id="lNext" onclick="lGo(1)">Next ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPEAKING PROMPTS -->
+  <div id="speakMode" style="display:none">
+    <div class="speak-card">
+      <div class="speak-title">🎤 Say It Out Loud!</div>
+      <div class="speak-emoji" id="spEmoji">🌞</div>
+      <div class="speak-prompt-text" id="spPrompt"></div>
+      <div class="speak-hint" id="spHint"></div>
+      <div class="speak-starter" id="spStarter"></div>
+      <div class="sp-actions">
+        <button class="sp-btn" style="background:#9C27B0" onclick="speakPromptAloud()">🔊 Hear the Question</button>
+        <button class="sp-btn" style="background:#FF7043" onclick="speakStarter()">💡 Hear Starter</button>
+      </div>
+      <div class="sp-nav">
+        <button class="spn-btn prev" id="spPrev" onclick="spGo(-1)" disabled>◀ Prev</button>
+        <span style="color:#888;font-size:0.95em" id="spCount">1 / 10</span>
+        <button class="spn-btn next" id="spNext" onclick="spGo(1)">Next ▶</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── TONGUE TWISTERS ──
+const twisters = [
+  {emoji:'🐚', title:'She Sells Seashells', text:'She sells seashells by the seashore.\nThe shells she sells are surely seashells.', tip:'Focus on the "sh" sound. Say it slow, then speed up!', key:'sh'},
+  {emoji:'🐝', title:'Betty Botter', text:'Betty Botter bought some butter.\nBut the butter Betty bought was bitter.\nSo Betty bought some better butter.', tip:'Focus on the "b" and "t" sounds!', key:'b'},
+  {emoji:'🦆', title:'How Much Wood', text:'How much wood would a woodchuck chuck\nif a woodchuck could chuck wood?', tip:'Focus on the "w" and "ch" sounds!', key:'w'},
+  {emoji:'🐱', title:'Fuzzy Wuzzy', text:'Fuzzy Wuzzy was a bear.\nFuzzy Wuzzy had no hair.\nFuzzy Wuzzy wasn\'t fuzzy, was he?', tip:'Focus on the "f" and "z" sounds!', key:'f'},
+  {emoji:'🥛', title:'Red Lorry', text:'Red lorry, yellow lorry.\nRed lorry, yellow lorry.\nRed lorry, yellow lorry!', tip:'Focus on the "r" and "l" sounds — tricky ones!', key:'r'},
+  {emoji:'🐦', title:'Peter Piper', text:'Peter Piper picked a peck of pickled peppers.\nA peck of pickled peppers Peter Piper picked.', tip:'Focus on the "p" sound — press your lips together!', key:'p'},
+  {emoji:'🦈', title:'Six Slippery', text:'Six slippery snails slid slowly seaward.', tip:'Focus on the "sl" and "s" sounds!', key:'s'},
+  {emoji:'🐸', title:'Frog Frolic', text:'Fresh French fried fish,\nFish fresh French fried,\nFried fish fresh French.', tip:'Focus on the "fr" blend sound!', key:'fr'},
+];
+let ttCur=0;
+function renderTT(){
+  const t=twisters[ttCur];
+  document.getElementById('ttEmoji').textContent=t.emoji;
+  document.getElementById('ttTitle').textContent=t.title;
+  document.getElementById('ttText').innerHTML=t.text.split('\n').map(line=>`<div>${line}</div>`).join('');
+  document.getElementById('ttTip').innerHTML=`💡 <strong>Tip:</strong> ${t.tip}`;
+  document.getElementById('ttPrev').disabled=ttCur===0;
+  document.getElementById('ttNext').disabled=ttCur===twisters.length-1;
+  document.getElementById('ttCount').textContent=`${ttCur+1} / ${twisters.length}`;
+}
+function speakTT(rate){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(twisters[ttCur].text);
+  u.rate=rate;u.pitch=1.1;
+  window.speechSynthesis.speak(u);
+}
+function ttGo(dir){ttCur=Math.max(0,Math.min(twisters.length-1,ttCur+dir));renderTT();}
+
+// ── NURSERY RHYMES ──
+const rhymes = [
+  {emoji:'⭐',title:'Twinkle Twinkle Little Star',subtitle:'Classic Nursery Rhyme',
+    text:'Twinkle, twinkle, little <span class="rw">star</span>,\nHow I wonder what you <span class="rw">are</span>!\nUp above the world so <span class="rw">high</span>,\nLike a diamond in the <span class="rw">sky</span>.\nTwinkle, twinkle, little <span class="rw">star</span>,\nHow I wonder what you <span class="rw">are</span>!'},
+  {emoji:'🐑',title:'Baa Baa Black Sheep',subtitle:'Classic Nursery Rhyme',
+    text:'Baa, baa, black <span class="rw">sheep</span>,\nHave you any <span class="rw">wool</span>?\nYes sir, yes sir,\nThree bags <span class="rw">full</span>!\nOne for the <span class="rw">master</span>,\nOne for the <span class="rw">dame</span>,\nAnd one for the little boy\nWho lives down the <span class="rw">lane</span>.'},
+  {emoji:'🐣',title:'Humpty Dumpty',subtitle:'Classic Nursery Rhyme',
+    text:'Humpty Dumpty sat on a <span class="rw">wall</span>,\nHumpty Dumpty had a great <span class="rw">fall</span>.\nAll the king\'s horses\nAnd all the king\'s <span class="rw">men</span>,\nCouldn\'t put Humpty\nTogether <span class="rw">again</span>.'},
+  {emoji:'🕸️',title:'Incy Wincy Spider',subtitle:'Action Rhyme',
+    text:'Incy Wincy spider\nClimbed up the water <span class="rw">spout</span>.\nDown came the rain\nAnd washed the spider <span class="rw">out</span>.\nOut came the sunshine\nAnd dried up all the <span class="rw">rain</span>,\nIncy Wincy spider\nClimbed up the spout <span class="rw">again</span>!'},
+  {emoji:'🌟',title:'Star Light Star Bright',subtitle:'Wishing Rhyme',
+    text:'Star light, star <span class="rw">bright</span>,\nFirst star I see <span class="rw">tonight</span>,\nWish I may, wish I <span class="rw">might</span>,\nHave the wish I wish <span class="rw">tonight</span>!'},
+  {emoji:'🐠',title:'One Two Three Four Five',subtitle:'Counting Rhyme',
+    text:'One, two, three, four, <span class="rw">five</span>,\nOnce I caught a fish <span class="rw">alive</span>.\nSix, seven, eight, nine, <span class="rw">ten</span>,\nThen I let it go <span class="rw">again</span>.\nWhy did you let it <span class="rw">go</span>?\nBecause it bit my finger <span class="rw">so</span>.\nWhich finger did it <span class="rw">bite</span>?\nThis little finger on the <span class="rw">right</span>!'},
+];
+let rCur=0;
+function renderRhyme(){
+  const r=rhymes[rCur];
+  document.getElementById('rEmoji').textContent=r.emoji;
+  document.getElementById('rTitle').textContent=r.title;
+  document.getElementById('rSubtitle').textContent=r.subtitle;
+  document.getElementById('rText').innerHTML=r.text.split('\n').map(l=>`<div>${l}</div>`).join('');
+  document.getElementById('rPrev').disabled=rCur===0;
+  document.getElementById('rNext').disabled=rCur===rhymes.length-1;
+  document.getElementById('rCount').textContent=`${rCur+1} / ${rhymes.length}`;
+}
+function speakRhyme(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(rhymes[rCur].text.replace(/<[^>]+>/g,''));u.rate=0.9;u.pitch=1.15;window.speechSynthesis.speak(u);}
+function speakRhymeSlow(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(rhymes[rCur].text.replace(/<[^>]+>/g,''));u.rate=0.65;u.pitch=1.1;window.speechSynthesis.speak(u);}
+function rGo(dir){rCur=Math.max(0,Math.min(rhymes.length-1,rCur+dir));renderRhyme();}
+
+// ── LISTENING ──
+const listenItems = [
+  {emoji:'🐶',sentence:'The big brown dog ran to the park and jumped over the fence.',question:'What did the dog jump over?',opts:['A wall','The fence','A puddle','The gate'],ans:1},
+  {emoji:'🌧️',sentence:'It was raining heavily, so Maya put on her yellow coat and red boots.',question:'What colour was Maya\'s coat?',opts:['Red','Blue','Yellow','Green'],ans:2},
+  {emoji:'🍎',sentence:'Tom had three apples, two oranges, and one banana in his lunchbox.',question:'How many apples did Tom have?',opts:['One','Two','Three','Four'],ans:2},
+  {emoji:'🌊',sentence:'The fish swam quickly under the bridge and hid behind a large rock.',question:'Where did the fish hide?',opts:['Under the bridge','Behind a large rock','In a cave','Near the boat'],ans:1},
+  {emoji:'🎈',sentence:'At the party there were red, blue, and green balloons on every table.',question:'Which colour balloons were NOT mentioned?',opts:['Red','Pink','Blue','Green'],ans:1},
+  {emoji:'🐦',sentence:'Every morning, the little bird sat on the branch and sang a sweet song.',question:'When did the bird sing?',opts:['At night','In the evening','Every morning','After school'],ans:2},
+  {emoji:'🚌',sentence:'The school bus arrived at seven thirty and all the children got on quickly.',question:'What time did the bus arrive?',opts:['Seven o\'clock','Half past seven','Eight o\'clock','Six thirty'],ans:1},
+  {emoji:'🌺',sentence:'Grandma planted red roses and white daisies along the garden path.',question:'What did Grandma plant in the garden?',opts:['Tulips and roses','Red roses and white daisies','Yellow flowers only','Sunflowers'],ans:1},
+];
+let lCur=0, lAnswered={}, lScore=0, lTotal=0;
+function renderListen(){
+  const item=listenItems[lCur];
+  document.getElementById('lEmoji').textContent=item.emoji;
+  document.getElementById('lPrompt').textContent='Press Play to hear the sentence, then answer!';
+  document.getElementById('lQuestion').textContent=item.question;
+  document.getElementById('lFeedback').textContent='';
+  const optsDiv=document.getElementById('lOpts');
+  optsDiv.innerHTML='';
+  item.opts.forEach((opt,oi)=>{
+    const btn=document.createElement('button');
+    btn.className='listen-opt';btn.textContent=opt;
+    if(lAnswered[lCur]!==undefined){
+      btn.disabled=true;
+      if(oi===item.ans)btn.classList.add('correct');
+      else if(oi===lAnswered[lCur])btn.classList.add('wrong');
+    }
+    btn.onclick=()=>{
+      if(lAnswered[lCur]!==undefined)return;
+      lAnswered[lCur]=oi;
+      const ok=oi===item.ans;
+      if(ok)lScore++;lTotal++;
+      optsDiv.querySelectorAll('.listen-opt').forEach((b,i)=>{
+        b.disabled=true;
+        if(i===item.ans)b.classList.add('correct');
+        else if(i===oi)b.classList.add('wrong');
+      });
+      const fb=document.getElementById('lFeedback');
+      fb.textContent=ok?'✅ Correct! Great listening! 🌟':'❌ Listen again carefully!';
+      fb.style.color=ok?'#2e7d32':'#c62828';
+      document.getElementById('lScore').textContent=`Score: ${lScore} / ${lTotal} ⭐`;
+    };
+    optsDiv.appendChild(btn);
+  });
+  document.getElementById('lPrev').disabled=lCur===0;
+  document.getElementById('lNext').disabled=lCur===listenItems.length-1;
+  document.getElementById('lCount').textContent=`${lCur+1} / ${listenItems.length}`;
+}
+function playListening(){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(listenItems[lCur].sentence);
+  u.rate=0.82;u.pitch=1.05;
+  document.getElementById('playBtn').textContent='🔊 Playing…';
+  u.onend=()=>document.getElementById('playBtn').textContent='▶ Play Again';
+  window.speechSynthesis.speak(u);
+}
+function lGo(dir){lCur=Math.max(0,Math.min(listenItems.length-1,lCur+dir));renderListen();}
+
+// ── SPEAKING PROMPTS ──
+const prompts = [
+  {emoji:'🐾',prompt:'Tell me about your favourite animal.',hint:'Think about: What does it look like? Where does it live? What does it eat?',starter:'My favourite animal is… because…'},
+  {emoji:'🏠',prompt:'Describe your home.',hint:'Think about: How many rooms? What colour? What is your favourite room?',starter:'My home has… My favourite room is…'},
+  {emoji:'🌞',prompt:'What did you do this morning?',hint:'Think about: When did you wake up? What did you eat? What did you wear?',starter:'This morning I woke up at… Then I…'},
+  {emoji:'🎂',prompt:'Talk about your last birthday.',hint:'Think about: How old did you turn? Who was there? What did you do?',starter:'On my last birthday I turned… We…'},
+  {emoji:'🌈',prompt:'Describe your favourite colour.',hint:'Think about: What things are that colour? Why do you like it? How does it make you feel?',starter:'My favourite colour is… because…'},
+  {emoji:'📚',prompt:'Tell me about your favourite book.',hint:'Think about: What is the story? Who are the characters? What happens?',starter:'My favourite book is… It is about…'},
+  {emoji:'🍕',prompt:'What is your favourite food and why?',hint:'Think about: What does it taste like? When do you eat it? Who makes it?',starter:'My favourite food is… It tastes…'},
+  {emoji:'🌳',prompt:'Describe the weather today.',hint:'Think about: Is it sunny, rainy, or cloudy? Is it hot or cold? What are people wearing?',starter:'Today the weather is… It is…'},
+  {emoji:'👨‍👩‍👧',prompt:'Talk about someone special in your family.',hint:'Think about: Who are they? What do they look like? What do you do together?',starter:'Someone special in my family is… They…'},
+  {emoji:'🚀',prompt:'If you could go anywhere in the world, where would you go?',hint:'Think about: Where would you go? Why? What would you do there?',starter:'If I could go anywhere, I would go to… because…'},
+];
+let spCur=0;
+function renderSpeak(){
+  const p=prompts[spCur];
+  document.getElementById('spEmoji').textContent=p.emoji;
+  document.getElementById('spPrompt').textContent=p.prompt;
+  document.getElementById('spHint').textContent='💡 '+p.hint;
+  document.getElementById('spStarter').textContent='🗣️ Sentence starter: "'+p.starter+'"';
+  document.getElementById('spPrev').disabled=spCur===0;
+  document.getElementById('spNext').disabled=spCur===prompts.length-1;
+  document.getElementById('spCount').textContent=`${spCur+1} / ${prompts.length}`;
+}
+function speakPromptAloud(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(prompts[spCur].prompt);u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
+function speakStarter(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(prompts[spCur].starter);u.rate=0.8;u.pitch=1.05;window.speechSynthesis.speak(u);}
+function spGo(dir){spCur=Math.max(0,Math.min(prompts.length-1,spCur+dir));renderSpeak();}
+
+// ── MODE SWITCH ──
+function showMode(m, tab) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  ['tongue','rhyme','listen','speak'].forEach(id=>{
+    const el=document.getElementById(id+'Mode');
+    el.style.display='none';
+  });
+  const el=document.getElementById(m+'Mode');
+  el.style.display=(m==='listen')?'flex':'block';
+}
+
+// Init all
+renderTT();
+renderRhyme();
+renderListen();
+renderSpeak();
+</script>
+</body>
+</html>

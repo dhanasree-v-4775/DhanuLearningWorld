@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2D & 3D Shapes</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#8360c3,#2ebf91);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.25);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .tabs{display:flex;gap:8px;padding:12px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:10px 26px;border-radius:50px;border:2px solid rgba(255,255,255,0.5);background:rgba(255,255,255,0.15);color:white;font-family:inherit;font-size:1em;cursor:pointer;transition:all 0.2s;font-weight:bold;}
+  .tab.active{background:white;color:#8360c3;}
+  .tab:hover{background:rgba(255,255,255,0.35);}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:16px;}
+
+  /* SHAPE STRIP */
+  .shape-strip{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:10px 20px;background:rgba(0,0,0,0.15);width:100%;}
+  .sh-btn{padding:8px 14px;border-radius:16px;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:white;font-family:inherit;font-size:0.85em;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .sh-btn:hover{background:rgba(255,255,255,0.3);}
+  .sh-btn.active{background:white;color:#8360c3;font-weight:bold;}
+
+  /* SHAPE CARD */
+  .shape-card{width:720px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.25);overflow:hidden;}
+  .sc-top{padding:24px 28px;display:flex;gap:24px;align-items:center;border-bottom:3px dashed #e0e0e0;}
+  .shape-display{width:160px;height:160px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .sc-info{flex:1;}
+  .sc-name{font-size:2.2em;font-weight:bold;color:#333;margin-bottom:8px;}
+  .sc-type-badge{display:inline-block;font-size:0.75em;padding:4px 14px;border-radius:20px;color:white;margin-bottom:10px;font-weight:bold;}
+  .sc-props{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;}
+  .prop-chip{background:#f3e5f5;border-radius:20px;padding:6px 14px;font-size:0.95em;color:#6a1b9a;}
+  .sc-body{padding:20px 28px;display:flex;flex-direction:column;gap:10px;}
+  .sc-desc{font-size:1.15em;color:#333;line-height:1.7;}
+  .sc-example{font-size:1em;color:#555;font-style:italic;background:#f5f5f5;border-radius:10px;padding:10px 14px;border-left:4px solid #8360c3;}
+  .real-world{display:flex;flex-wrap:wrap;gap:10px;padding:16px 28px 24px;}
+  .rw-item{background:#e8f5e9;border-radius:16px;padding:10px 16px;text-align:center;font-size:1em;color:#2e7d32;}
+  .rw-item .rw-emoji{font-size:2em;display:block;}
+  .sc-speak-btn{border:none;background:#8360c3;color:white;border-radius:50px;padding:9px 22px;font-size:0.95em;font-family:inherit;cursor:pointer;margin:0 28px 20px;transition:transform 0.15s;}
+  .sc-speak-btn:hover{transform:scale(1.05);}
+
+  /* SVG Shapes */
+  svg{animation:popIn 0.4s ease;}
+  @keyframes popIn{0%{transform:scale(0.3);opacity:0;}70%{transform:scale(1.1);}100%{transform:scale(1);opacity:1;}}
+
+  /* QUIZ MODE */
+  .quiz-wrap{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+  .quiz-card{width:680px;max-width:100%;background:white;border-radius:24px;box-shadow:0 16px 50px rgba(0,0,0,0.25);padding:28px;}
+  .quiz-qtext{font-size:1.15em;color:#555;margin-bottom:10px;}
+  .quiz-shape-display{display:flex;justify-content:center;margin:12px 0;}
+  .quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px;}
+  .quiz-opt{background:#f5f5f5;border:3px solid #ddd;border-radius:16px;padding:14px;font-size:1.1em;font-family:inherit;cursor:pointer;text-align:center;color:#333;transition:all 0.2s;}
+  .quiz-opt:hover{border-color:#8360c3;background:#f3e5f5;}
+  .quiz-opt.correct{background:#c8f7c5;border-color:#2e7d32;color:#1b5e20;}
+  .quiz-opt.wrong{background:#ffcdd2;border-color:#c62828;color:#b71c1c;}
+  .quiz-score{color:white;font-size:1.1em;}
+  .quiz-feedback{font-size:1.2em;font-weight:bold;text-align:center;min-height:36px;}
+
+  .nav{display:flex;justify-content:center;align-items:center;gap:14px;padding:14px;}
+  .nav-btn{border:none;border-radius:50px;padding:11px 28px;font-size:1.1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#555;cursor:not-allowed;transform:none;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🔷 2D & 3D Shapes</span>
+  <span style="color:white;font-size:0.9em">Maths</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="setMode('learn',this)">📖 Learn Shapes</button>
+  <button class="tab" onclick="setMode('quiz',this)">🧠 Quiz</button>
+</div>
+<div class="main" id="mainArea">
+
+  <!-- LEARN MODE -->
+  <div id="learnMode" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:14px;">
+    <div class="shape-strip" id="shapeStrip"></div>
+    <div class="shape-card" id="shapeCard">
+      <div class="sc-top">
+        <div class="shape-display" id="shapeDisplay"></div>
+        <div class="sc-info">
+          <div class="sc-name" id="scName">Circle</div>
+          <span class="sc-type-badge" id="scBadge">2D Shape</span>
+          <div class="sc-props" id="scProps"></div>
+        </div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-desc" id="scDesc"></div>
+        <div class="sc-example" id="scExample"></div>
+      </div>
+      <div style="padding:8px 28px 4px;font-size:0.9em;color:#888;font-weight:bold;">Real-world examples:</div>
+      <div class="real-world" id="realWorld"></div>
+      <button class="sc-speak-btn" onclick="speakShape()">🔊 Tell Me About This Shape</button>
+    </div>
+    <div class="nav">
+      <button class="nav-btn prev" id="prevBtn" onclick="go(-1)" disabled>◀ Prev</button>
+      <span style="color:white" id="navCount">1 / 13</span>
+      <button class="nav-btn next" id="nextBtn" onclick="go(1)">Next ▶</button>
+    </div>
+  </div>
+
+  <!-- QUIZ MODE -->
+  <div id="quizMode" style="display:none;flex-direction:column;align-items:center;gap:14px;width:100%;">
+    <div style="color:white;font-size:1.1em" id="qScore">Score: 0 ⭐</div>
+    <div class="quiz-card">
+      <div class="quiz-qtext" id="qText">What shape is this?</div>
+      <div class="quiz-shape-display" id="qShapeDisplay"></div>
+      <div class="quiz-opts" id="qOpts"></div>
+    </div>
+    <div class="quiz-feedback" id="qFeedback"></div>
+  </div>
+</div>
+
+<script>
+const shapes = [
+  // 2D
+  {name:'Circle', type:'2D', color:'#E53935',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><circle cx="70" cy="70" r="60" fill="#E53935" opacity="0.85"/></svg>`,
+   props:['0 sides','0 corners','Perfectly round'],
+   desc:'A circle is a perfectly round shape. Every point on the edge is the same distance from the centre.',
+   example:'A coin, a wheel, and the sun all look like circles!',
+   real:[{e:'🌞',n:'Sun'},{e:'🍕',n:'Pizza'},{e:'⚽',n:'Ball'},{e:'⌚',n:'Watch'}]},
+  {name:'Square', type:'2D', color:'#1E88E5',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><rect x="10" y="10" width="120" height="120" rx="6" fill="#1E88E5" opacity="0.85"/></svg>`,
+   props:['4 sides','4 corners','All sides equal'],
+   desc:'A square has 4 equal sides and 4 right-angle corners. All sides are exactly the same length.',
+   example:'A chessboard square, a window, and a post-it note look like squares!',
+   real:[{e:'🪟',n:'Window'},{e:'🎁',n:'Gift box'},{e:'🎮',n:'Game pad'},{e:'📱',n:'Phone'}]},
+  {name:'Rectangle', type:'2D', color:'#43A047',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><rect x="5" y="30" width="130" height="80" rx="6" fill="#43A047" opacity="0.85"/></svg>`,
+   props:['4 sides','4 corners','Opposite sides equal'],
+   desc:'A rectangle has 4 sides and 4 right-angle corners. The two long sides are equal, and the two short sides are equal.',
+   example:'A door, a book, and a TV screen are shaped like rectangles!',
+   real:[{e:'📺',n:'TV Screen'},{e:'📚',n:'Book'},{e:'🚪',n:'Door'},{e:'💳',n:'Card'}]},
+  {name:'Triangle', type:'2D', color:'#FB8C00',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><polygon points="70,5 135,135 5,135" fill="#FB8C00" opacity="0.85"/></svg>`,
+   props:['3 sides','3 corners','Pointed top'],
+   desc:'A triangle has 3 straight sides and 3 corners. The corners (angles) can be different sizes.',
+   example:'A slice of pizza, a mountain peak, and a ruler corner are triangular!',
+   real:[{e:'🍕',n:'Pizza slice'},{e:'🏔️',n:'Mountain'},{e:'⚠️',n:'Warning sign'},{e:'🎋',n:'Pyramid'}]},
+  {name:'Pentagon', type:'2D', color:'#9C27B0',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><polygon points="70,5 135,55 110,130 30,130 5,55" fill="#9C27B0" opacity="0.85"/></svg>`,
+   props:['5 sides','5 corners','Regular or irregular'],
+   desc:'A pentagon has exactly 5 straight sides and 5 corners. The word "penta" means five in Greek!',
+   example:'A starfish (almost!), and the shape on a football are pentagons!',
+   real:[{e:'⚽',n:'Football patch'},{e:'🏠',n:'House shape'},{e:'🌟',n:'Star section'},{e:'🛑',n:'Stop? No-5'}]},
+  {name:'Hexagon', type:'2D', color:'#00897B',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><polygon points="70,5 130,37 130,103 70,135 10,103 10,37" fill="#00897B" opacity="0.85"/></svg>`,
+   props:['6 sides','6 corners','Like a honeycomb'],
+   desc:'A hexagon has 6 straight sides and 6 corners. Bees use hexagons to build their honeycombs!',
+   example:'A honeycomb cell and a snowflake section are shaped like hexagons!',
+   real:[{e:'🍯',n:'Honeycomb'},{e:'❄️',n:'Snowflake'},{e:'⬡',n:'Hex tile'},{e:'🐝',n:'Bee cell'}]},
+  {name:'Oval', type:'2D', color:'#F4511E',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><ellipse cx="70" cy="70" rx="65" ry="45" fill="#F4511E" opacity="0.85"/></svg>`,
+   props:['0 sides','0 corners','Like a stretched circle'],
+   desc:'An oval (or ellipse) is like a circle that has been stretched. It has no sides or corners.',
+   example:'An egg, a rugby ball, and a mirror are oval shaped!',
+   real:[{e:'🥚',n:'Egg'},{e:'🏉',n:'Rugby ball'},{e:'🪞',n:'Mirror'},{e:'🫒',n:'Olive'}]},
+  // 3D
+  {name:'Sphere', type:'3D', color:'#E53935',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><defs><radialGradient id="sg" cx="40%" cy="35%"><stop offset="0%" stop-color="#ff8a80"/><stop offset="100%" stop-color="#b71c1c"/></radialGradient></defs><circle cx="70" cy="70" r="62" fill="url(#sg)"/></svg>`,
+   props:['0 flat faces','0 edges','0 vertices','Perfectly round'],
+   desc:'A sphere is a perfectly round 3D shape. Every point on its surface is the same distance from the centre. It can roll in any direction!',
+   example:'A ball, a globe, and a marble are all spheres!',
+   real:[{e:'⚽',n:'Football'},{e:'🌍',n:'Earth'},{e:'🎱',n:'Ball'},{e:'🍊',n:'Orange'}]},
+  {name:'Cube', type:'3D', color:'#1E88E5',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><polygon points="30,35 100,35 100,105 30,105" fill="#1E88E5" opacity="0.7"/><polygon points="30,35 60,10 130,10 100,35" fill="#1565C0" opacity="0.9"/><polygon points="100,35 130,10 130,80 100,105" fill="#0D47A1" opacity="0.85"/></svg>`,
+   props:['6 square faces','12 edges','8 vertices'],
+   desc:'A cube has 6 equal square faces, 12 equal edges, and 8 vertices (corners). Think of it as a 3D square!',
+   example:'A dice, a Rubik\'s cube, and a sugar cube are cubes!',
+   real:[{e:'🎲',n:'Dice'},{e:'🧊',n:'Ice cube'},{e:'📦',n:'Box'},{e:'🧩',n:"Rubik's cube"}]},
+  {name:'Cuboid', type:'3D', color:'#43A047',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><polygon points="10,40 110,40 110,120 10,120" fill="#43A047" opacity="0.7"/><polygon points="10,40 40,15 140,15 110,40" fill="#2E7D32" opacity="0.9"/><polygon points="110,40 140,15 140,95 110,120" fill="#1B5E20" opacity="0.85"/></svg>`,
+   props:['6 rectangular faces','12 edges','8 vertices'],
+   desc:'A cuboid is like a stretched cube. It has 6 rectangular faces. All opposite faces are the same size.',
+   example:'A cereal box, a brick, and a book are cuboids!',
+   real:[{e:'📦',n:'Cereal box'},{e:'🧱',n:'Brick'},{e:'📚',n:'Book'},{e:'🧊',n:'Fridge'}]},
+  {name:'Cylinder', type:'3D', color:'#FB8C00',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><ellipse cx="70" cy="30" rx="55" ry="20" fill="#FB8C00"/><rect x="15" y="30" width="110" height="90" fill="#E65100" opacity="0.8"/><ellipse cx="70" cy="120" rx="55" ry="20" fill="#BF360C"/></svg>`,
+   props:['2 circular faces','1 curved surface','0 vertices'],
+   desc:'A cylinder has two circular faces at the top and bottom, joined by a curved surface. It can roll but stands upright too!',
+   example:'A tin can, a toilet roll, and a rolling pin are cylinders!',
+   real:[{e:'🥫',n:'Tin can'},{e:'🧻',n:'Toilet roll'},{e:'🪵',n:'Log'},{e:'🎺',n:'Drum'}]},
+  {name:'Cone', type:'3D', color:'#9C27B0',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><ellipse cx="70" cy="118" rx="58" ry="18" fill="#6A1B9A"/><polygon points="70,5 128,118 12,118" fill="#9C27B0" opacity="0.85"/></svg>`,
+   props:['1 circular face','1 curved surface','1 vertex (tip)'],
+   desc:'A cone has a flat circular base and a curved surface that comes to a point at the top called the apex or vertex.',
+   example:'An ice cream cone, a party hat, and a traffic cone are cones!',
+   real:[{e:'🍦',n:'Ice cream'},{e:'🎉',n:'Party hat'},{e:'🚧',n:'Traffic cone'},{e:'🌲',n:'Fir tree'}]},
+  {name:'Pyramid', type:'3D', color:'#00897B',
+   svg:`<svg width="140" height="140" viewBox="0 0 140 140"><polygon points="20,130 120,130 70,10" fill="#00897B" opacity="0.85"/><polygon points="20,130 120,130 120,90 20,90" fill="#00695C" opacity="0.5"/></svg>`,
+   props:['1 square base','4 triangular faces','5 vertices','8 edges'],
+   desc:'A pyramid has a square flat base and 4 triangular faces that meet at a point at the top. The ancient Egyptian pyramids are this shape!',
+   example:'The pyramids of Egypt and a roof of a house are pyramid-shaped!',
+   real:[{e:'🏔️',n:'Pyramid'},{e:'🔺',n:'Triangle'},{e:'🏠',n:'Roof'},{e:'⛺',n:'Tent'}]},
+];
+
+let cur=0, mode='learn', qScore=0;
+
+// Build strip
+const strip=document.getElementById('shapeStrip');
+shapes.forEach((s,i)=>{
+  const btn=document.createElement('button');
+  btn.className='sh-btn'+(i===0?' active':'');
+  const preview=s.svg.replace(/width="\d+"/, 'width="30"').replace(/height="\d+"/, 'height="30"');
+  btn.innerHTML=`<span style="pointer-events:none">${preview}</span><span>${s.name}</span>`;
+  btn.onclick=()=>goTo(i);
+  strip.appendChild(btn);
+});
+
+function render(){
+  const s=shapes[cur];
+  // display
+  document.getElementById('shapeDisplay').innerHTML=s.svg;
+  document.getElementById('scName').textContent=s.name;
+  const badge=document.getElementById('scBadge');
+  badge.textContent=s.type+' Shape';
+  badge.style.background=s.type==='2D'?'#1E88E5':'#9C27B0';
+  document.getElementById('scProps').innerHTML=s.props.map(p=>`<span class="prop-chip">${p}</span>`).join('');
+  document.getElementById('scDesc').textContent=s.desc;
+  document.getElementById('scExample').textContent='💡 '+s.example;
+  document.getElementById('realWorld').innerHTML=s.real.map(r=>`<div class="rw-item"><span class="rw-emoji">${r.e}</span>${r.n}</div>`).join('');
+  // strip
+  document.querySelectorAll('.sh-btn').forEach((b,i)=>b.classList.toggle('active',i===cur));
+  document.getElementById('prevBtn').disabled=cur===0;
+  document.getElementById('nextBtn').disabled=cur===shapes.length-1;
+  document.getElementById('navCount').textContent=`${cur+1} / ${shapes.length}`;
+}
+
+function go(dir){cur=Math.max(0,Math.min(shapes.length-1,cur+dir));render();}
+function goTo(i){cur=i;render();}
+
+function speakShape(){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const s=shapes[cur];
+  const txt=`${s.name}. ${s.type} shape. Properties: ${s.props.join(', ')}. ${s.desc} ${s.example}`;
+  const u=new SpeechSynthesisUtterance(txt);
+  u.rate=0.85;u.pitch=1.1;
+  window.speechSynthesis.speak(u);
+}
+
+// QUIZ
+function newQuiz(){
+  const qi=Math.floor(Math.random()*shapes.length);
+  const correct=shapes[qi];
+  document.getElementById('qText').textContent='What is the name of this shape?';
+  document.getElementById('qShapeDisplay').innerHTML=correct.svg;
+  document.getElementById('qFeedback').textContent='';
+  let opts=[correct.name];
+  while(opts.length<4){const rn=shapes[Math.floor(Math.random()*shapes.length)].name;if(!opts.includes(rn))opts.push(rn);}
+  opts=opts.sort(()=>Math.random()-0.5);
+  const container=document.getElementById('qOpts');
+  container.innerHTML='';
+  opts.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.className='quiz-opt';btn.textContent=opt;
+    btn.onclick=()=>{
+      container.querySelectorAll('.quiz-opt').forEach(b=>b.onclick=null);
+      if(opt===correct.name){btn.classList.add('correct');qScore++;document.getElementById('qFeedback').textContent='✅ Yes! That is a '+correct.name+'! 🌟';document.getElementById('qFeedback').style.color='#2e7d32';}
+      else{btn.classList.add('wrong');container.querySelectorAll('.quiz-opt').forEach(b=>{if(b.textContent===correct.name)b.classList.add('correct');});document.getElementById('qFeedback').textContent=`❌ That is a ${correct.name}!`;document.getElementById('qFeedback').style.color='#c62828';}
+      document.getElementById('qScore').textContent=`Score: ${qScore} ⭐`;
+      setTimeout(newQuiz,2200);
+    };
+    container.appendChild(btn);
+  });
+}
+
+function setMode(m,tab){
+  mode=m;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('learnMode').style.display=m==='learn'?'flex':'none';
+  const qm=document.getElementById('quizMode');
+  qm.style.display=m==='quiz'?'flex':'none';
+  if(m==='quiz')newQuiz();
+}
+
+document.addEventListener('keydown',e=>{if(mode==='learn'){if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1);}});
+render();
+</script>
+</body>
+</html>

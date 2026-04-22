@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patterns – What Comes Next?</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#cc2b5e,#753a88);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.25);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+
+  /* SCORE */
+  .score-row{display:flex;gap:16px;color:white;font-size:1em;justify-content:center;}
+  .sc-box{background:rgba(255,255,255,0.2);border-radius:14px;padding:8px 20px;text-align:center;}
+  .sc-box .val{font-size:1.5em;font-weight:bold;display:block;}
+
+  /* CARD */
+  .card{width:720px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.3);padding:28px;}
+  .level-badge{display:inline-block;font-size:0.8em;padding:4px 14px;border-radius:20px;color:white;margin-bottom:12px;}
+  .level-1{background:#4CAF50;}
+  .level-2{background:#FF9800;}
+  .level-3{background:#E53935;}
+  .pattern-label{font-size:1em;color:#888;margin-bottom:10px;}
+  .pattern-type{font-size:0.9em;font-weight:bold;color:#753a88;margin-bottom:14px;}
+
+  /* PATTERN ROW */
+  .pattern-row{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;margin:10px 0 20px;}
+  .pat-item{font-size:2.8em;display:flex;align-items:center;justify-content:center;width:64px;height:64px;border-radius:16px;background:#f5f5f5;transition:transform 0.2s;}
+  .pat-item:hover{transform:scale(1.1);}
+  .pat-blank{width:64px;height:64px;border-radius:16px;border:4px dashed #ce93d8;background:#f3e5f5;display:flex;align-items:center;justify-content:center;font-size:2.5em;cursor:pointer;transition:all 0.2s;}
+  .pat-blank.filled{border-color:#4CAF50;background:#c8f7c5;}
+  .pat-blank.wrong-fill{border-color:#E53935;background:#ffcdd2;animation:shake 0.4s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
+
+  /* OPTIONS */
+  .options-label{font-size:1em;color:#888;margin-bottom:10px;text-align:center;}
+  .options-row{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:14px;}
+  .opt-btn{font-size:2.5em;width:70px;height:70px;border-radius:16px;border:3px solid #ddd;background:#f9f9f9;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;}
+  .opt-btn:hover{border-color:#753a88;background:#f3e5f5;transform:scale(1.1);}
+  .opt-btn.selected{border-color:#4CAF50;background:#c8f7c5;}
+  .opt-btn.wrong{border-color:#E53935;background:#ffcdd2;}
+
+  .feedback{font-size:1.3em;font-weight:bold;text-align:center;min-height:36px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-top:12px;}
+  .action-btn{border:none;border-radius:50px;padding:12px 28px;font-size:1.1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+  .action-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+
+  /* LEVEL SELECTOR */
+  .level-sel{display:flex;gap:8px;justify-content:center;padding:10px 20px;background:rgba(0,0,0,0.15);width:100%;}
+  .lv-btn{padding:8px 22px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.1);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .lv-btn.active{background:white;color:#753a88;font-weight:bold;}
+  .lv-btn:hover{background:rgba(255,255,255,0.3);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🔁 Patterns – What Comes Next?</span>
+  <span style="color:white;font-size:0.9em">Maths</span>
+</div>
+<div class="level-sel">
+  <button class="lv-btn active" onclick="setLevel(1,this)">🌱 Level 1 – AB</button>
+  <button class="lv-btn" onclick="setLevel(2,this)">🌿 Level 2 – ABC</button>
+  <button class="lv-btn" onclick="setLevel(3,this)">🌳 Level 3 – Mixed</button>
+</div>
+<div class="main">
+  <div class="score-row">
+    <div class="sc-box"><span class="val" id="sRight">0</span>✅</div>
+    <div class="sc-box"><span class="val" id="sWrong">0</span>❌</div>
+    <div class="sc-box"><span class="val" id="sStreak">0</span>🔥</div>
+  </div>
+  <div class="card">
+    <span class="level-badge" id="levelBadge">Level 1 – AB Pattern</span>
+    <div class="pattern-label">👀 Find the pattern and fill in the blanks!</div>
+    <div class="pattern-type" id="patternType">AB Pattern</div>
+    <div class="pattern-row" id="patternRow"></div>
+    <div class="options-label">Choose from below:</div>
+    <div class="options-row" id="optionsRow"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#607D8B" onclick="newPattern()">🔄 New Pattern</button>
+      <button class="action-btn" style="background:#9C27B0" onclick="showHint()">💡 Hint</button>
+    </div>
+  </div>
+</div>
+<script>
+const patterns = {
+  1: [ // AB
+    {type:'AB',items:['🌸','⭐'],blanks:2},
+    {type:'AB',items:['🐶','🐱'],blanks:2},
+    {type:'AB',items:['🔴','🔵'],blanks:2},
+    {type:'AB',items:['🍎','🍊'],blanks:2},
+    {type:'AB',items:['🌙','☀️'],blanks:2},
+    {type:'AABB',items:['🎈','🎈','🌟','🌟'],blanks:2},
+    {type:'AABB',items:['🐸','🐸','🦋','🦋'],blanks:2},
+  ],
+  2: [ // ABC
+    {type:'ABC',items:['🍎','🍊','🍇'],blanks:3},
+    {type:'ABC',items:['🔴','🟡','🔵'],blanks:3},
+    {type:'ABC',items:['🐶','🐱','🐰'],blanks:3},
+    {type:'ABB',items:['⭐','🌸','🌸'],blanks:3},
+    {type:'AAB',items:['🎈','🎈','🌟'],blanks:3},
+  ],
+  3: [ // Mixed + Number patterns
+    {type:'Number +2',items:['2','4','6','8'],blanks:2,isNum:true,step:2,start:2},
+    {type:'Number +3',items:['3','6','9','12'],blanks:2,isNum:true,step:3,start:3},
+    {type:'Number +5',items:['5','10','15','20'],blanks:1,isNum:true,step:5,start:5},
+    {type:'Count back -1',items:['10','9','8','7'],blanks:2,isNum:true,step:-1,start:10},
+    {type:'Size pattern',items:['🐜','🐜','🐘','🐜','🐜'],blanks:2},
+    {type:'ABCD',items:['🌸','🌻','🌹','🌷'],blanks:4},
+  ]
+};
+const distractors=['🎯','🍉','🦄','🎪','🎨','🏆','🌴','🎠'];
+let level=1, right=0, wrong=0, streak=0;
+let curPattern=null, blanksAnswered=[], blankTargets=[];
+
+function setLevel(l,tab){
+  level=l;
+  document.querySelectorAll('.lv-btn').forEach(b=>b.classList.remove('active'));
+  tab.classList.add('active');
+  newPattern();
+}
+
+function newPattern(){
+  const pool=patterns[level];
+  const p=pool[Math.floor(Math.random()*pool.length)];
+  curPattern=p;
+  blanksAnswered=[];
+  document.getElementById('feedback').textContent='';
+
+  const badge=document.getElementById('levelBadge');
+  badge.textContent=`Level ${level} – ${p.type} Pattern`;
+  badge.className='level-badge level-'+level;
+  document.getElementById('patternType').textContent=p.type+' Pattern';
+
+  // Generate full sequence (show 2 full cycles + blanks)
+  let sequence=[];
+  let answers=[];
+  if(p.isNum){
+    // number pattern
+    let v=p.start;
+    for(let i=0;i<6;i++){sequence.push(String(v));v+=p.step;}
+    blankTargets=sequence.slice(4);
+    sequence=sequence.slice(0,4);
+  } else {
+    for(let i=0;i<2;i++) sequence.push(...p.items);
+    blankTargets=[];
+    for(let i=0;i<p.blanks;i++) blankTargets.push(p.items[i%p.items.length]);
+  }
+
+  // Render pattern row
+  const row=document.getElementById('patternRow');
+  row.innerHTML='';
+  sequence.forEach(item=>{
+    const div=document.createElement('div');
+    div.className='pat-item';
+    div.textContent=item;
+    row.appendChild(div);
+  });
+  // Add blank slots
+  blankTargets.forEach((_,bi)=>{
+    const div=document.createElement('div');
+    div.className='pat-blank';
+    div.id='blank'+bi;
+    div.textContent='?';
+    row.appendChild(div);
+  });
+
+  // Options
+  const optsRow=document.getElementById('optionsRow');
+  optsRow.innerHTML='';
+  let opts=p.isNum
+    ? [...new Set([...blankTargets,...[String(parseInt(blankTargets[0])+p.step),String(parseInt(blankTargets[0])-p.step),...distractors.slice(0,2)]])].slice(0,6)
+    : [...new Set([...p.items,...distractors.slice(0,4)])].slice(0,6);
+  opts=opts.sort(()=>Math.random()-0.5);
+  opts.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.className='opt-btn';btn.textContent=opt;
+    btn.onclick=()=>fillBlank(opt,btn);
+    optsRow.appendChild(btn);
+  });
+}
+
+function fillBlank(val,btn){
+  const nextBlank=blanksAnswered.length;
+  if(nextBlank>=blankTargets.length)return;
+  const blankEl=document.getElementById('blank'+nextBlank);
+  if(val===blankTargets[nextBlank]){
+    blankEl.textContent=val;blankEl.classList.add('filled');
+    btn.classList.add('selected');btn.onclick=null;
+    blanksAnswered.push(val);
+    if(blanksAnswered.length===blankTargets.length){
+      right++;streak++;
+      document.getElementById('feedback').textContent='✅ Amazing! You found the pattern! 🌟';
+      document.getElementById('feedback').style.color='#2e7d32';
+      speak('Amazing! You found the pattern!');
+    }
+  } else {
+    blankEl.classList.add('wrong-fill');
+    setTimeout(()=>blankEl.classList.remove('wrong-fill'),500);
+    btn.classList.add('wrong');
+    setTimeout(()=>btn.classList.remove('wrong'),500);
+    wrong++;streak=0;
+    document.getElementById('feedback').textContent='❌ Try again!';
+    document.getElementById('feedback').style.color='#c62828';
+  }
+  document.getElementById('sRight').textContent=right;
+  document.getElementById('sWrong').textContent=wrong;
+  document.getElementById('sStreak').textContent=streak;
+}
+
+function showHint(){
+  const nextBlank=blanksAnswered.length;
+  if(nextBlank<blankTargets.length){
+    document.getElementById('feedback').textContent=`💡 The next piece is: ${blankTargets[nextBlank]}`;
+    document.getElementById('feedback').style.color='#753a88';
+  }
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=0.85;u.pitch=1.2;
+  window.speechSynthesis.speak(u);
+}
+newPattern();
+</script>
+</body>
+</html>

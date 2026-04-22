@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Number Bonds – Make 10 & 20</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#1a237e,#283593,#3949ab);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.25);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .tabs{display:flex;gap:8px;padding:12px 20px;justify-content:center;}
+  .tab{padding:10px 28px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.15);color:white;font-family:inherit;font-size:1em;cursor:pointer;transition:all 0.2s;font-weight:bold;}
+  .tab.active{background:white;color:#1a237e;}
+  .tab:hover{background:rgba(255,255,255,0.3);}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+
+  /* SCORE */
+  .score-row{display:flex;gap:16px;color:white;font-size:1em;justify-content:center;flex-wrap:wrap;}
+  .sc-box{background:rgba(255,255,255,0.2);border-radius:14px;padding:8px 20px;text-align:center;}
+  .sc-box .val{font-size:1.5em;font-weight:bold;display:block;}
+
+  /* CARD */
+  .card{width:760px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.35);padding:28px 32px;}
+
+  /* LEARN MODE */
+  .bond-diagram{display:flex;flex-direction:column;align-items:center;gap:0;margin:20px 0;}
+  .bond-whole{width:100px;height:70px;border-radius:18px;background:linear-gradient(135deg,#1a237e,#5c6bc0);color:white;font-size:2.5em;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(26,35,126,0.4);}
+  .bond-line{width:2px;height:30px;background:#aaa;position:relative;}
+  .bond-branch{display:flex;gap:80px;position:relative;}
+  .bond-branch::before{content:'';position:absolute;top:0;left:50px;right:50px;height:2px;background:#aaa;}
+  .bond-branch::after{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:2px;height:30px;background:#aaa;}
+  .bond-part{width:80px;height:60px;border-radius:14px;font-size:2em;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,0.15);}
+  .bond-part.a{background:linear-gradient(135deg,#e91e63,#f48fb1);color:white;}
+  .bond-part.b{background:linear-gradient(135deg,#4caf50,#a5d6a7);color:white;}
+  .bond-part.unknown{background:#f5f5f5;border:3px dashed #bbb;color:#bbb;cursor:pointer;}
+  .bond-part.unknown:hover{border-color:#5c6bc0;background:#e8eaf6;}
+
+  /* DOTS VISUAL */
+  .dots-row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:16px 0;}
+  .dot-group{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:10px 14px;border-radius:14px;min-width:80px;}
+  .dot-group.ga{background:#fce4ec;}
+  .dot-group.gb{background:#e8f5e9;}
+  .dot-item{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2em;animation:popIn 0.3s ease both;}
+  @keyframes popIn{0%{transform:scale(0);opacity:0;}100%{transform:scale(1);opacity:1;}}
+  .dot-item.da{background:#e91e63;}
+  .dot-item.db{background:#4caf50;}
+
+  .equation-strip{display:flex;align-items:center;justify-content:center;gap:10px;font-size:2em;font-weight:bold;margin:12px 0;color:#333;}
+  .eq-blank{width:60px;height:50px;border:3px dashed #9fa8da;border-radius:12px;background:#e8eaf6;display:flex;align-items:center;justify-content:center;font-size:0.9em;color:#9fa8da;cursor:pointer;}
+  .eq-blank.filled{border-color:#4caf50;background:#c8f7c5;color:#2e7d32;border-style:solid;}
+
+  /* NUMPAD */
+  .numpad{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:400px;margin:12px auto;}
+  .np-btn{width:60px;height:54px;border-radius:14px;border:2px solid #c5cae9;background:#e8eaf6;font-size:1.5em;font-weight:bold;font-family:inherit;cursor:pointer;color:#1a237e;transition:all 0.15s;}
+  .np-btn:hover{background:#c5cae9;transform:scale(1.08);}
+
+  /* BONDS LIST */
+  .bonds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin:16px 0;}
+  .bond-card{background:linear-gradient(135deg,#e8eaf6,#c5cae9);border-radius:16px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;border:3px solid transparent;}
+  .bond-card:hover{transform:translateY(-3px);border-color:#5c6bc0;}
+  .bond-card.active-bc{border-color:#1a237e;background:linear-gradient(135deg,#1a237e,#5c6bc0);color:white;}
+  .bc-top{font-size:1.5em;font-weight:bold;}
+  .bc-eq{font-size:1.1em;color:#555;margin-top:4px;}
+  .bond-card.active-bc .bc-eq{color:#c5cae9;}
+
+  .feedback{font-size:1.3em;font-weight:bold;text-align:center;min-height:36px;margin-top:8px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  .action-btn{border:none;border-radius:50px;padding:12px 28px;font-size:1.1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+
+  /* FAMILY VIEW */
+  .family-box{background:#f5f5f5;border-radius:16px;padding:16px;margin:12px 0;}
+  .family-title{font-size:1em;color:#888;margin-bottom:10px;text-align:center;}
+  .family-eqs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+  .feq{background:white;border-radius:10px;padding:8px 16px;font-size:1.2em;font-weight:bold;color:#333;border:2px solid #e8eaf6;transition:all 0.2s;}
+  .feq:hover{border-color:#5c6bc0;background:#e8eaf6;}
+
+  .section-title{font-size:1.1em;font-weight:bold;color:#1a237e;margin-bottom:10px;}
+
+  @keyframes celebrate{0%,100%{transform:scale(1);}50%{transform:scale(1.15) rotate(3deg);}}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
+  .correct-anim{animation:celebrate 0.5s ease;}
+  .wrong-anim{animation:shake 0.4s ease;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🔢 Number Bonds – Make 10 & 20</span>
+  <span style="color:white;font-size:0.9em">Maths</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="setMode('learn',this)">📖 Learn</button>
+  <button class="tab" onclick="setMode('quiz',this)">🧩 Quiz</button>
+  <button class="tab" onclick="setMode('family',this)">👨‍👩‍👧 Bond Family</button>
+</div>
+<div class="main">
+  <div class="score-row" id="scoreRow" style="display:none">
+    <div class="sc-box"><span class="val" id="sRight">0</span>✅</div>
+    <div class="sc-box"><span class="val" id="sWrong">0</span>❌</div>
+    <div class="sc-box"><span class="val" id="sStreak">0</span>🔥</div>
+  </div>
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+// All number bonds to 10 and 20
+const bonds10 = [];
+for(let i=0;i<=10;i++) bonds10.push([i,10-i]);
+const bonds20 = [];
+for(let i=0;i<=20;i++) bonds20.push([i,20-i]);
+
+const emojis10 = ['🍎','🌟','🐶','🎈','🌸','🦋','⭐','🍊','🐸','🐱','🎯'];
+const emojis20 = ['🍓','🌼','🐻','🎀','🌈','🏆','🎭','🍇','🦊','🐧','🎸'];
+
+let mode = 'learn';
+let learnTarget = 10;
+let learnIdx = 0;
+let quizTarget = 10;
+let quizRight = 0, quizWrong = 0, quizStreak = 0;
+let quizAnswered = false;
+let quizA, quizB, quizMissing; // 'a' or 'b'
+let familyTarget = 10;
+let familyIdx = 0;
+
+function setMode(m, tab) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('scoreRow').style.display = m === 'quiz' ? 'flex' : 'none';
+  render();
+}
+
+function render() {
+  if (mode === 'learn') renderLearn();
+  else if (mode === 'quiz') renderQuiz();
+  else renderFamily();
+}
+
+// ============ LEARN MODE ============
+function renderLearn() {
+  const bonds = learnTarget === 10 ? bonds10 : bonds20;
+  const bond = bonds[learnIdx];
+  const a = bond[0], b = bond[1], total = learnTarget;
+  const emoji = learnTarget === 10 ? emojis10[learnIdx % emojis10.length] : emojis20[learnIdx % emojis20.length];
+
+  let dotsA = '', dotsB = '';
+  for (let i = 0; i < a; i++) dotsA += `<div class="dot-item da" style="animation-delay:${i*0.05}s">${emoji}</div>`;
+  for (let i = 0; i < b; i++) dotsB += `<div class="dot-item db" style="animation-delay:${(a+i)*0.05}s">${emoji}</div>`;
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:14px">
+      <button onclick="learnTarget=10;learnIdx=0;renderLearn()" style="padding:8px 20px;border-radius:50px;border:2px solid ${learnTarget===10?'#1a237e':'#ccc'};background:${learnTarget===10?'#1a237e':'white'};color:${learnTarget===10?'white':'#333'};font-family:inherit;font-size:1em;cursor:pointer;font-weight:bold;">Make 10</button>
+      <button onclick="learnTarget=20;learnIdx=0;renderLearn()" style="padding:8px 20px;border-radius:50px;border:2px solid ${learnTarget===20?'#1a237e':'#ccc'};background:${learnTarget===20?'#1a237e':'white'};color:${learnTarget===20?'white':'#333'};font-family:inherit;font-size:1em;cursor:pointer;font-weight:bold;">Make 20</button>
+    </div>
+    <div style="text-align:center;font-size:1em;color:#888;margin-bottom:6px">Bond ${learnIdx+1} of ${bonds.length}</div>
+
+    <!-- Part-whole diagram -->
+    <div class="bond-diagram">
+      <div class="bond-whole">${total}</div>
+      <div class="bond-line"></div>
+      <div class="bond-branch">
+        <div class="bond-part a">${a}</div>
+        <div class="bond-part b">${b}</div>
+      </div>
+    </div>
+
+    <!-- Dots visual -->
+    <div class="dots-row">
+      <div class="dot-group ga">${dotsA || '<span style="color:#bbb;font-size:1.2em">0</span>'}</div>
+      <span style="font-size:2em;color:#555;align-self:center">+</span>
+      <div class="dot-group gb">${dotsB || '<span style="color:#bbb;font-size:1.2em">0</span>'}</div>
+      <span style="font-size:2em;color:#555;align-self:center">=</span>
+      <div style="font-size:2.5em;font-weight:bold;color:#1a237e;align-self:center">${total}</div>
+    </div>
+
+    <!-- Equation strip -->
+    <div class="family-box">
+      <div class="family-title">📝 Number sentences</div>
+      <div class="family-eqs">
+        <div class="feq">${a} + ${b} = ${total}</div>
+        <div class="feq">${b} + ${a} = ${total}</div>
+        <div class="feq">${total} − ${b} = ${a}</div>
+        <div class="feq">${total} − ${a} = ${b}</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="action-btn" style="background:#607D8B" onclick="learnIdx=Math.max(0,learnIdx-1);renderLearn()" ${learnIdx===0?'disabled':''}>◀ Prev</button>
+      <button class="action-btn" style="background:#3949ab" onclick="speak('${a} and ${b} make ${total}')">🔊 Say It</button>
+      <button class="action-btn" style="background:#43A047" onclick="learnIdx=Math.min(bonds.length-1,learnIdx+1);renderLearn()" ${learnIdx===bonds.length-1?'disabled':''}>Next ▶</button>
+    </div>
+    <div style="text-align:center;margin-top:10px">
+      ${bonds.map((_,i)=>`<span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin:2px;background:${i===learnIdx?'#1a237e':i<learnIdx?'#9fa8da':'#ddd'}"></span>`).join('')}
+    </div>
+  `;
+  speak(`${a} and ${b} make ${total}`);
+}
+
+// ============ QUIZ MODE ============
+function renderQuiz() {
+  const bonds = quizTarget === 10 ? bonds10 : bonds20;
+  const bond = bonds[Math.floor(Math.random() * bonds.length)];
+  quizA = bond[0]; quizB = bond[1];
+  quizMissing = Math.random() > 0.5 ? 'b' : 'a';
+  if (quizA === 0) quizMissing = 'b';
+  if (quizB === 0) quizMissing = 'a';
+  quizAnswered = false;
+  const total = quizTarget;
+
+  const shownA = quizMissing === 'a' ? '?' : quizA;
+  const shownB = quizMissing === 'b' ? '?' : quizB;
+
+  // Generate numpad options (correct + 5 distractors)
+  const correct = quizMissing === 'a' ? quizA : quizB;
+  let opts = new Set([correct]);
+  while (opts.size < 6) {
+    const r = Math.floor(Math.random() * (total + 1));
+    opts.add(r);
+  }
+  opts = [...opts].sort(() => Math.random() - 0.5);
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:14px">
+      <button onclick="quizTarget=10;renderQuiz()" style="padding:8px 20px;border-radius:50px;border:2px solid ${quizTarget===10?'#1a237e':'#ccc'};background:${quizTarget===10?'#1a237e':'white'};color:${quizTarget===10?'white':'#333'};font-family:inherit;font-size:1em;cursor:pointer;font-weight:bold;">Make 10</button>
+      <button onclick="quizTarget=20;renderQuiz()" style="padding:8px 20px;border-radius:50px;border:2px solid ${quizTarget===20?'#1a237e':'#ccc'};background:${quizTarget===20?'#1a237e':'white'};color:${quizTarget===20?'white':'#333'};font-family:inherit;font-size:1em;cursor:pointer;font-weight:bold;">Make 20</button>
+    </div>
+    <div style="text-align:center;font-size:1.1em;color:#888;margin-bottom:16px">Fill in the missing number!</div>
+
+    <!-- Part-whole diagram with blank -->
+    <div class="bond-diagram">
+      <div class="bond-whole">${total}</div>
+      <div class="bond-line"></div>
+      <div class="bond-branch">
+        <div class="bond-part ${quizMissing==='a'?'unknown':'a'}" id="partA">${shownA}</div>
+        <div class="bond-part ${quizMissing==='b'?'unknown':'b'}" id="partB">${shownB}</div>
+      </div>
+    </div>
+
+    <div class="equation-strip">
+      <span id="eqA">${shownA}</span>
+      <span>+</span>
+      <span id="eqB">${shownB}</span>
+      <span>=</span>
+      <span>${total}</span>
+    </div>
+
+    <div class="numpad" id="quizNumpad">
+      ${opts.map(o=>`<button class="np-btn" onclick="checkQuiz(${o},this)">${o}</button>`).join('')}
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="renderQuiz()">🔄 New Question</button>
+    </div>
+  `;
+}
+
+function checkQuiz(val, btn) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const correct = quizMissing === 'a' ? quizA : quizB;
+  const fb = document.getElementById('feedback');
+  const partEl = document.getElementById('part' + (quizMissing === 'a' ? 'A' : 'B'));
+  const eqEl = document.getElementById('eq' + (quizMissing === 'a' ? 'A' : 'B'));
+
+  if (val === correct) {
+    partEl.className = 'bond-part ' + (quizMissing === 'a' ? 'a' : 'b');
+    partEl.textContent = correct;
+    eqEl.textContent = correct;
+    btn.style.background = '#c8f7c5';
+    btn.style.borderColor = '#4caf50';
+    quizRight++; quizStreak++;
+    fb.textContent = '✅ Brilliant! ' + correct + ' is right! 🌟';
+    fb.style.color = '#2e7d32';
+    speak('Brilliant! The answer is ' + correct);
+    setTimeout(() => renderQuiz(), 1800);
+  } else {
+    btn.style.background = '#ffcdd2';
+    btn.style.borderColor = '#ef9a9a';
+    quizWrong++; quizStreak = 0;
+    quizAnswered = false;
+    fb.textContent = '❌ Try again!';
+    fb.style.color = '#c62828';
+    setTimeout(() => { btn.style.background = ''; btn.style.borderColor = ''; fb.textContent = ''; }, 600);
+  }
+  document.getElementById('sRight').textContent = quizRight;
+  document.getElementById('sWrong').textContent = quizWrong;
+  document.getElementById('sStreak').textContent = quizStreak;
+}
+
+// ============ BOND FAMILY MODE ============
+function renderFamily() {
+  const bonds = familyTarget === 10 ? bonds10 : bonds20;
+  const bond = bonds[familyIdx];
+  const a = bond[0], b = bond[1], total = familyTarget;
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="display:flex;gap:10px;justify-content:center;margin-bottom:14px">
+      <button onclick="familyTarget=10;familyIdx=0;renderFamily()" style="padding:8px 20px;border-radius:50px;border:2px solid ${familyTarget===10?'#1a237e':'#ccc'};background:${familyTarget===10?'#1a237e':'white'};color:${familyTarget===10?'white':'#333'};font-family:inherit;font-size:1em;cursor:pointer;font-weight:bold;">Make 10</button>
+      <button onclick="familyTarget=20;familyIdx=0;renderFamily()" style="padding:8px 20px;border-radius:50px;border:2px solid ${familyTarget===20?'#1a237e':'#ccc'};background:${familyTarget===20?'#1a237e':'white'};color:${familyTarget===20?'white':'#333'};font-family:inherit;font-size:1em;cursor:pointer;font-weight:bold;">Make 20</button>
+    </div>
+
+    <div style="text-align:center;font-size:1em;color:#888;margin-bottom:8px">Choose a bond to explore:</div>
+
+    <div class="bonds-grid">
+      ${bonds.map((b,i)=>`<div class="bond-card ${i===familyIdx?'active-bc':''}" onclick="familyIdx=${i};renderFamily()">
+        <div class="bc-top">${b[0]} + ${b[1]}</div>
+        <div class="bc-eq">= ${total}</div>
+      </div>`).join('')}
+    </div>
+
+    <div class="family-box">
+      <div class="family-title">👨‍👩‍👧 The Bond Family for ${a} + ${b} = ${total}</div>
+      <div class="family-eqs">
+        <div class="feq" onclick="speak('${a} plus ${b} equals ${total}')">${a} + ${b} = ${total} 🔊</div>
+        <div class="feq" onclick="speak('${b} plus ${a} equals ${total}')">${b} + ${a} = ${total} 🔊</div>
+        <div class="feq" onclick="speak('${total} minus ${b} equals ${a}')">${total} − ${b} = ${a} 🔊</div>
+        <div class="feq" onclick="speak('${total} minus ${a} equals ${b}')">${total} − ${a} = ${b} 🔊</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="action-btn" style="background:#3949ab" onclick="speak('${a} and ${b} make ${total}')">🔊 Read It</button>
+    </div>
+  `;
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.85; u.pitch = 1.2;
+  window.speechSynthesis.speak(u);
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Writing Practice</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#4b1248,#f10711);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.3);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .topbar a:hover{background:rgba(255,255,255,0.35);}
+
+  /* MODE TABS */
+  .tabs{display:flex;gap:10px;padding:14px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:10px 22px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.1);color:white;font-family:inherit;font-size:0.95em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#4b1248;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.25);}
+
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+
+  /* ── LETTER TRACE ── */
+  .trace-card{width:720px;max-width:100%;background:white;border-radius:24px;box-shadow:0 16px 50px rgba(0,0,0,0.35);padding:28px;}
+  .letter-grid{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;}
+  .letter-pick{width:44px;height:44px;border-radius:10px;border:2px solid #ddd;background:#f5f5f5;font-size:1.3em;font-weight:bold;cursor:pointer;transition:all 0.2s;font-family:inherit;}
+  .letter-pick:hover{border-color:#4b1248;background:#f3e5f5;}
+  .letter-pick.active{background:#4b1248;color:white;border-color:#4b1248;}
+  .trace-display{display:flex;align-items:center;justify-content:center;gap:32px;margin:10px 0 20px;}
+  .trace-letter{font-size:9em;font-weight:bold;color:#4b1248;line-height:1;text-align:center;opacity:0.15;position:relative;}
+  .trace-letter-sm{font-size:6em;font-weight:bold;color:#9c27b0;line-height:1;text-align:center;opacity:0.15;}
+  .trace-label{font-size:0.75em;color:#aaa;text-align:center;margin-top:4px;}
+  .stroke-guide{background:#f3e5f5;border-radius:16px;padding:16px 20px;margin-bottom:16px;}
+  .stroke-title{font-size:1em;font-weight:bold;color:#4b1248;margin-bottom:8px;}
+  .stroke-steps{display:flex;flex-direction:column;gap:6px;}
+  .stroke-step{font-size:1em;color:#555;display:flex;align-items:center;gap:8px;}
+  .canvas-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  canvas{border:3px solid #ddd;border-radius:16px;cursor:crosshair;touch-action:none;background:#fafafa;}
+  .canvas-btns{display:flex;gap:10px;}
+  .cbtn{border:none;border-radius:50px;padding:10px 22px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .cbtn:hover{transform:scale(1.05);}
+  .cbtn-clear{background:#607D8B;}
+  .cbtn-speak{background:#9C27B0;}
+
+  /* ── SENTENCE BUILD ── */
+  .sentence-card{width:720px;max-width:100%;background:white;border-radius:24px;box-shadow:0 16px 50px rgba(0,0,0,0.35);padding:28px;display:none;}
+  .sb-title{font-size:1.2em;font-weight:bold;color:#4b1248;margin-bottom:6px;}
+  .sb-picture{font-size:4em;text-align:center;margin:10px 0;}
+  .sb-prompt{font-size:1em;color:#777;margin-bottom:14px;}
+  .sb-drop-zone{min-height:60px;border:3px dashed #ce93d8;border-radius:16px;padding:12px 16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#fce4ec;margin-bottom:14px;}
+  .sb-drop-zone .word-chip{background:#9c27b0;color:white;}
+  .word-bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px;}
+  .word-chip{background:#f3e5f5;border:2px solid #ce93d8;border-radius:20px;padding:8px 16px;font-size:1.05em;cursor:pointer;color:#4b1248;user-select:none;transition:all 0.2s;}
+  .word-chip:hover{background:#e1bee7;transform:scale(1.05);}
+  .word-chip.used{opacity:0.3;pointer-events:none;}
+  .sb-check{border:none;border-radius:50px;padding:12px 28px;font-size:1.1em;font-family:inherit;cursor:pointer;background:#4b1248;color:white;transition:transform 0.15s;}
+  .sb-check:hover{transform:scale(1.05);}
+  .sb-feedback{font-size:1.1em;font-weight:bold;text-align:center;min-height:32px;margin-top:8px;}
+  .sb-nav{display:flex;gap:10px;justify-content:center;margin-top:10px;}
+  .sb-nav-btn{border:none;border-radius:50px;padding:10px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .sb-nav-btn:hover{transform:scale(1.05);}
+  .sb-nav-btn.prev{background:#FF7043;}
+  .sb-nav-btn.next{background:#4CAF50;}
+  .sb-nav-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+
+  /* ── COPY WRITING ── */
+  .copy-card{width:720px;max-width:100%;background:white;border-radius:24px;box-shadow:0 16px 50px rgba(0,0,0,0.35);padding:28px;display:none;}
+  .copy-sentence{font-size:1.5em;color:#4b1248;font-weight:bold;text-align:center;background:#fce4ec;border-radius:12px;padding:16px;margin-bottom:16px;line-height:1.6;}
+  .copy-textarea{width:100%;height:100px;border:3px solid #ce93d8;border-radius:16px;padding:12px 16px;font-size:1.3em;font-family:'Comic Sans MS',cursive;resize:none;outline:none;color:#333;}
+  .copy-textarea:focus{border-color:#4b1248;}
+  .copy-result{font-size:1em;text-align:center;margin-top:8px;min-height:28px;}
+  .copy-btns{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap;}
+  .copy-btn{border:none;border-radius:50px;padding:10px 22px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .copy-btn:hover{transform:scale(1.05);}
+
+  .nav{display:flex;justify-content:center;align-items:center;gap:14px;padding:14px;}
+  .nav-btn{border:none;border-radius:50px;padding:11px 28px;font-size:1.1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#555;cursor:not-allowed;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">✍️ Writing Practice</span>
+  <span style="color:white;font-size:0.9em">English</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showMode('trace')">🔤 Letter Trace</button>
+  <button class="tab" onclick="showMode('sentence')">🧩 Build Sentences</button>
+  <button class="tab" onclick="showMode('copy')">📝 Copy Writing</button>
+</div>
+
+<div class="main">
+
+  <!-- LETTER TRACE -->
+  <div class="trace-card" id="traceMode">
+    <div style="font-size:1.1em;font-weight:bold;color:#4b1248;margin-bottom:12px">Choose a letter to practise:</div>
+    <div class="letter-grid" id="letterGrid"></div>
+    <div class="trace-display">
+      <div style="text-align:center">
+        <div class="trace-letter" id="traceBig">A</div>
+        <div class="trace-label">Uppercase</div>
+      </div>
+      <div style="text-align:center">
+        <div class="trace-letter-sm" id="traceSm">a</div>
+        <div class="trace-label">Lowercase</div>
+      </div>
+    </div>
+    <div class="stroke-guide">
+      <div class="stroke-title">✏️ How to write: <span id="strokeLetter">A</span></div>
+      <div class="stroke-steps" id="strokeSteps"></div>
+    </div>
+    <div class="canvas-wrap">
+      <div style="font-size:0.95em;color:#888;margin-bottom:4px">Draw the letter below — practise 3 times! ✍️</div>
+      <canvas id="drawCanvas" width="640" height="180"></canvas>
+      <div class="canvas-btns">
+        <button class="cbtn cbtn-clear" onclick="clearCanvas()">🗑️ Clear</button>
+        <button class="cbtn cbtn-speak" onclick="speakLetter()">🔊 Say Letter</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SENTENCE BUILD -->
+  <div class="sentence-card" id="sentenceMode">
+    <div class="sb-title">🧩 Build the Sentence</div>
+    <div class="sb-picture" id="sbPic">🐶</div>
+    <div class="sb-prompt" id="sbPrompt">Arrange the words to make a correct sentence:</div>
+    <div class="sb-drop-zone" id="dropZone">
+      <span style="color:#ce93d8;font-size:0.9em;font-style:italic">Tap words below to add them here…</span>
+    </div>
+    <div class="word-bank" id="wordBank"></div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="sb-check" onclick="checkSentence()">✅ Check</button>
+      <button class="sb-check" style="background:#607D8B" onclick="clearSentence()">🔄 Clear</button>
+      <button class="sb-check" style="background:#9C27B0" onclick="speakAnswer()">🔊 Hear It</button>
+    </div>
+    <div class="sb-feedback" id="sbFeedback"></div>
+    <div class="sb-nav">
+      <button class="sb-nav-btn prev" id="sbPrev" onclick="sbGo(-1)" disabled>◀</button>
+      <span style="color:#555;font-size:0.95em" id="sbCount">1 / 8</span>
+      <button class="sb-nav-btn next" id="sbNext" onclick="sbGo(1)">▶</button>
+    </div>
+  </div>
+
+  <!-- COPY WRITING -->
+  <div class="copy-card" id="copyMode">
+    <div style="font-size:1.1em;font-weight:bold;color:#4b1248;margin-bottom:12px">📝 Read and Copy the Sentence:</div>
+    <div class="copy-sentence" id="copySentence">The dog runs fast.</div>
+    <div style="font-size:0.9em;color:#888;margin-bottom:8px">Type it carefully below:</div>
+    <textarea class="copy-textarea" id="copyInput" placeholder="Type the sentence here…" oninput="checkCopy()"></textarea>
+    <div class="copy-result" id="copyResult"></div>
+    <div class="copy-btns">
+      <button class="copy-btn" style="background:#607D8B" onclick="clearCopy()">🔄 Clear</button>
+      <button class="copy-btn" style="background:#9C27B0" onclick="speakCopy()">🔊 Hear It</button>
+      <button class="copy-btn prev" style="background:#FF7043" onclick="cpGo(-1)" id="cpPrev" disabled>◀ Prev</button>
+      <button class="copy-btn next" style="background:#4CAF50" onclick="cpGo(1)" id="cpNext">Next ▶</button>
+    </div>
+    <div style="text-align:center;color:#888;font-size:0.85em;margin-top:8px" id="cpCount">Sentence 1 of 10</div>
+  </div>
+
+</div>
+
+<script>
+// ─── LETTER DATA ───
+const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+const strokes = {
+  A:['Start at the bottom left','Draw a line up to a point at the top','Draw a line back down to the right','Add a small line across the middle'],
+  B:['Draw a tall straight line downward','Add a bump on the top half (curves right)','Add a bigger bump on the bottom half (curves right)'],
+  C:['Start at the top right','Curve left and all the way around','Stop at the bottom right (open circle)'],
+  D:['Draw a tall straight line downward','Add a big curve from top to bottom on the right'],
+  E:['Draw a tall straight line downward','Draw a line right from the top','Draw a line right from the middle','Draw a line right from the bottom'],
+  F:['Draw a tall straight line downward','Draw a line right from the top','Draw a shorter line right from the middle'],
+  G:['Start at the top right and curve left all around','Stop halfway up the right side','Add a short line going left from that point'],
+  H:['Draw a tall line downward on the left','Draw a tall line downward on the right','Connect them with a line across the middle'],
+  I:['Draw a short line across the top','Draw a tall line straight down','Draw a short line across the bottom'],
+  J:['Draw a short line across the top','Draw a tall line straight down','Curve to the left at the bottom'],
+  K:['Draw a tall straight line downward','From the middle, draw a line up-right','From the middle, draw a line down-right'],
+  L:['Draw a tall straight line downward','Draw a line to the right at the bottom'],
+  M:['Draw a tall straight line downward on the left','Go up and draw a diagonal line to the middle point','Go back up and draw a diagonal line back up right','Draw a tall straight line downward on the right'],
+  N:['Draw a tall straight line downward on the left','Draw a diagonal line from top-left to bottom-right','Draw a tall straight line upward on the right'],
+  O:['Start at the top','Draw a big oval all the way around and close it'],
+  P:['Draw a tall straight line downward','Add a bump on the top half only (curves right)'],
+  Q:['Draw a big circle','Add a small diagonal line at the bottom right'],
+  R:['Draw a tall straight line downward','Add a bump on the top half (curves right)','Add a diagonal leg from the bump going down-right'],
+  S:['Curve from top to the left','Continue curving to the right at the bottom'],
+  T:['Draw a line across the top','Draw a tall straight line downward from the middle'],
+  U:['Draw a line downward from the top left','Curve at the bottom','Draw a line upward on the right'],
+  V:['Draw a diagonal line downward to the right','Draw a diagonal line back up to the right'],
+  W:['Draw a diagonal line down-right','Draw a diagonal line back up','Draw a diagonal line down-right again','Draw a diagonal line back up'],
+  X:['Draw a diagonal line from top-left to bottom-right','Draw a diagonal line from top-right to bottom-left'],
+  Y:['Draw a diagonal line from top-left to the middle','Draw a diagonal line from top-right to the middle','Continue straight down from the middle'],
+  Z:['Draw a line across the top','Draw a diagonal line from top-right to bottom-left','Draw a line across the bottom'],
+};
+
+let curLetter = 'A';
+let drawing = false, ctx, canvas;
+
+// Build letter picker
+const grid = document.getElementById('letterGrid');
+letters.forEach(l => {
+  const btn = document.createElement('button');
+  btn.className = 'letter-pick' + (l==='A'?' active':'');
+  btn.textContent = l;
+  btn.onclick = () => selectLetter(l);
+  grid.appendChild(btn);
+});
+
+function selectLetter(l) {
+  curLetter = l;
+  document.querySelectorAll('.letter-pick').forEach(b => b.classList.toggle('active', b.textContent===l));
+  document.getElementById('traceBig').textContent = l;
+  document.getElementById('traceSm').textContent = l.toLowerCase();
+  document.getElementById('strokeLetter').textContent = l;
+  const steps = strokes[l] || ['Draw the letter carefully!'];
+  document.getElementById('strokeSteps').innerHTML = steps.map((s,i) =>
+    `<div class="stroke-step"><span style="background:#4b1248;color:white;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:0.8em;flex-shrink:0">${i+1}</span>${s}</div>`
+  ).join('');
+  clearCanvas();
+}
+
+// Canvas drawing
+window.addEventListener('load', () => {
+  canvas = document.getElementById('drawCanvas');
+  ctx = canvas.getContext('2d');
+  ctx.strokeStyle = '#4b1248';
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+
+  // Draw guide lines
+  drawGuideLines();
+
+  const getPos = (e) => {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - r.left, y: src.clientY - r.top };
+  };
+  canvas.addEventListener('mousedown', e => { drawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); });
+  canvas.addEventListener('mousemove', e => { if(!drawing)return; const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); });
+  canvas.addEventListener('mouseup', () => drawing=false);
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); });
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); if(!drawing)return; const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.stroke(); });
+  canvas.addEventListener('touchend', () => drawing=false);
+
+  selectLetter('A');
+});
+
+function drawGuideLines() {
+  if (!ctx) return;
+  ctx.save();
+  ctx.strokeStyle = '#e0e0e0';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([5,5]);
+  [60, 120].forEach(y => { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(640,y); ctx.stroke(); });
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+function clearCanvas() {
+  if (!ctx) return;
+  ctx.clearRect(0, 0, 640, 180);
+  drawGuideLines();
+}
+
+function speakLetter() {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(curLetter);
+  u.rate=0.7; u.pitch=1.2;
+  window.speechSynthesis.speak(u);
+}
+
+// ─── SENTENCE BUILD ───
+const sentences = [
+  {pic:'🐶', words:['The','dog','is','big','.'], answer:'The dog is big .'},
+  {pic:'🌞', words:['The','sun','is','hot','.'], answer:'The sun is hot .'},
+  {pic:'🐦', words:['The','bird','can','fly','.'], answer:'The bird can fly .'},
+  {pic:'🍎', words:['I','like','red','apples','.'], answer:'I like red apples .'},
+  {pic:'🐸', words:['The','frog','sat','on','a','log','.'], answer:'The frog sat on a log .'},
+  {pic:'🌧️', words:['It','is','raining','today','.'], answer:'It is raining today .'},
+  {pic:'🚌', words:['We','go','to','school','by','bus','.'], answer:'We go to school by bus .'},
+  {pic:'⭐', words:['I','can','see','the','stars','.'], answer:'I can see the stars .'},
+];
+let sbCur=0, sbChosen=[];
+
+function renderSentence() {
+  const s=sentences[sbCur];
+  document.getElementById('sbPic').textContent=s.pic;
+  sbChosen=[];
+  const bank=document.getElementById('wordBank');
+  bank.innerHTML='';
+  const shuffled=[...s.words].sort(()=>Math.random()-0.5);
+  shuffled.forEach(w => {
+    const chip=document.createElement('div');
+    chip.className='word-chip';chip.textContent=w;
+    chip.onclick=()=>addWord(w,chip);
+    bank.appendChild(chip);
+  });
+  const dz=document.getElementById('dropZone');
+  dz.innerHTML='<span style="color:#ce93d8;font-size:0.9em;font-style:italic">Tap words below to add them here…</span>';
+  document.getElementById('sbFeedback').textContent='';
+  document.getElementById('sbPrev').disabled=sbCur===0;
+  document.getElementById('sbNext').disabled=sbCur===sentences.length-1;
+  document.getElementById('sbCount').textContent=`${sbCur+1} / ${sentences.length}`;
+}
+
+function addWord(w, chip) {
+  if(chip.classList.contains('used')) return;
+  chip.classList.add('used');
+  sbChosen.push(w);
+  const dz=document.getElementById('dropZone');
+  if(dz.querySelector('span')) dz.innerHTML='';
+  const wc=document.createElement('div');wc.className='word-chip';wc.textContent=w;
+  wc.onclick=()=>removeWord(w,chip,wc);
+  dz.appendChild(wc);
+}
+
+function removeWord(w,origChip,dzChip){
+  sbChosen=sbChosen.filter((x,i)=>{ if(x===w){sbChosen.splice(i,1);return false;}return true;});
+  sbChosen=sbChosen.filter(x=>x!==w);
+  dzChip.remove();origChip.classList.remove('used');
+  if(document.getElementById('dropZone').children.length===0)
+    document.getElementById('dropZone').innerHTML='<span style="color:#ce93d8;font-size:0.9em;font-style:italic">Tap words below to add them here…</span>';
+}
+
+function checkSentence(){
+  const s=sentences[sbCur];
+  const attempt=Array.from(document.getElementById('dropZone').querySelectorAll('.word-chip')).map(c=>c.textContent).join(' ');
+  const ok=attempt===s.answer;
+  const fb=document.getElementById('sbFeedback');
+  fb.textContent=ok?'✅ Great job! Correct sentence! 🌟':'❌ Not quite. Try again!';
+  fb.style.color=ok?'#2e7d32':'#c62828';
+}
+
+function clearSentence(){
+  document.querySelectorAll('.word-chip.used').forEach(c=>c.classList.remove('used'));
+  sbChosen=[];
+  document.getElementById('dropZone').innerHTML='<span style="color:#ce93d8;font-size:0.9em;font-style:italic">Tap words below to add them here…</span>';
+  document.getElementById('sbFeedback').textContent='';
+}
+
+function speakAnswer(){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(sentences[sbCur].answer.replace(/\./g,''));
+  u.rate=0.85;u.pitch=1.1;
+  window.speechSynthesis.speak(u);
+}
+
+function sbGo(dir){sbCur=Math.max(0,Math.min(sentences.length-1,sbCur+dir));renderSentence();}
+
+// ─── COPY WRITING ───
+const copySentences = [
+  'The cat sat on the mat.','I can see a big red ball.','She has a blue bag.','We play in the park today.','The bird sat in the tree.','My dog is fluffy and kind.','I like to read and draw.','The sun is big and hot.','He ran fast to the gate.','Look at the pretty flowers!',
+];
+let cpCur=0;
+
+function renderCopy(){
+  document.getElementById('copySentence').textContent=copySentences[cpCur];
+  document.getElementById('copyInput').value='';
+  document.getElementById('copyResult').textContent='';
+  document.getElementById('cpPrev').disabled=cpCur===0;
+  document.getElementById('cpNext').disabled=cpCur===copySentences.length-1;
+  document.getElementById('cpCount').textContent=`Sentence ${cpCur+1} of ${copySentences.length}`;
+}
+
+function checkCopy(){
+  const target=copySentences[cpCur].toLowerCase();
+  const typed=document.getElementById('copyInput').value.toLowerCase();
+  const res=document.getElementById('copyResult');
+  if(typed===target){res.textContent='✅ Perfect! Well done! 🌟';res.style.color='#2e7d32';}
+  else if(target.startsWith(typed)){res.textContent='✏️ Keep going…';res.style.color='#888';}
+  else{res.textContent='🔍 Check your spelling!';res.style.color='#e65100';}
+}
+
+function clearCopy(){document.getElementById('copyInput').value='';document.getElementById('copyResult').textContent='';}
+function speakCopy(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(copySentences[cpCur]);u.rate=0.8;u.pitch=1.1;window.speechSynthesis.speak(u);}
+function cpGo(dir){cpCur=Math.max(0,Math.min(copySentences.length-1,cpCur+dir));renderCopy();}
+
+// ─── MODE SWITCH ───
+function showMode(m){
+  ['trace','sentence','copy'].forEach(id=>{
+    document.getElementById(id+'Mode').style.display='none';
+  });
+  document.getElementById(m+'Mode').style.display='block';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  event.target.classList.add('active');
+  if(m==='sentence')renderSentence();
+  if(m==='copy')renderCopy();
+}
+
+renderSentence();
+renderCopy();
+</script>
+</body>
+</html>

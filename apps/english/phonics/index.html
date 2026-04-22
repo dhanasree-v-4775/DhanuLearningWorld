@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phonics – Letter Sounds</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+    min-height: 100vh;
+    background: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .topbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(0,0,0,0.3);
+    color: white;
+  }
+  .topbar a {
+    color: white; text-decoration: none;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 14px; border-radius: 20px;
+    transition: background 0.2s;
+  }
+  .topbar a:hover { background: rgba(255,255,255,0.35); }
+
+  /* ALPHABET STRIP */
+  .alpha-strip {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 20px;
+    background: rgba(0,0,0,0.2);
+    width: 100%;
+  }
+  .alpha-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 1em;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.2s;
+  }
+  .alpha-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.3); }
+  .alpha-btn.active { border-color: gold; background: gold; color: #333; transform: scale(1.2); }
+
+  /* MAIN CARD */
+  .card-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    width: 100%;
+  }
+  .card {
+    width: 680px;
+    max-width: 100%;
+    background: white;
+    border-radius: 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-header {
+    padding: 30px 30px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .letter-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .letter-upper {
+    font-size: 8em;
+    font-weight: bold;
+    line-height: 1;
+    transition: color 0.4s;
+  }
+  .letter-lower {
+    font-size: 4em;
+    font-weight: bold;
+    opacity: 0.6;
+    transition: color 0.4s;
+  }
+
+  .emoji-display {
+    font-size: 8em;
+    text-align: center;
+    flex: 1;
+    animation: popIn 0.4s ease;
+  }
+  @keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .card-body {
+    padding: 10px 30px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .word-display {
+    font-size: 2.8em;
+    font-weight: bold;
+    text-align: center;
+    transition: color 0.4s;
+  }
+  .word-display span.highlight {
+    font-size: 1.2em;
+    text-decoration: underline;
+    text-decoration-style: wavy;
+  }
+  .sound-tag {
+    font-size: 1.3em;
+    background: #f0f0f0;
+    border-radius: 12px;
+    padding: 8px 20px;
+    color: #555;
+    font-style: italic;
+  }
+  .example-words {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 4px;
+  }
+  .ex-word {
+    background: #e8f5e9;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 1.1em;
+    color: #2e7d32;
+    border: 2px solid #a5d6a7;
+  }
+
+  .speak-btn {
+    background: #9C27B0;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 36px;
+    font-size: 1.2em;
+    font-family: inherit;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(156,39,176,0.4);
+    transition: transform 0.15s, background 0.2s;
+    margin-top: 4px;
+  }
+  .speak-btn:hover { transform: scale(1.05); background: #7B1FA2; }
+
+  /* NAVIGATION */
+  .nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+  }
+  .nav-btn {
+    border: none;
+    border-radius: 50px;
+    padding: 12px 30px;
+    font-size: 1.15em;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.15s;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .nav-btn.prev { background: #FF7043; }
+  .nav-btn.next { background: #4CAF50; }
+  .nav-btn:hover { transform: scale(1.05); }
+  .nav-btn:disabled { background: #555; cursor: not-allowed; transform: none; }
+  .nav-count { color: white; font-size: 1.1em; min-width: 80px; text-align: center; }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    width: 90%;
+    max-width: 680px;
+    height: 10px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 10px;
+    margin: 0 auto 16px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: gold;
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../../../index.html">🏠 Home</a>
+  <span style="color:white; font-size:1.1em; font-weight:bold">🔡 Phonics – Letter Sounds A to Z</span>
+  <span style="color:white; font-size:0.9em">Grade 1</span>
+</div>
+
+<!-- ALPHABET STRIP -->
+<div class="alpha-strip" id="alphaStrip"></div>
+
+<!-- PROGRESS BAR -->
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<!-- CARD -->
+<div class="card-wrap">
+  <div class="card">
+    <div class="card-header" id="cardHeader">
+      <div class="letter-display">
+        <div class="letter-upper" id="letterUpper">A</div>
+        <div class="letter-lower" id="letterLower">a</div>
+      </div>
+      <div class="emoji-display" id="emojiDisplay">🍎</div>
+    </div>
+    <div class="card-body">
+      <div class="word-display" id="wordDisplay">
+        <span class="highlight" id="wordHighlight">A</span><span id="wordRest">pple</span>
+      </div>
+      <div class="sound-tag" id="soundTag">Sound: /æ/ as in "apple"</div>
+      <div class="example-words" id="exampleWords"></div>
+      <button class="speak-btn" onclick="speakCurrent()">🔊 Hear the Sound</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<div class="nav">
+  <button class="nav-btn prev" id="prevBtn" onclick="go(-1)" disabled>◀ Prev</button>
+  <span class="nav-count" id="navCount">1 / 26</span>
+  <button class="nav-btn next" id="nextBtn" onclick="go(1)">Next ▶</button>
+</div>
+
+<script>
+const letters = [
+  { l:'A', emoji:'🍎', word:'Apple',   rest:'pple', sound:'/æ/ as in "apple"',   ex:['ant','ask','add'] },
+  { l:'B', emoji:'🎈', word:'Balloon', rest:'alloon',sound:'/b/ as in "balloon"', ex:['bed','big','bus'] },
+  { l:'C', emoji:'🐱', word:'Cat',     rest:'at',   sound:'/k/ as in "cat"',     ex:['cup','car','cap'] },
+  { l:'D', emoji:'🐶', word:'Dog',     rest:'og',   sound:'/d/ as in "dog"',     ex:['dip','dig','den'] },
+  { l:'E', emoji:'🐘', word:'Elephant',rest:'lephant',sound:'/ɛ/ as in "elephant"',ex:['egg','end','elm'] },
+  { l:'F', emoji:'🐟', word:'Fish',    rest:'ish',  sound:'/f/ as in "fish"',    ex:['fun','fan','fit'] },
+  { l:'G', emoji:'🍇', word:'Grapes',  rest:'rapes', sound:'/g/ as in "grapes"', ex:['gap','got','gum'] },
+  { l:'H', emoji:'🏠', word:'House',   rest:'ouse', sound:'/h/ as in "house"',   ex:['hat','hop','hen'] },
+  { l:'I', emoji:'🍦', word:'Ice cream',rest:'ce cream',sound:'/ɪ/ as in "ice"', ex:['ink','ill','in'] },
+  { l:'J', emoji:'🫙', word:'Jar',     rest:'ar',   sound:'/dʒ/ as in "jar"',   ex:['jog','jab','jet'] },
+  { l:'K', emoji:'🪁', word:'Kite',    rest:'ite',  sound:'/k/ as in "kite"',   ex:['kit','kid','key'] },
+  { l:'L', emoji:'🦁', word:'Lion',    rest:'ion',  sound:'/l/ as in "lion"',   ex:['leg','lap','lid'] },
+  { l:'M', emoji:'🌙', word:'Moon',    rest:'oon',  sound:'/m/ as in "moon"',   ex:['map','mud','mix'] },
+  { l:'N', emoji:'🪺', word:'Nest',    rest:'est',  sound:'/n/ as in "nest"',   ex:['nap','nod','net'] },
+  { l:'O', emoji:'🍊', word:'Orange',  rest:'range',sound:'/ɒ/ as in "orange"', ex:['odd','opt','ox'] },
+  { l:'P', emoji:'🐧', word:'Penguin', rest:'enguin',sound:'/p/ as in "penguin"',ex:['pat','pen','pig'] },
+  { l:'Q', emoji:'👸', word:'Queen',   rest:'ueen', sound:'/kw/ as in "queen"', ex:['quiz','quit'] },
+  { l:'R', emoji:'🌈', word:'Rainbow', rest:'ainbow',sound:'/r/ as in "rainbow"',ex:['rat','rug','run'] },
+  { l:'S', emoji:'☀️', word:'Sun',     rest:'un',   sound:'/s/ as in "sun"',    ex:['sit','sip','sad'] },
+  { l:'T', emoji:'🐯', word:'Tiger',   rest:'iger', sound:'/t/ as in "tiger"',  ex:['tap','tin','top'] },
+  { l:'U', emoji:'☂️', word:'Umbrella',rest:'mbrella',sound:'/ʌ/ as in "umbrella"',ex:['up','us','ug'] },
+  { l:'V', emoji:'🎻', word:'Violin',  rest:'iolin',sound:'/v/ as in "violin"', ex:['van','vet','vim'] },
+  { l:'W', emoji:'🐳', word:'Whale',   rest:'hale', sound:'/w/ as in "whale"',  ex:['web','win','wag'] },
+  { l:'X', emoji:'🎵', word:'Xylophone',rest:'ylophone',sound:'/ks/ as in "xylophone"',ex:['fox','box','mix'] },
+  { l:'Y', emoji:'🧶', word:'Yarn',    rest:'arn',  sound:'/j/ as in "yarn"',   ex:['yak','yam','yes'] },
+  { l:'Z', emoji:'🦓', word:'Zebra',   rest:'ebra', sound:'/z/ as in "zebra"',  ex:['zip','zap','zoo'] },
+];
+
+const colors = [
+  '#E53935','#D81B60','#8E24AA','#3949AB','#1E88E5','#039BE5',
+  '#00ACC1','#00897B','#43A047','#7CB342','#C0CA33','#FDD835',
+  '#FFB300','#FB8C00','#F4511E','#6D4C41','#546E7A','#1E88E5',
+  '#5E35B1','#00897B','#F4511E','#D81B60','#00ACC1','#43A047',
+  '#FFB300','#E53935'
+];
+
+let cur = 0;
+
+// Build alphabet strip
+const strip = document.getElementById('alphaStrip');
+letters.forEach((lt, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'alpha-btn' + (i===0?' active':'');
+  btn.textContent = lt.l;
+  btn.onclick = () => goTo(i);
+  strip.appendChild(btn);
+});
+
+function render() {
+  const d = letters[cur];
+  const col = colors[cur];
+
+  document.getElementById('letterUpper').textContent = d.l;
+  document.getElementById('letterUpper').style.color = col;
+  document.getElementById('letterLower').textContent = d.l.toLowerCase();
+  document.getElementById('letterLower').style.color = col;
+
+  // emoji with pop animation
+  const emojiEl = document.getElementById('emojiDisplay');
+  emojiEl.style.animation = 'none';
+  emojiEl.offsetHeight; // reflow
+  emojiEl.style.animation = 'popIn 0.4s ease';
+  emojiEl.textContent = d.emoji;
+
+  // word
+  document.getElementById('wordHighlight').textContent = d.l;
+  document.getElementById('wordHighlight').style.color = col;
+  document.getElementById('wordRest').textContent = d.word.slice(1);
+  document.getElementById('wordDisplay').style.color = '#333';
+
+  document.getElementById('soundTag').textContent = 'Sound: ' + d.sound;
+
+  // example words
+  const exEl = document.getElementById('exampleWords');
+  exEl.innerHTML = d.ex.map(w =>
+    `<span class="ex-word" style="color:${col};border-color:${col};background:${col}18">${w}</span>`
+  ).join('');
+
+  // card background tint
+  document.querySelector('.card').style.borderTop = `6px solid ${col}`;
+
+  // alphabet strip
+  document.querySelectorAll('.alpha-btn').forEach((b,i) => {
+    b.classList.toggle('active', i===cur);
+    if(i===cur) { b.style.background=col; b.style.borderColor=col; b.style.color='white'; }
+    else { b.style.background=''; b.style.borderColor=''; b.style.color=''; }
+  });
+
+  document.getElementById('prevBtn').disabled = cur === 0;
+  document.getElementById('nextBtn').disabled = cur === letters.length - 1;
+  document.getElementById('navCount').textContent = `${cur+1} / 26`;
+  document.getElementById('progressFill').style.width = `${((cur+1)/26)*100}%`;
+}
+
+function go(dir) {
+  cur = Math.max(0, Math.min(letters.length-1, cur+dir));
+  render();
+}
+function goTo(i) { cur=i; render(); }
+
+function speakCurrent() {
+  if (!('speechSynthesis' in window)) return;
+  const d = letters[cur];
+  window.speechSynthesis.cancel();
+  const sayLetter = new SpeechSynthesisUtterance(d.l);
+  sayLetter.rate = 0.8; sayLetter.pitch = 1.2;
+  const sayWord = new SpeechSynthesisUtterance(d.word);
+  sayWord.rate = 0.8; sayWord.pitch = 1.1;
+  const sayExamples = new SpeechSynthesisUtterance(d.ex.join(', '));
+  sayExamples.rate = 0.85;
+  window.speechSynthesis.speak(sayLetter);
+  window.speechSynthesis.speak(sayWord);
+  window.speechSynthesis.speak(sayExamples);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') go(1);
+  if (e.key === 'ArrowLeft')  go(-1);
+});
+
+render();
+</script>
+</body>
+</html>

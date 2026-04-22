@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animals & Habitats</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#e65100,#bf360c,#4e342e);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.25);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .tabs{display:flex;gap:8px;padding:12px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:9px 20px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.12);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#e65100;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.3);}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+  .score-row{display:flex;gap:16px;color:white;font-size:1em;justify-content:center;}
+  .sc-box{background:rgba(255,255,255,0.2);border-radius:14px;padding:8px 20px;text-align:center;}
+  .sc-box .val{font-size:1.5em;font-weight:bold;display:block;}
+  .card{width:780px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.35);padding:24px 28px;}
+
+  /* ANIMAL CARDS */
+  .animal-filter{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:16px;}
+  .filter-btn{padding:7px 16px;border-radius:50px;border:2px solid #ffcc80;background:white;font-family:inherit;font-size:0.9em;cursor:pointer;color:#e65100;transition:all 0.2s;}
+  .filter-btn.active{background:#e65100;color:white;border-color:#e65100;}
+  .filter-btn:hover{background:#fff3e0;}
+  .animals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin:10px 0;}
+  .animal-card{background:linear-gradient(135deg,#fff8e1,#ffecb3);border-radius:18px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;border:2px solid transparent;}
+  .animal-card:hover,.animal-card.sel{border-color:#e65100;transform:translateY(-3px);box-shadow:0 6px 20px rgba(230,81,0,0.2);}
+  .animal-card.sel{background:linear-gradient(135deg,#fff3e0,#ffe0b2);}
+  .a-emoji{font-size:2.5em;margin-bottom:6px;}
+  .a-name{font-size:1em;font-weight:bold;color:#333;}
+  .a-type{font-size:0.8em;color:#e65100;margin-top:2px;}
+
+  /* DETAIL PANEL */
+  .detail-panel{background:linear-gradient(135deg,#fff8e1,#ffecb3);border-radius:20px;padding:20px;margin:10px 0;border-left:5px solid #e65100;}
+  .dp-top{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;}
+  .dp-icon{font-size:4em;}
+  .dp-info{flex:1;}
+  .dp-name{font-size:1.6em;font-weight:bold;color:#e65100;}
+  .dp-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;}
+  .dp-chip{padding:4px 12px;border-radius:20px;font-size:0.85em;font-weight:bold;color:white;}
+  .dp-desc{font-size:0.95em;color:#333;line-height:1.6;margin-top:8px;}
+  .dp-habitat{font-size:0.9em;color:#555;background:#fff3e0;border-radius:10px;padding:8px 12px;margin-top:8px;}
+
+  /* HABITAT MAP */
+  .habitat-tabs{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px;}
+  .hab-btn{padding:8px 18px;border-radius:50px;border:2px solid #ccc;background:white;font-family:inherit;font-size:0.9em;cursor:pointer;color:#333;transition:all 0.2s;}
+  .hab-btn.active{color:white;font-weight:bold;}
+  .habitat-box{border-radius:20px;padding:20px;margin:10px 0;}
+  .hab-animals{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:12px 0;}
+  .hab-animal{text-align:center;cursor:pointer;transition:all 0.2s;}
+  .hab-animal:hover{transform:scale(1.15);}
+  .hab-emoji{font-size:2.8em;}
+  .hab-name{font-size:0.8em;color:#555;margin-top:4px;}
+
+  /* CLASSIFICATION */
+  .class-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin:14px 0;}
+  .class-card{border-radius:18px;padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;}
+  .class-card:hover{transform:translateY(-3px);}
+  .class-icon{font-size:2.5em;margin-bottom:8px;}
+  .class-name{font-size:1.1em;font-weight:bold;margin-bottom:4px;}
+  .class-desc{font-size:0.85em;line-height:1.4;}
+  .class-examples{font-size:1.5em;margin-top:8px;letter-spacing:4px;}
+
+  /* QUIZ */
+  .q-text{font-size:1.2em;font-weight:bold;color:#333;text-align:center;margin:14px 0;}
+  .q-emoji{font-size:3.5em;text-align:center;margin:10px 0;}
+  .q-opts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .q-opt{padding:12px 22px;border-radius:50px;border:2px solid #ffcc80;background:white;font-family:inherit;font-size:1.05em;cursor:pointer;color:#333;transition:all 0.2s;}
+  .q-opt:hover{border-color:#e65100;background:#fff3e0;}
+  .q-opt.correct{border-color:#4caf50;background:#c8f7c5;}
+  .q-opt.wrong{border-color:#e53935;background:#ffcdd2;}
+  .feedback{font-size:1.2em;font-weight:bold;text-align:center;min-height:36px;margin-top:10px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  .action-btn{border:none;border-radius:50px;padding:11px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+  @keyframes popIn{0%{transform:scale(0);}100%{transform:scale(1);}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🐾 Animals & Habitats</span>
+  <span style="color:white;font-size:0.9em">Science</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="setMode('animals',this)">🐘 Animals</button>
+  <button class="tab" onclick="setMode('habitats',this)">🏕️ Habitats</button>
+  <button class="tab" onclick="setMode('classify',this)">🔍 Classification</button>
+  <button class="tab" onclick="setMode('quiz',this)">🧩 Quiz</button>
+</div>
+<div class="main">
+  <div class="score-row" id="scoreRow" style="display:none">
+    <div class="sc-box"><span class="val" id="sRight">0</span>✅</div>
+    <div class="sc-box"><span class="val" id="sWrong">0</span>❌</div>
+    <div class="sc-box"><span class="val" id="sStreak">0</span>🔥</div>
+  </div>
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+const animals = [
+  {emoji:'🦁',name:'Lion',type:'Mammal',group:'mammal',habitat:'Grassland',food:'Meat',move:'Walk/Run',cover:'Fur',baby:'Cub',desc:'Lions are the kings of the savannah. They live in groups called prides and hunt together.',fun:'Only female lions (lionesses) do most of the hunting!'},
+  {emoji:'🐘',name:'Elephant',type:'Mammal',group:'mammal',habitat:'Grassland/Forest',food:'Plants',move:'Walk',cover:'Thick skin',baby:'Calf',desc:'Elephants are the largest land animals. They have long trunks to pick up food and water.',fun:'Elephants never forget! They have amazing memories.'},
+  {emoji:'🐬',name:'Dolphin',type:'Mammal',group:'mammal',habitat:'Ocean',food:'Fish',move:'Swim',cover:'Smooth skin',baby:'Calf',desc:'Dolphins are very smart animals that live in the ocean. They breathe air like us!',fun:'Dolphins sleep with one eye open!'},
+  {emoji:'🐸',name:'Frog',type:'Amphibian',group:'amphibian',habitat:'Pond/Land',food:'Insects',move:'Jump/Swim',cover:'Moist skin',baby:'Tadpole',desc:'Frogs can live both in water and on land. They start life as tadpoles in water.',fun:'Frogs drink water through their skin!'},
+  {emoji:'🦎',name:'Lizard',type:'Reptile',group:'reptile',habitat:'Desert/Forest',food:'Insects',move:'Walk/Crawl',cover:'Scales',baby:'Hatchling',desc:'Lizards are cold-blooded reptiles. They love sunbathing to warm their bodies!',fun:'Some lizards can drop their tail to escape predators — and it grows back!'},
+  {emoji:'🐊',name:'Crocodile',type:'Reptile',group:'reptile',habitat:'River/Swamp',food:'Meat',move:'Swim/Walk',cover:'Scales',baby:'Hatchling',desc:'Crocodiles are ancient reptiles that live near water. They are excellent swimmers.',fun:'Crocodiles have been on Earth for over 200 million years!'},
+  {emoji:'🦅',name:'Eagle',type:'Bird',group:'bird',habitat:'Mountains/Forest',food:'Fish/Meat',move:'Fly',cover:'Feathers',baby:'Chick',desc:'Eagles are powerful birds of prey with sharp talons and excellent eyesight.',fun:'Eagles can spot a rabbit from 3 kilometres away!'},
+  {emoji:'🐧',name:'Penguin',type:'Bird',group:'bird',habitat:'Antarctica',food:'Fish',move:'Swim/Waddle',cover:'Feathers',baby:'Chick',desc:'Penguins are birds that cannot fly but are amazing swimmers! They live in cold places.',fun:'Penguins huddle together to keep warm in freezing weather.'},
+  {emoji:'🦋',name:'Butterfly',type:'Insect',group:'insect',habitat:'Garden/Forest',food:'Nectar',move:'Fly',cover:'Exoskeleton',baby:'Caterpillar',desc:'Butterflies start as caterpillars, then change in a chrysalis before becoming beautiful butterflies!',fun:'Butterflies taste with their feet!'},
+  {emoji:'🐝',name:'Bee',type:'Insect',group:'insect',habitat:'Garden/Hive',food:'Nectar/Pollen',move:'Fly',cover:'Exoskeleton',baby:'Larva',desc:'Bees are very important insects. They carry pollen from flower to flower and make honey.',fun:'A bee visits up to 2,000 flowers to make just one jar of honey!'},
+  {emoji:'🐟',name:'Fish',type:'Fish',group:'fish',habitat:'Ocean/River',food:'Plants/Insects',move:'Swim',cover:'Scales',baby:'Fry',desc:'Fish live in water and breathe through gills. They use fins to swim.',fun:'There are more than 33,000 different species of fish!'},
+  {emoji:'🦈',name:'Shark',type:'Fish',group:'fish',habitat:'Ocean',food:'Fish/Meat',move:'Swim',cover:'Scales',baby:'Pup',desc:'Sharks are top predators of the ocean. They have rows of sharp teeth.',fun:'Sharks never stop swimming — they need to keep moving to breathe!'},
+];
+
+const habitats = [
+  {name:'Ocean', icon:'🌊', color:'#1565C0', bg:'#e3f2fd',
+   desc:'The ocean is a huge body of salty water. It covers most of our planet!',
+   animals:['🐬','🦈','🐟','🐙','🐠','🦑','🐳','🦀']},
+  {name:'Rainforest', icon:'🌳', color:'#2e7d32', bg:'#e8f5e9',
+   desc:'Rainforests are warm, wet forests with thousands of different plants and animals.',
+   animals:['🦜','🐊','🐒','🦋','🐸','🐆','🦥','🐍']},
+  {name:'Grassland', icon:'🌾', color:'#f57f17', bg:'#fffde7',
+   desc:'Grasslands are large open areas covered in grass. Also called savannah or prairie.',
+   animals:['🦁','🐘','🦒','🦓','🐃','🦅','🐆','🐜']},
+  {name:'Desert', icon:'🏜️', color:'#e65100', bg:'#fff3e0',
+   desc:'Deserts are very dry and hot in the day but cold at night. Little rain falls here.',
+   animals:['🐪','🦎','🦂','🐍','🦊','🦅','🐜','🦗']},
+  {name:'Polar', icon:'❄️', color:'#0277bd', bg:'#e1f5fe',
+   desc:'Polar regions (Arctic and Antarctic) are freezing cold with ice and snow all year.',
+   animals:['🐧','🐻‍❄️','🦭','🦦','🐋','🦣','🦊','🐦']},
+  {name:'Pond/River', icon:'🏞️', color:'#00695c', bg:'#e0f2f1',
+   desc:'Fresh water habitats like ponds and rivers are home to many amazing creatures.',
+   animals:['🐸','🦆','🐟','🦦','🐢','🦩','🐊','🦋']},
+];
+
+const classifications = [
+  {name:'Mammals', icon:'🦁', color:'#e65100', bg:'#fff3e0',
+   desc:'Warm-blooded, have fur/hair, feed babies milk, breathe air.',
+   examples:['🦁','🐘','🐬','🐶','🐱','🐭'],
+   facts:['Have live babies (mostly)','Feed babies milk','Breathe air with lungs','Have hair or fur']},
+  {name:'Birds', icon:'🦅', color:'#1565c0', bg:'#e3f2fd',
+   desc:'Warm-blooded, have feathers, lay eggs, most can fly.',
+   examples:['🦅','🐧','🦜','🐦','🦆','🦚'],
+   facts:['Have feathers','Have a beak/bill','Lay eggs','Have two wings']},
+  {name:'Reptiles', icon:'🦎', color:'#2e7d32', bg:'#e8f5e9',
+   desc:'Cold-blooded, have scales, lay eggs, breathe air.',
+   examples:['🦎','🐊','🐍','🐢','🦕','🦖'],
+   facts:['Have scales','Cold-blooded','Lay eggs on land','Breathe air with lungs']},
+  {name:'Amphibians', icon:'🐸', color:'#6a1b9a', bg:'#f3e5f5',
+   desc:'Cold-blooded, moist skin, can live in water AND on land.',
+   examples:['🐸','🦎','🐊','🦕'],
+   facts:['Live on land AND water','Start life in water','Breathe through skin (partly)','Cold-blooded']},
+  {name:'Fish', icon:'🐟', color:'#00838f', bg:'#e0f7fa',
+   desc:'Cold-blooded, have scales and fins, breathe through gills, live in water.',
+   examples:['🐟','🦈','🐠','🐡','🦑','🐙'],
+   facts:['Live in water','Breathe with gills','Have fins to swim','Have scales']},
+  {name:'Insects', icon:'🦋', color:'#c62828', bg:'#ffebee',
+   desc:'Have 6 legs, 3 body parts, most have wings.',
+   examples:['🦋','🐝','🐛','🐞','🦗','🐜'],
+   facts:['Have 6 legs','Body has 3 parts','Have an exoskeleton','Most have wings']},
+];
+
+const quizQs = [
+  {q:'Which animal is a mammal?', opts:['Eagle','Shark','Lion','Frog'], ans:'Lion', emoji:'🦁'},
+  {q:'Where does a penguin live?', opts:['Desert','Ocean/Antarctica','Forest','Grassland'], ans:'Ocean/Antarctica', emoji:'🐧'},
+  {q:'How many legs does an insect have?', opts:['4','6','8','2'], ans:'6', emoji:'🐝'},
+  {q:'What do we call a baby frog?', opts:['Cub','Chick','Tadpole','Calf'], ans:'Tadpole', emoji:'🐸'},
+  {q:'Which animal breathes through gills?', opts:['Dolphin','Eagle','Fish','Elephant'], ans:'Fish', emoji:'🐟'},
+  {q:'What covers a bird\'s body?', opts:['Scales','Fur','Feathers','Smooth skin'], ans:'Feathers', emoji:'🦅'},
+  {q:'Which habitat is very dry and hot?', opts:['Ocean','Rainforest','Desert','Polar'], ans:'Desert', emoji:'🏜️'},
+  {q:'What do bees collect from flowers?', opts:['Water','Nectar','Seeds','Leaves'], ans:'Nectar', emoji:'🐝'},
+  {q:'Which group do crocodiles belong to?', opts:['Mammals','Birds','Fish','Reptiles'], ans:'Reptiles', emoji:'🐊'},
+  {q:'A baby lion is called a...?', opts:['Pup','Cub','Calf','Chick'], ans:'Cub', emoji:'🦁'},
+];
+
+let mode = 'animals';
+let selAnimal = 0, animalFilter = 'all';
+let activeHabitat = 0;
+let activeClass = 0;
+let qIdx = 0, qRight = 0, qWrong = 0, qStreak = 0, qAnswered = false;
+
+function setMode(m, tab) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('scoreRow').style.display = m === 'quiz' ? 'flex' : 'none';
+  render();
+}
+
+function render() {
+  if (mode === 'animals') renderAnimals();
+  else if (mode === 'habitats') renderHabitats();
+  else if (mode === 'classify') renderClassify();
+  else renderQuiz();
+}
+
+function renderAnimals() {
+  const filters = ['all','mammal','bird','reptile','amphibian','fish','insect'];
+  const filterLabels = {'all':'🐾 All','mammal':'🦁 Mammals','bird':'🦅 Birds','reptile':'🦎 Reptiles','amphibian':'🐸 Amphibians','fish':'🐟 Fish','insect':'🦋 Insects'};
+  const filtered = animalFilter === 'all' ? animals : animals.filter(a => a.group === animalFilter);
+  const a = animals[selAnimal];
+
+  document.getElementById('mainCard').innerHTML = `
+    <div class="animal-filter">
+      ${filters.map(f=>`<button class="filter-btn ${f===animalFilter?'active':''}" onclick="animalFilter='${f}';renderAnimals()">${filterLabels[f]}</button>`).join('')}
+    </div>
+    <div class="animals-grid">
+      ${filtered.map((an,i)=>{
+        const idx = animals.indexOf(an);
+        return `<div class="animal-card ${idx===selAnimal?'sel':''}" onclick="selAnimal=${idx};renderAnimals()">
+          <div class="a-emoji">${an.emoji}</div>
+          <div class="a-name">${an.name}</div>
+          <div class="a-type">${an.type}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="detail-panel">
+      <div class="dp-top">
+        <div class="dp-icon">${a.emoji}</div>
+        <div class="dp-info">
+          <div class="dp-name">${a.name}</div>
+          <div class="dp-chips">
+            <span class="dp-chip" style="background:#e65100">${a.type}</span>
+            <span class="dp-chip" style="background:#1565c0">🏕️ ${a.habitat}</span>
+            <span class="dp-chip" style="background:#2e7d32">🍖 ${a.food}</span>
+            <span class="dp-chip" style="background:#6a1b9a">🏃 ${a.move}</span>
+            <span class="dp-chip" style="background:#00838f">🧸 Baby: ${a.baby}</span>
+          </div>
+          <div class="dp-desc">${a.desc}</div>
+          <div class="dp-habitat">💡 Fun Fact: ${a.fun}</div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#e65100" onclick="speak('${a.name}. ${a.desc}')">🔊 Read</button>
+    </div>
+  `;
+}
+
+function renderHabitats() {
+  const h = habitats[activeHabitat];
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#333;margin-bottom:12px;text-align:center">🏕️ Animal Habitats</div>
+    <div class="habitat-tabs">
+      ${habitats.map((hb,i)=>`<button class="hab-btn ${i===activeHabitat?'active':''}" style="${i===activeHabitat?'background:'+hb.color+';color:white;border-color:'+hb.color:''}" onclick="activeHabitat=${i};renderHabitats()">${hb.icon} ${hb.name}</button>`).join('')}
+    </div>
+    <div class="habitat-box" style="background:${h.bg};border:2px solid ${h.color}">
+      <div style="font-size:2em;margin-bottom:6px;text-align:center">${h.icon}</div>
+      <div style="font-size:1.2em;font-weight:bold;color:${h.color};text-align:center;margin-bottom:8px">${h.name}</div>
+      <div style="font-size:0.95em;color:#333;text-align:center;margin-bottom:14px">${h.desc}</div>
+      <div style="font-size:0.9em;font-weight:bold;color:#555;text-align:center;margin-bottom:8px">Animals that live here:</div>
+      <div class="hab-animals">
+        ${h.animals.map(e=>`<div class="hab-animal" onclick="speak('This animal lives in the ${h.name}')">
+          <div class="hab-emoji">${e}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#e65100" onclick="speak('The ${h.name} habitat. ${h.desc}')">🔊 Read</button>
+    </div>
+  `;
+}
+
+function renderClassify() {
+  const c = classifications[activeClass];
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#333;margin-bottom:12px;text-align:center">🔍 Animal Classification</div>
+    <div class="class-grid">
+      ${classifications.map((cl,i)=>`<div class="class-card ${i===activeClass?'sel':''}" style="background:${cl.bg};border:2px solid ${i===activeClass?cl.color:'transparent'}" onclick="activeClass=${i};renderClassify()">
+        <div class="class-icon">${cl.icon}</div>
+        <div class="class-name" style="color:${cl.color}">${cl.name}</div>
+        <div class="class-examples">${cl.examples.slice(0,3).join('')}</div>
+      </div>`).join('')}
+    </div>
+    <div style="background:${c.bg};border-radius:18px;padding:18px;border-left:5px solid ${c.color};margin-top:10px">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div style="font-size:3em">${c.icon}</div>
+        <div style="flex:1">
+          <div style="font-size:1.4em;font-weight:bold;color:${c.color}">${c.name}</div>
+          <div style="font-size:0.95em;color:#333;margin:6px 0">${c.desc}</div>
+          <div style="font-size:1.8em;letter-spacing:4px">${c.examples.join('')}</div>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div style="font-size:0.9em;font-weight:bold;color:#555;margin-bottom:8px">Key features:</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px">
+          ${c.facts.map(f=>`<span style="background:white;border:1px solid ${c.color};color:${c.color};padding:4px 12px;border-radius:20px;font-size:0.85em">✅ ${f}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:${c.color}" onclick="speak('${c.name}. ${c.desc}')">🔊 Read</button>
+    </div>
+  `;
+}
+
+function renderQuiz() {
+  if (qIdx >= quizQs.length) qIdx = 0;
+  const q = quizQs[qIdx];
+  qAnswered = false;
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-bottom:6px">Question ${qIdx+1} of ${quizQs.length}</div>
+    <div class="q-emoji">${q.emoji}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="q-opts" id="opts">
+      ${q.opts.map(o=>`<button class="q-opt" onclick="checkQ(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}')">  ${o}</button>`).join('')}
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="qIdx=0;renderQuiz()">🔄 Restart</button>
+    </div>
+  `;
+}
+
+function checkQ(btn, val, ans) {
+  if (qAnswered) return;
+  qAnswered = true;
+  document.querySelectorAll('#opts .q-opt').forEach(b => b.disabled = true);
+  const fb = document.getElementById('feedback');
+  if (val === ans) {
+    btn.classList.add('correct'); qRight++; qStreak++;
+    fb.textContent = '✅ Amazing! ' + ans + ' is right! 🌟';
+    fb.style.color = '#2e7d32';
+    speak('Amazing! Correct!');
+    setTimeout(() => { qIdx++; renderQuiz(); }, 1800);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('#opts .q-opt').forEach(b => { if (b.textContent.trim() === ans) b.classList.add('correct'); });
+    qWrong++; qStreak = 0;
+    fb.textContent = '❌ The answer is: ' + ans;
+    fb.style.color = '#c62828';
+    setTimeout(() => { qIdx++; renderQuiz(); }, 2200);
+  }
+  document.getElementById('sRight').textContent = qRight;
+  document.getElementById('sWrong').textContent = qWrong;
+  document.getElementById('sStreak').textContent = qStreak;
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.85; u.pitch = 1.1;
+  window.speechSynthesis.speak(u);
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magic Tree House #1 – Dinosaurs Before Dark</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:#0a0a1a;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.4);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .topbar a:hover{background:rgba(255,255,255,0.35);}
+  .stage{flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding:20px;}
+  .book{width:780px;max-width:100%;background:white;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,0.6);overflow:hidden;min-height:480px;}
+  .page{display:none;min-height:480px;}
+  .page.active{display:flex;}
+  .pg-full{flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;}
+  .pg-split{flex-direction:row;}
+  .pg-split .left,.pg-split .right{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;}
+  .story-text{font-size:1.25em;line-height:1.85;color:#333;text-align:center;max-width:500px;}
+  .notebook{background:#fffde7;border:3px solid #fdd835;border-radius:12px;padding:14px 18px;font-size:1em;color:#4e342e;text-align:left;max-width:300px;line-height:1.9;}
+  .notebook strong{color:#e65100;}
+  .fact-box{background:#e3f2fd;border-left:5px solid #1e88e5;border-radius:8px;padding:10px 16px;font-size:1em;color:#0d47a1;margin:8px 0;max-width:320px;text-align:left;}
+  .speech-j{background:#e8f5e9;border:3px solid #43a047;border-radius:16px;padding:10px 16px;font-size:1.05em;color:#1b5e20;margin:8px;max-width:270px;text-align:center;}
+  .speech-a{background:#fce4ec;border:3px solid #e91e63;border-radius:16px;padding:10px 16px;font-size:1.05em;color:#880e4f;margin:8px;max-width:270px;text-align:center;}
+  .name-j{font-size:0.75em;font-weight:bold;color:#2e7d32;margin-bottom:3px;}
+  .name-a{font-size:0.75em;font-weight:bold;color:#880e4f;margin-bottom:3px;}
+
+  .cover{background:linear-gradient(160deg,#1a237e,#283593,#4527a0);}
+  .cover-title{font-size:2.1em;font-weight:bold;color:white;text-shadow:2px 2px 8px rgba(0,0,0,0.4);line-height:1.2;margin:12px 0;}
+  .cover-sub{font-size:1em;color:rgba(255,255,255,0.9);margin-top:8px;}
+  .bg-woods{background:linear-gradient(160deg,#e8f5e9,#f1f8e9);}
+  .bg-treehouse{background:linear-gradient(160deg,#fff8e1,#fffde7);}
+  .bg-dino{background:linear-gradient(160deg,#e0f7fa,#b2ebf2);}
+  .bg-jungle{background:linear-gradient(160deg,#e8f5e9,#c8e6c9);}
+  .bg-trex{background:linear-gradient(160deg,#ffebee,#ffcdd2);}
+  .bg-escape{background:linear-gradient(160deg,#f3e5f5,#e1bee7);}
+  .bg-mystery{background:linear-gradient(160deg,#1a237e,#283593);}
+  .bg-end{background:linear-gradient(135deg,#1a237e,#4527a0);}
+
+  .spin{display:inline-block;animation:spin 3s linear infinite;}
+  @keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+  .bounce{display:inline-block;animation:bounce 1.5s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+  .shake{display:inline-block;animation:shake 0.4s ease-in-out infinite;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .fly{display:inline-block;animation:fly 2s ease-in-out infinite;}
+  @keyframes fly{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-15px) rotate(3deg);}}
+  .glow{animation:glow 2s ease-in-out infinite;}
+  @keyframes glow{0%,100%{filter:drop-shadow(0 0 6px gold);}50%{filter:drop-shadow(0 0 18px gold);}}
+
+  .nav{display:flex;justify-content:center;align-items:center;gap:20px;padding:18px;}
+  .nav-btn{border:none;border-radius:50px;padding:12px 32px;font-size:1.2em;font-family:inherit;cursor:pointer;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.2);transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+  .read-btn{background:#9C27B0;color:white;border:none;border-radius:50px;padding:12px 24px;font-size:1em;font-family:inherit;cursor:pointer;transition:transform 0.15s;}
+  .read-btn:hover{transform:scale(1.05);}
+  .dots{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:0 20px 14px;}
+  .dot{width:10px;height:10px;border-radius:50%;background:#ccc;cursor:pointer;transition:background 0.3s;}
+  .dot.active{background:#5c35b1;transform:scale(1.4);}
+  .dot.done{background:#b39ddb;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.05em;font-weight:bold">🌳 Magic Tree House #1 – Dinosaurs Before Dark</span>
+  <span id="pageIndicator" style="color:white;font-size:0.95em">Page 1 of 16</span>
+</div>
+<div class="stage"><div class="book">
+
+  <!-- 1. COVER -->
+  <div class="page active pg-full cover">
+    <div style="display:flex;gap:16px;justify-content:center;align-items:flex-end;margin-bottom:12px">
+      <div style="text-align:center"><span class="bounce" style="font-size:4em">🌳</span></div>
+      <div style="text-align:center"><span class="bounce" style="font-size:3em;animation-delay:0.3s">🏠</span></div>
+      <div style="text-align:center"><span class="bounce" style="font-size:4em;animation-delay:0.6s">🦕</span></div>
+    </div>
+    <div class="cover-title">Magic Tree House #1<br><span style="font-size:0.8em">Dinosaurs Before Dark</span></div>
+    <div style="font-size:1.8em;margin:10px 0">🧒👧 📚 ⏰ 🦖 🌟</div>
+    <div class="cover-sub">Inspired by Mary Pope Osborne • A time-travel adventure!</div>
+  </div>
+
+  <!-- 2. JACK AND ANNIE -->
+  <div class="page pg-split bg-woods">
+    <div class="left">
+      <div style="display:flex;gap:12px;font-size:4em">🧒👧</div>
+      <div style="font-size:0.85em;font-weight:bold;color:#2e7d32;margin-top:6px">Jack & Annie</div>
+    </div>
+    <div class="right">
+      <div class="story-text">
+        Eight-year-old <strong>Jack</strong><br>
+        and his sister <strong>Annie</strong><br>
+        were walking through<br>
+        the Frog Creek woods<br>
+        one afternoon...<br><br>
+        <em style="color:#888">"Look! Up in that oak tree!"</em> 🌳
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. THE TREEHOUSE -->
+  <div class="page pg-full bg-treehouse">
+    <div style="font-size:5em" class="glow">🌳🏠</div>
+    <div class="story-text" style="margin-top:16px">
+      High up in a tall oak tree<br>
+      was a <strong style="color:#ff6d00">tree house!</strong><br><br>
+      It was filled with books —<br>
+      <strong>hundreds of books!</strong> 📚📚📚<br><br>
+      <em style="color:#888">Whose tree house was it?<br>Where did all the books come from?</em>
+    </div>
+  </div>
+
+  <!-- 4. CLIMBING UP -->
+  <div class="page pg-split bg-treehouse">
+    <div class="left">
+      <div style="font-size:4em">👧</div>
+      <div class="name-a">Annie</div>
+      <div class="speech-a">Come on, Jack!<br>Let's climb up! 🪜</div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em">🧒📓</div>
+      <div class="name-j">Jack</div>
+      <div class="speech-j">Wait! We should<br>find out whose<br>it is first! 🤔</div>
+      <div style="font-size:1em;color:#888;margin-top:8px;font-style:italic">But he climbed up anyway!</div>
+    </div>
+  </div>
+
+  <!-- 5. THE DINOSAUR BOOK -->
+  <div class="page pg-full bg-treehouse">
+    <div style="font-size:4em;margin-bottom:14px">📚🔍</div>
+    <div class="story-text" style="margin-bottom:16px">
+      Jack found a book about<br>
+      <strong style="color:#1565c0">dinosaurs!</strong> 🦕<br><br>
+      He opened to a picture of<br>
+      a flying reptile — a <strong>Pteranodon!</strong>
+    </div>
+    <div class="notebook">
+      📓 <strong>Jack's Notes:</strong><br>
+      Pteranodon = flying reptile<br>
+      • Not a dinosaur!<br>
+      • Wingspan: 7 metres!<br>
+      • No teeth — beak like a bird
+    </div>
+  </div>
+
+  <!-- 6. I WISH -->
+  <div class="page pg-full" style="background:linear-gradient(160deg,#f3e5f5,#e8eaf6)">
+    <div style="font-size:4em;margin-bottom:14px">🧒📖✨</div>
+    <div class="story-text">
+      Jack pointed to the Pteranodon picture.<br><br>
+      <em>"I wish I could see a<br>real Pteranodon,"</em> he said.<br><br>
+      Suddenly the wind began to blow! 💨<br><br>
+      The tree house began to SPIN! 🌪️
+    </div>
+    <div class="spin" style="font-size:4em;margin-top:14px">🌀</div>
+  </div>
+
+  <!-- 7. TIME TRAVEL -->
+  <div class="page pg-full bg-mystery">
+    <div class="spin" style="font-size:5em;margin-bottom:14px">🌀⭐🌀</div>
+    <div class="story-text" style="color:white;font-size:1.4em">
+      The tree house spun<br>
+      <strong style="color:#ffd54f">faster and faster!</strong><br><br>
+      Then — everything stopped.<br><br>
+      <em style="color:#b39ddb">They had travelled back in time —<br>65 million years!</em>
+    </div>
+    <div style="font-size:3em;margin-top:14px">⏰ → 🦕</div>
+  </div>
+
+  <!-- 8. DINOSAUR WORLD -->
+  <div class="page pg-full bg-dino">
+    <div style="font-size:4em;margin-bottom:14px">🦕🌿🌴🦖</div>
+    <div class="story-text">
+      They looked out of the window.<br>
+      The Frog Creek woods were GONE!<br><br>
+      Instead — <strong style="color:#01579b">a dinosaur world!</strong><br><br>
+      Tall fern trees. A wide river.<br>
+      And in the sky above them…
+    </div>
+    <div class="fly" style="font-size:5em;margin-top:14px">🦅</div>
+    <div style="font-size:1.1em;color:#01579b;font-weight:bold;margin-top:8px">A real Pteranodon!</div>
+  </div>
+
+  <!-- 9. ANNIE MAKES A FRIEND -->
+  <div class="page pg-split bg-jungle">
+    <div class="left">
+      <div style="font-size:5em">👧</div>
+      <div class="name-a">Annie</div>
+      <div class="speech-a">Hello! I won't<br>hurt you! 😊<br>You're beautiful!</div>
+    </div>
+    <div class="right">
+      <div class="fly" style="font-size:5em">🦅</div>
+      <div class="story-text" style="margin-top:10px">
+        The Pteranodon landed<br>beside Annie!<br><br>
+        Annie gently patted<br>its golden crest.<br><br>
+        <em style="color:#2e7d32">"I'm going to call you Henry!"</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. JACK TAKES NOTES -->
+  <div class="page pg-split bg-jungle">
+    <div class="left">
+      <div style="font-size:4em">🧒📓</div>
+      <div class="name-j">Jack</div>
+      <div class="speech-j">I must write<br>everything down!<br>This is amazing! ✍️</div>
+    </div>
+    <div class="right">
+      <div class="notebook">
+        📓 <strong>Jack's field notes:</strong><br>
+        ✅ Pteranodon is real!<br>
+        ✅ Not scary — gentle!<br>
+        ✅ Golden crest on head<br>
+        ✅ Annie is very brave 😄
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. THE T-REX! -->
+  <div class="page pg-full bg-trex">
+    <div class="shake" style="font-size:5em">🦖</div>
+    <div style="font-size:2em;font-weight:900;color:#b71c1c;margin:10px 0">ROAAARRR! 💥</div>
+    <div class="story-text">
+      A <strong style="color:#b71c1c">Tyrannosaurus Rex</strong><br>
+      thundered out of the trees!<br><br>
+      BOOM! BOOM! BOOM!<br>
+      The ground shook with every step! 🌍<br><br>
+      <em>"RUN!"</em> yelled Jack. 🏃
+    </div>
+  </div>
+
+  <!-- 12. HENRY TO THE RESCUE -->
+  <div class="page pg-split bg-escape">
+    <div class="left">
+      <div style="font-size:4em">🧒👧😱</div>
+      <div class="story-text" style="margin-top:10px;font-size:1.1em">
+        Jack dropped his backpack!<br>
+        The T-Rex stopped to sniff it.<br>
+        <em style="color:#7b1fa2">That gave them time!</em>
+      </div>
+    </div>
+    <div class="right">
+      <div class="fly" style="font-size:4em">🦅</div>
+      <div class="story-text" style="margin-top:10px">
+        Henry the Pteranodon<br>swooped down!<br><br>
+        He carried Jack and Annie<br>safely back to the tree house! 🏠
+      </div>
+    </div>
+  </div>
+
+  <!-- 13. GOING HOME -->
+  <div class="page pg-full" style="background:linear-gradient(160deg,#f3e5f5,#e8eaf6)">
+    <div style="font-size:4em;margin-bottom:14px">🧒👧📖</div>
+    <div class="story-text" style="margin-bottom:16px">
+      Jack grabbed the book<br>
+      about Frog Creek woods<br>
+      and pointed to a picture.<br><br>
+      <em>"I wish we could go home!"</em>
+    </div>
+    <div class="spin" style="font-size:4em">🌀</div>
+    <div style="font-size:1.2em;color:#7b1fa2;font-weight:bold;margin-top:12px">
+      The tree house spun again… ✨
+    </div>
+  </div>
+
+  <!-- 14. BACK HOME + MYSTERY -->
+  <div class="page pg-split bg-woods">
+    <div class="left">
+      <div style="font-size:4em">🧒👧</div>
+      <div class="story-text" style="margin-top:10px">
+        They were back in<br>Frog Creek woods!<br><br>
+        Same day. Same time.<br>
+        Like nothing happened! ⏰
+      </div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em" class="glow">✨📜✨</div>
+      <div class="story-text" style="margin-top:10px">
+        Jack noticed something<br>in the tree house —<br>
+        a gold medallion with<br>the letter <strong style="color:#ff6d00;font-size:1.3em">M</strong>.<br><br>
+        <em style="color:#888">Who does it belong to?</em>
+      </div>
+    </div>
+  </div>
+
+  <!-- 15. WHO IS M? -->
+  <div class="page pg-full bg-mystery">
+    <div class="glow" style="font-size:5em">🪄</div>
+    <div style="font-size:3em;font-weight:bold;color:gold;text-shadow:2px 2px 8px rgba(0,0,0,0.5);margin:16px 0">
+      Who is <em>M</em>?
+    </div>
+    <div class="story-text" style="color:rgba(255,255,255,0.9)">
+      The tree house belongs to<br>
+      someone magical...<br><br>
+      Someone with the letter <strong style="color:gold">M</strong>.<br><br>
+      <em>Could it be <strong style="color:gold">Morgan le Fay</strong>?<br>
+      A powerful librarian magician!</em><br><br>
+      Find out in the next book! 📚
+    </div>
+  </div>
+
+  <!-- 16. THE END -->
+  <div class="page pg-full bg-end">
+    <div style="display:flex;gap:12px;justify-content:center;font-size:3.5em;margin-bottom:14px">
+      <span class="bounce">🌳</span><span class="bounce" style="animation-delay:0.2s">🏠</span><span class="bounce" style="animation-delay:0.4s">⭐</span>
+    </div>
+    <div style="font-size:3em;font-weight:bold;color:white;text-shadow:2px 2px 6px rgba(0,0,0,0.3);margin:12px 0">The End!</div>
+    <div style="font-size:1em;color:rgba(255,255,255,0.9);margin-bottom:20px">
+      🦕 Dinosaur Facts learned today:<br>
+      <em>Pteranodon • T-Rex • Time Travel 🕐</em><br><br>
+      Books can take you anywhere! 📚✨
+    </div>
+    <a href="../../index.html" style="background:white;color:#1a237e;padding:12px 28px;border-radius:30px;text-decoration:none;font-size:1.1em;font-weight:bold;">🏠 Back to Home</a>
+  </div>
+
+</div></div>
+<div class="dots" id="dots"></div>
+<div class="nav">
+  <button class="nav-btn prev" id="prevBtn" onclick="changePage(-1)" disabled>◀ Prev</button>
+  <button class="read-btn" onclick="readPage()">🔊 Read Aloud</button>
+  <button class="nav-btn next" id="nextBtn" onclick="changePage(1)">Next ▶</button>
+</div>
+<script>
+const pages=document.querySelectorAll('.page'),totalPages=pages.length;let current=0;
+const dotsEl=document.getElementById('dots');
+pages.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);d.style.cursor='pointer';dotsEl.appendChild(d);});
+function updateUI(){pages.forEach((p,i)=>p.classList.toggle('active',i===current));document.querySelectorAll('.dot').forEach((d,i)=>{d.className='dot'+(i===current?' active':i<current?' done':'');});document.getElementById('prevBtn').disabled=current===0;document.getElementById('nextBtn').disabled=current===totalPages-1;document.getElementById('pageIndicator').textContent=`Page ${current+1} of ${totalPages}`;}
+function changePage(dir){current=Math.max(0,Math.min(totalPages-1,current+dir));updateUI();}
+function goTo(i){current=i;updateUI();}
+const pageTexts=["Magic Tree House number one: Dinosaurs Before Dark! A time travel adventure.","Eight year old Jack and his sister Annie were walking through the Frog Creek woods one afternoon. Look! Up in that oak tree!","High up in a tall oak tree was a tree house! It was filled with hundreds of books! Whose tree house was it?","Come on Jack! Let's climb up! said Annie. Wait! We should find out whose it is first! said Jack. But he climbed up anyway!","Jack found a book about dinosaurs. He opened to a picture of a flying reptile called a Pteranodon. Pteranodon means flying reptile. It had a wingspan of seven metres!","I wish I could see a real Pteranodon, said Jack. Suddenly the wind began to blow and the tree house began to spin!","The tree house spun faster and faster! Then everything stopped. They had travelled back in time, sixty five million years!","They looked out of the window. The Frog Creek woods were gone! Instead, a dinosaur world! Tall fern trees, a wide river, and in the sky, a real Pteranodon!","Hello! I won't hurt you! You're beautiful! said Annie to the Pteranodon. It landed beside her! I'm going to call you Henry, said Annie.","I must write everything down! said Jack. Pteranodon is real! Not scary, gentle! Golden crest on head. Annie is very brave!","A Tyrannosaurus Rex thundered out of the trees! ROAARRR! The ground shook with every step! RUN! yelled Jack.","Jack dropped his backpack and the T Rex stopped to sniff it. Henry the Pteranodon swooped down and carried Jack and Annie safely back to the tree house!","Jack grabbed the book about Frog Creek woods. I wish we could go home! The tree house spun again.","They were back in Frog Creek woods! Same day, same time. Like nothing happened! But Jack noticed a gold medallion with the letter M. Who does it belong to?","Who is M? The tree house belongs to someone magical. Someone with the letter M. Could it be Morgan le Fay, a powerful librarian magician? Find out in the next book!","The End! Books can take you anywhere! Dinosaur facts learned today: Pteranodon, T Rex, and time travel!"];
+function readPage(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(pageTexts[current]);u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')changePage(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')changePage(-1);});
+updateUI();
+</script>
+</body>
+</html>

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>My Learning World 🌟</title>
+<style>
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Comic Sans MS','Chalkboard SE','Segoe UI',cursive;
+  background:#0f0c29;
+  min-height:100vh;
+  overflow-x:hidden;
+  color:#333;
+}
+
+/* ============================================================
+   ANIMATED BACKGROUND
+   ============================================================ */
+.bg-wrap {
+  position:fixed; inset:0; z-index:0;
+  background:linear-gradient(135deg,#1a1a2e 0%,#16213e 40%,#0f3460 100%);
+  overflow:hidden;
+}
+.bg-blob {
+  position:absolute; border-radius:50%; filter:blur(80px); opacity:0.35;
+  animation:blobFloat 12s ease-in-out infinite alternate;
+}
+.bg-blob:nth-child(1){width:500px;height:500px;background:#667eea;top:-100px;left:-100px;animation-delay:0s;}
+.bg-blob:nth-child(2){width:400px;height:400px;background:#f093fb;top:40%;right:-80px;animation-delay:3s;}
+.bg-blob:nth-child(3){width:350px;height:350px;background:#4facfe;bottom:-80px;left:30%;animation-delay:6s;}
+.bg-blob:nth-child(4){width:280px;height:280px;background:#43e97b;top:20%;left:50%;animation-delay:9s;}
+@keyframes blobFloat{0%{transform:translate(0,0) scale(1);}100%{transform:translate(30px,40px) scale(1.1);}}
+
+/* ============================================================
+   LAYOUT WRAPPER
+   ============================================================ */
+.app-wrapper { position:relative; z-index:1; min-height:100vh; display:flex; flex-direction:column; }
+
+/* ============================================================
+   HERO HEADER
+   ============================================================ */
+.hero {
+  text-align:center;
+  padding:48px 24px 32px;
+  position:relative;
+}
+.hero-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,0.12);
+  border:1.5px solid rgba(255,255,255,0.25);
+  border-radius:50px; padding:8px 20px;
+  color:rgba(255,255,255,0.9); font-size:0.9em;
+  margin-bottom:20px; backdrop-filter:blur(10px);
+}
+.hero-stars {
+  font-size:2.4em; margin-bottom:14px;
+  animation:starPulse 3s ease-in-out infinite;
+}
+@keyframes starPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
+.hero h1 {
+  font-size:clamp(2em,5vw,3.4em);
+  color:#fff;
+  text-shadow:0 4px 24px rgba(0,0,0,0.3);
+  margin-bottom:10px;
+  line-height:1.15;
+}
+.hero h1 span { color:#ffd700; }
+.hero p {
+  font-size:clamp(1em,2.5vw,1.25em);
+  color:rgba(255,255,255,0.8);
+  max-width:520px; margin:0 auto 28px;
+}
+.hero-stats {
+  display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+}
+.stat-pill {
+  background:rgba(255,255,255,0.15);
+  border:1.5px solid rgba(255,255,255,0.25);
+  border-radius:50px; padding:10px 22px;
+  color:white; backdrop-filter:blur(10px);
+  font-size:0.95em; font-weight:bold;
+  display:flex; align-items:center; gap:8px;
+}
+
+/* ============================================================
+   STICKY SUBJECT NAV
+   ============================================================ */
+.subject-nav {
+  position:sticky; top:0; z-index:100;
+  padding:12px 16px;
+  backdrop-filter:blur(20px) saturate(1.8);
+  background:rgba(15,12,41,0.75);
+  border-bottom:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 4px 24px rgba(0,0,0,0.3);
+}
+.subject-nav-inner {
+  display:flex; gap:8px; overflow-x:auto; padding-bottom:2px;
+  scrollbar-width:none; max-width:1200px; margin:0 auto;
+  justify-content:center; flex-wrap:wrap;
+}
+.subject-nav-inner::-webkit-scrollbar { display:none; }
+.nav-pill {
+  display:inline-flex; align-items:center; gap:6px;
+  padding:10px 20px; border-radius:50px;
+  border:2px solid rgba(255,255,255,0.2);
+  background:rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.85); font-family:inherit;
+  font-size:0.9em; font-weight:bold; cursor:pointer;
+  transition:all 0.22s ease; white-space:nowrap;
+  text-decoration:none;
+  -webkit-user-select:none; user-select:none;
+  min-height:44px;
+}
+.nav-pill:active,.nav-pill:hover {
+  background:rgba(255,255,255,0.95);
+  border-color:transparent;
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(0,0,0,0.25);
+}
+.nav-pill.books:active,.nav-pill.books:hover{color:#e91e8c;}
+.nav-pill.english:active,.nav-pill.english:hover{color:#00b4d8;}
+.nav-pill.maths:active,.nav-pill.maths:hover{color:#ff6b35;}
+.nav-pill.science:active,.nav-pill.science:hover{color:#2d9e2d;}
+.nav-pill.ict:active,.nav-pill.ict:hover{color:#6c5ce7;}
+.nav-pill.evs:active,.nav-pill.evs:hover{color:#00b894;}
+
+/* ============================================================
+   MAIN CONTENT
+   ============================================================ */
+.content { flex:1; padding:28px 16px 60px; max-width:1200px; margin:0 auto; width:100%; }
+
+/* ============================================================
+   SECTION
+   ============================================================ */
+.section { margin-bottom:48px; }
+.section-header {
+  display:flex; align-items:center; gap:16px;
+  margin-bottom:20px; padding:18px 24px;
+  border-radius:20px; position:relative; overflow:hidden;
+}
+.section-header::before {
+  content:''; position:absolute; inset:0;
+  background:inherit; filter:brightness(0.9);
+  z-index:0;
+}
+.section-header-inner { position:relative; z-index:1; display:flex; align-items:center; gap:16px; width:100%; }
+.section-icon { font-size:2.4em; flex-shrink:0; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.2)); }
+.section-text { flex:1; }
+.section-title { font-size:clamp(1.2em,2.5vw,1.5em); font-weight:bold; color:white; line-height:1.2; }
+.section-sub { font-size:0.85em; color:rgba(255,255,255,0.8); margin-top:3px; }
+.section-count {
+  background:rgba(255,255,255,0.25); color:white;
+  border-radius:50px; padding:4px 14px;
+  font-size:0.8em; font-weight:bold; white-space:nowrap;
+}
+
+/* Section header colors */
+.sh-books   { background:linear-gradient(135deg,#e91e8c,#c2185b); }
+.sh-english { background:linear-gradient(135deg,#0096c7,#0077b6); }
+.sh-maths   { background:linear-gradient(135deg,#ff6b35,#e65100); }
+.sh-science { background:linear-gradient(135deg,#2d9e2d,#1b5e20); }
+.sh-ict     { background:linear-gradient(135deg,#6c5ce7,#4a148c); }
+.sh-evs     { background:linear-gradient(135deg,#00b894,#00695c); }
+
+/* ============================================================
+   CARD GRID
+   ============================================================ */
+.card-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(168px,1fr));
+  gap:16px;
+}
+
+/* ============================================================
+   APP CARD
+   ============================================================ */
+.app-card {
+  border-radius:22px;
+  overflow:hidden;
+  text-decoration:none;
+  color:inherit;
+  display:flex; flex-direction:column;
+  background:white;
+  box-shadow:0 6px 24px rgba(0,0,0,0.14);
+  transition:transform 0.22s ease, box-shadow 0.22s ease;
+  cursor:pointer;
+  -webkit-user-select:none; user-select:none;
+  position:relative;
+  min-height:190px;
+}
+.app-card:active {
+  transform:scale(0.96);
+  box-shadow:0 2px 10px rgba(0,0,0,0.15);
+}
+@media (hover:hover) {
+  .app-card:hover {
+    transform:translateY(-6px) scale(1.02);
+    box-shadow:0 16px 40px rgba(0,0,0,0.22);
+  }
+}
+.card-icon-wrap {
+  height:110px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:3.2em; position:relative;
+  flex-shrink:0;
+}
+.card-icon-wrap::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:24px;
+  background:white;
+  border-radius:50% 50% 0 0 / 100% 100% 0 0;
+}
+.card-body {
+  padding:10px 14px 14px;
+  display:flex; flex-direction:column; flex:1;
+}
+.card-title {
+  font-size:0.95em; font-weight:bold; color:#1a1a2e;
+  line-height:1.3; margin-bottom:4px;
+}
+.card-sub { font-size:0.77em; color:#888; flex:1; }
+.card-badge {
+  display:inline-block; padding:3px 10px;
+  border-radius:20px; font-size:0.7em;
+  font-weight:bold; color:white; margin-top:8px;
+  align-self:flex-start;
+}
+
+/* ============================================================
+   CARD ACCENT COLORS (icon bg + badge)
+   ============================================================ */
+/* Books */
+.ac-book .card-icon-wrap   { background:linear-gradient(135deg,#f72585,#b5179e); }
+.ac-book .card-badge       { background:#e91e8c; }
+/* English */
+.ac-english .card-icon-wrap{ background:linear-gradient(135deg,#0096c7,#023e8a); }
+.ac-english .card-badge    { background:#0077b6; }
+/* Maths */
+.ac-maths .card-icon-wrap  { background:linear-gradient(135deg,#ff9f1c,#e65100); }
+.ac-maths .card-badge      { background:#ff6b35; }
+/* Science */
+.ac-science .card-icon-wrap{ background:linear-gradient(135deg,#4caf50,#1b5e20); }
+.ac-science .card-badge    { background:#2d9e2d; }
+/* ICT */
+.ac-ict .card-icon-wrap    { background:linear-gradient(135deg,#a855f7,#4a148c); }
+.ac-ict .card-badge        { background:#6c5ce7; }
+/* EVS */
+.ac-evs .card-icon-wrap    { background:linear-gradient(135deg,#00d2a0,#00695c); }
+.ac-evs .card-badge        { background:#00b894; }
+
+/* ============================================================
+   NEW BADGE ON CARDS (optional decoration)
+   ============================================================ */
+.card-new {
+  position:absolute; top:10px; right:10px; z-index:2;
+  background:#ffd700; color:#333; font-size:0.65em;
+  font-weight:bold; padding:2px 8px; border-radius:20px;
+}
+
+/* ============================================================
+   SCROLL ENTRANCE ANIMATION
+   ============================================================ */
+.app-card {
+  opacity:0; transform:translateY(24px);
+  animation:cardIn 0.5s ease forwards;
+}
+@keyframes cardIn{to{opacity:1;transform:translateY(0);}}
+
+/* ============================================================
+   DIVIDER WAVE
+   ============================================================ */
+.wave-divider { width:100%; line-height:0; overflow:hidden; margin:-1px 0; }
+.wave-divider svg { display:block; width:100%; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  text-align:center; padding:28px 16px;
+  color:rgba(255,255,255,0.55); font-size:0.9em;
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+.footer span { color:#ffd700; }
+
+/* ============================================================
+   TABLET & RESPONSIVE TWEAKS
+   ============================================================ */
+@media (min-width:600px) {
+  .card-grid { grid-template-columns:repeat(auto-fill,minmax(175px,1fr)); gap:18px; }
+  .content { padding:32px 24px 72px; }
+}
+@media (min-width:768px) {
+  .hero { padding:60px 32px 40px; }
+  .card-grid { grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:20px; }
+  .content { padding:36px 32px 80px; }
+  .section-header { padding:20px 28px; }
+}
+@media (min-width:1024px) {
+  .card-grid { grid-template-columns:repeat(auto-fill,minmax(195px,1fr)); gap:22px; }
+  .content { padding:40px 40px 80px; }
+}
+
+/* landscape tablet fix */
+@media (max-height:600px) and (orientation:landscape) {
+  .hero { padding:24px 24px 16px; }
+  .hero h1 { font-size:1.8em; }
+  .hero-stars { font-size:1.6em; }
+}
+
+/* Make sure touch targets are big enough */
+.nav-pill, .app-card { min-height:44px; }
+</style>
+</head>
+<body>
+
+<!-- Animated background blobs -->
+<div class="bg-wrap">
+  <div class="bg-blob"></div>
+  <div class="bg-blob"></div>
+  <div class="bg-blob"></div>
+  <div class="bg-blob"></div>
+</div>
+
+<div class="app-wrapper">
+
+  <!-- ============ HERO ============ -->
+  <header class="hero">
+    <div class="hero-badge">🎓 Grade 1 · IGCSE · Age 5–6</div>
+    <div class="hero-stars">⭐ 🌟 ⭐</div>
+    <h1>My <span>Learning</span> World</h1>
+    <p>Books, Games & Fun Activities — all in one place!</p>
+    <div class="hero-stats">
+      <div class="stat-pill">📚 8 Story Books</div>
+      <div class="stat-pill">🎮 26 Learning Apps</div>
+      <div class="stat-pill">🔊 Read Aloud</div>
+    </div>
+  </header>
+
+  <!-- ============ STICKY NAV ============ -->
+  <nav class="subject-nav">
+    <div class="subject-nav-inner">
+      <a class="nav-pill books"   href="#books">   📚 Books   </a>
+      <a class="nav-pill english" href="#english"> 🔤 English </a>
+      <a class="nav-pill maths"   href="#maths">   🔢 Maths   </a>
+      <a class="nav-pill science" href="#science"> 🔬 Science </a>
+      <a class="nav-pill ict"     href="#ict">     💻 ICT     </a>
+      <a class="nav-pill evs"     href="#evs">     🌍 EVS     </a>
+    </div>
+  </nav>
+
+  <!-- ============ CONTENT ============ -->
+  <main class="content">
+
+    <!-- ===== BOOKS ===== -->
+    <section class="section" id="books">
+      <div class="section-header sh-books">
+        <div class="section-header-inner">
+          <div class="section-icon">📚</div>
+          <div class="section-text">
+            <div class="section-title">Story Books</div>
+            <div class="section-sub">Tap to read & listen!</div>
+          </div>
+          <div class="section-count">8 Books</div>
+        </div>
+      </div>
+      <div class="card-grid">
+
+        <a class="app-card ac-book" href="books/caterpillar/index.html" style="animation-delay:0.05s">
+          <div class="card-icon-wrap">🐛</div>
+          <div class="card-body">
+            <div class="card-title">The Very Hungry Caterpillar</div>
+            <div class="card-sub">Eric Carle</div>
+            <span class="card-badge">Picture Book</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-book" href="books/green-eggs/index.html" style="animation-delay:0.09s">
+          <div class="card-icon-wrap">🍳</div>
+          <div class="card-body">
+            <div class="card-title">Green Eggs and Ham</div>
+            <div class="card-sub">Dr. Seuss</div>
+            <span class="card-badge">Early Reader</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-book" href="books/wild-things/index.html" style="animation-delay:0.13s">
+          <div class="card-icon-wrap">👹</div>
+          <div class="card-body">
+            <div class="card-title">Where the Wild Things Are</div>
+            <div class="card-sub">Maurice Sendak</div>
+            <span class="card-badge">Picture Book</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-book" href="books/gruffalo/index.html" style="animation-delay:0.17s">
+          <div class="card-icon-wrap">🧌</div>
+          <div class="card-body">
+            <div class="card-title">The Gruffalo</div>
+            <div class="card-sub">Julia Donaldson</div>
+            <span class="card-badge">Rhyming Story</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-book" href="books/elephant-piggie/index.html" style="animation-delay:0.21s">
+          <div class="card-icon-wrap">🐘</div>
+          <div class="card-body">
+            <div class="card-title">Elephant & Piggie</div>
+            <div class="card-sub">Mo Willems</div>
+            <span class="card-badge">Early Reader</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-book" href="books/frog-toad/index.html" style="animation-delay:0.25s">
+          <div class="card-icon-wrap">🐸</div>
+          <div class="card-body">
+            <div class="card-title">Frog and Toad are Friends</div>
+            <div class="card-sub">Arnold Lobel</div>
+            <span class="card-badge">Chapter Book</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-book" href="books/fathers-dragon/index.html" style="animation-delay:0.29s">
+          <div class="card-icon-wrap">🐉</div>
+          <div class="card-body">
+            <div class="card-title">My Father's Dragon</div>
+            <div class="card-sub">Ruth Stiles Gannett</div>
+            <span class="card-badge">Chapter Book</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-book" href="books/magic-tree/index.html" style="animation-delay:0.33s">
+          <div class="card-icon-wrap">🌳</div>
+          <div class="card-body">
+            <div class="card-title">Magic Tree House</div>
+            <div class="card-sub">Mary Pope Osborne</div>
+            <span class="card-badge">Chapter Book</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ===== ENGLISH ===== -->
+    <section class="section" id="english">
+      <div class="section-header sh-english">
+        <div class="section-header-inner">
+          <div class="section-icon">🔤</div>
+          <div class="section-text">
+            <div class="section-title">English</div>
+            <div class="section-sub">Reading, Writing & Speaking</div>
+          </div>
+          <div class="section-count">8 Apps</div>
+        </div>
+      </div>
+      <div class="card-grid">
+
+        <a class="app-card ac-english" href="apps/english/phonics/index.html" style="animation-delay:0.05s">
+          <div class="card-icon-wrap">🔡</div>
+          <div class="card-body">
+            <div class="card-title">Phonics</div>
+            <div class="card-sub">Letter Sounds A–Z</div>
+            <span class="card-badge">English</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-english" href="apps/english/blending/index.html" style="animation-delay:0.09s">
+          <div class="card-icon-wrap">🔗</div>
+          <div class="card-body">
+            <div class="card-title">Blending</div>
+            <div class="card-sub">Join Sounds to Read</div>
+            <span class="card-badge">English</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-english" href="apps/english/sight-words/index.html" style="animation-delay:0.13s">
+          <div class="card-icon-wrap">👁️</div>
+          <div class="card-body">
+            <div class="card-title">Sight Words</div>
+            <div class="card-sub">40 Common Words</div>
+            <span class="card-badge">English</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-english" href="apps/english/reading/index.html" style="animation-delay:0.17s">
+          <div class="card-icon-wrap">📖</div>
+          <div class="card-body">
+            <div class="card-title">Reading</div>
+            <div class="card-sub">Short Stories & Quizzes</div>
+            <span class="card-badge">English</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-english" href="apps/english/comprehension/index.html" style="animation-delay:0.21s">
+          <div class="card-icon-wrap">🧠</div>
+          <div class="card-body">
+            <div class="card-title">Comprehension</div>
+            <div class="card-sub">Read & Answer</div>
+            <span class="card-badge">English</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-english" href="apps/english/writing/index.html" style="animation-delay:0.25s">
+          <div class="card-icon-wrap">✏️</div>
+          <div class="card-body">
+            <div class="card-title">Writing</div>
+            <div class="card-sub">Trace, Build & Copy</div>
+            <span class="card-badge">English</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-english" href="apps/english/vocabulary/index.html" style="animation-delay:0.29s">
+          <div class="card-icon-wrap">💬</div>
+          <div class="card-body">
+            <div class="card-title">Vocabulary</div>
+            <div class="card-sub">50 Words & Meanings</div>
+            <span class="card-badge">English</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-english" href="apps/english/speaking/index.html" style="animation-delay:0.33s">
+          <div class="card-icon-wrap">🎤</div>
+          <div class="card-body">
+            <div class="card-title">Speaking & Listening</div>
+            <div class="card-sub">Rhymes & Prompts</div>
+            <span class="card-badge">English</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ===== MATHS ===== -->
+    <section class="section" id="maths">
+      <div class="section-header sh-maths">
+        <div class="section-header-inner">
+          <div class="section-icon">🔢</div>
+          <div class="section-text">
+            <div class="section-title">Maths</div>
+            <div class="section-sub">Numbers, Shapes & More</div>
+          </div>
+          <div class="section-count">8 Apps</div>
+        </div>
+      </div>
+      <div class="card-grid">
+
+        <a class="app-card ac-maths" href="apps/maths/counting/index.html" style="animation-delay:0.05s">
+          <div class="card-icon-wrap">🔢</div>
+          <div class="card-body">
+            <div class="card-title">Counting 1–20</div>
+            <div class="card-sub">Count Objects</div>
+            <span class="card-badge">Maths</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-maths" href="apps/maths/addition/index.html" style="animation-delay:0.09s">
+          <div class="card-icon-wrap">➕</div>
+          <div class="card-body">
+            <div class="card-title">Addition & Subtraction</div>
+            <div class="card-sub">Within 20</div>
+            <span class="card-badge">Maths</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-maths" href="apps/maths/shapes/index.html" style="animation-delay:0.13s">
+          <div class="card-icon-wrap">🔷</div>
+          <div class="card-body">
+            <div class="card-title">Shapes</div>
+            <div class="card-sub">2D & 3D Shapes</div>
+            <span class="card-badge">Maths</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-maths" href="apps/maths/patterns/index.html" style="animation-delay:0.17s">
+          <div class="card-icon-wrap">🔁</div>
+          <div class="card-body">
+            <div class="card-title">Patterns</div>
+            <div class="card-sub">What Comes Next?</div>
+            <span class="card-badge">Maths</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-maths" href="apps/maths/time/index.html" style="animation-delay:0.21s">
+          <div class="card-icon-wrap">🕐</div>
+          <div class="card-body">
+            <div class="card-title">Time</div>
+            <div class="card-sub">O'clock & Half Past</div>
+            <span class="card-badge">Maths</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-maths" href="apps/maths/measurement/index.html" style="animation-delay:0.25s">
+          <div class="card-icon-wrap">📏</div>
+          <div class="card-body">
+            <div class="card-title">Measurement</div>
+            <div class="card-sub">Length, Weight & Capacity</div>
+            <span class="card-badge">Maths</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-maths" href="apps/maths/number-bonds/index.html" style="animation-delay:0.29s">
+          <div class="card-icon-wrap">🔗</div>
+          <div class="card-body">
+            <div class="card-title">Number Bonds</div>
+            <div class="card-sub">Make 10 & 20</div>
+            <span class="card-badge">Maths</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-maths" href="apps/maths/data-handling/index.html" style="animation-delay:0.33s">
+          <div class="card-icon-wrap">📊</div>
+          <div class="card-body">
+            <div class="card-title">Data Handling</div>
+            <div class="card-sub">Charts & Graphs</div>
+            <span class="card-badge">Maths</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ===== SCIENCE ===== -->
+    <section class="section" id="science">
+      <div class="section-header sh-science">
+        <div class="section-header-inner">
+          <div class="section-icon">🔬</div>
+          <div class="section-text">
+            <div class="section-title">Science</div>
+            <div class="section-sub">Explore the World Around Us</div>
+          </div>
+          <div class="section-count">4 Apps</div>
+        </div>
+      </div>
+      <div class="card-grid">
+
+        <a class="app-card ac-science" href="apps/science/plants/index.html" style="animation-delay:0.05s">
+          <div class="card-icon-wrap">🌱</div>
+          <div class="card-body">
+            <div class="card-title">Parts of a Plant</div>
+            <div class="card-sub">Roots to Flowers</div>
+            <span class="card-badge">Science</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-science" href="apps/science/animals/index.html" style="animation-delay:0.09s">
+          <div class="card-icon-wrap">🐾</div>
+          <div class="card-body">
+            <div class="card-title">Animals & Habitats</div>
+            <div class="card-sub">Where do they live?</div>
+            <span class="card-badge">Science</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-science" href="apps/science/senses/index.html" style="animation-delay:0.13s">
+          <div class="card-icon-wrap">👃</div>
+          <div class="card-body">
+            <div class="card-title">5 Senses</div>
+            <div class="card-sub">See, Hear, Touch…</div>
+            <span class="card-badge">Science</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-science" href="apps/science/materials/index.html" style="animation-delay:0.17s">
+          <div class="card-icon-wrap">🧱</div>
+          <div class="card-body">
+            <div class="card-title">Materials</div>
+            <div class="card-sub">What's it made of?</div>
+            <span class="card-badge">Science</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ===== ICT ===== -->
+    <section class="section" id="ict">
+      <div class="section-header sh-ict">
+        <div class="section-header-inner">
+          <div class="section-icon">💻</div>
+          <div class="section-text">
+            <div class="section-title">ICT</div>
+            <div class="section-sub">Coding, Logic & Creativity</div>
+          </div>
+          <div class="section-count">3 Apps</div>
+        </div>
+      </div>
+      <div class="card-grid">
+
+        <a class="app-card ac-ict" href="apps/ict/sequencing/index.html" style="animation-delay:0.05s">
+          <div class="card-icon-wrap">🎯</div>
+          <div class="card-body">
+            <div class="card-title">Sequencing</div>
+            <div class="card-sub">Order the Steps</div>
+            <span class="card-badge">ICT</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-ict" href="apps/ict/coding/index.html" style="animation-delay:0.09s">
+          <div class="card-icon-wrap">🤖</div>
+          <div class="card-body">
+            <div class="card-title">Coding Blocks</div>
+            <div class="card-sub">ScratchJr Style</div>
+            <span class="card-badge">ICT</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-ict" href="apps/ict/storytelling/index.html" style="animation-delay:0.13s">
+          <div class="card-icon-wrap">🎨</div>
+          <div class="card-body">
+            <div class="card-title">Digital Storytelling</div>
+            <div class="card-sub">Create & Present</div>
+            <span class="card-badge">ICT</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ===== EVS ===== -->
+    <section class="section" id="evs">
+      <div class="section-header sh-evs">
+        <div class="section-header-inner">
+          <div class="section-icon">🌍</div>
+          <div class="section-text">
+            <div class="section-title">EVS</div>
+            <div class="section-sub">Environment & Social Studies</div>
+          </div>
+          <div class="section-count">3 Apps</div>
+        </div>
+      </div>
+      <div class="card-grid">
+
+        <a class="app-card ac-evs" href="apps/evs/community/index.html" style="animation-delay:0.05s">
+          <div class="card-icon-wrap">👮</div>
+          <div class="card-body">
+            <div class="card-title">Community Helpers</div>
+            <div class="card-sub">People Who Help Us</div>
+            <span class="card-badge">EVS</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-evs" href="apps/evs/environment/index.html" style="animation-delay:0.09s">
+          <div class="card-icon-wrap">🌿</div>
+          <div class="card-body">
+            <div class="card-title">My Environment</div>
+            <div class="card-sub">Protect Our Planet</div>
+            <span class="card-badge">EVS</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-evs" href="apps/evs/healthy-habits/index.html" style="animation-delay:0.13s">
+          <div class="card-icon-wrap">💪</div>
+          <div class="card-body">
+            <div class="card-title">Healthy Habits</div>
+            <div class="card-sub">Stay Fit & Happy</div>
+            <span class="card-badge">EVS</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    Made with <span>❤️</span> for Grade 1 &nbsp;·&nbsp; Keep learning, keep growing! <span>🌟</span>
+  </footer>
+
+</div><!-- end app-wrapper -->
+
+<script>
+// Stagger card animations per section when scrolled into view
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const cards = entry.target.querySelectorAll('.app-card');
+      cards.forEach((card, i) => {
+        card.style.animationDelay = (0.04 + i * 0.06) + 's';
+        card.style.animationPlayState = 'running';
+      });
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.section').forEach(section => {
+  // Pause all cards initially
+  section.querySelectorAll('.app-card').forEach(card => {
+    card.style.animationPlayState = 'paused';
+  });
+  observer.observe(section);
+});
+
+// Smooth active state for nav pills on scroll
+const sections = document.querySelectorAll('.section[id]');
+const navPills = document.querySelectorAll('.nav-pill');
+
+const sectionObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.getAttribute('id');
+      navPills.forEach(pill => {
+        const href = pill.getAttribute('href').replace('#','');
+        pill.style.background = href === id
+          ? 'rgba(255,255,255,0.25)'
+          : 'rgba(255,255,255,0.08)';
+      });
+    }
+  });
+}, { rootMargin: '-30% 0px -60% 0px' });
+
+sections.forEach(s => sectionObserver.observe(s));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parts of a Plant</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#1b5e20,#2e7d32,#388e3c);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.25);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .tabs{display:flex;gap:8px;padding:12px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:9px 20px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.12);color:white;font-family:inherit;font-size:0.95em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#1b5e20;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.3);}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+  .score-row{display:flex;gap:16px;color:white;font-size:1em;justify-content:center;}
+  .sc-box{background:rgba(255,255,255,0.2);border-radius:14px;padding:8px 20px;text-align:center;}
+  .sc-box .val{font-size:1.5em;font-weight:bold;display:block;}
+  .card{width:780px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.35);padding:28px 32px;}
+
+  /* PLANT DIAGRAM */
+  .plant-area{display:flex;gap:24px;align-items:flex-start;justify-content:center;flex-wrap:wrap;}
+  .plant-svg-wrap{position:relative;flex-shrink:0;}
+  .plant-svg-wrap svg{width:280px;height:380px;}
+  .plant-label-btn{position:absolute;background:white;border:2px solid #4caf50;border-radius:20px;padding:4px 12px;font-size:0.85em;font-weight:bold;color:#1b5e20;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+  .plant-label-btn:hover,.plant-label-btn.active{background:#4caf50;color:white;transform:scale(1.05);}
+  .part-info{flex:1;min-width:220px;max-width:320px;}
+  .part-card{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:20px;padding:20px;border-left:5px solid #4caf50;min-height:200px;}
+  .part-icon{font-size:3em;margin-bottom:8px;}
+  .part-name{font-size:1.6em;font-weight:bold;color:#1b5e20;margin-bottom:8px;}
+  .part-desc{font-size:1em;color:#333;line-height:1.6;margin-bottom:10px;}
+  .part-fun{font-size:0.9em;color:#558b2f;background:#f1f8e9;border-radius:10px;padding:8px 12px;}
+
+  /* LIFECYCLE */
+  .lifecycle-row{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;margin:16px 0;}
+  .lc-step{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;}
+  .lc-icon{font-size:2.5em;background:#e8f5e9;border-radius:50%;width:70px;height:70px;display:flex;align-items:center;justify-content:center;border:3px solid #4caf50;transition:all 0.2s;}
+  .lc-step:hover .lc-icon,.lc-step.active .lc-icon{background:#4caf50;border-color:#1b5e20;transform:scale(1.1);}
+  .lc-label{font-size:0.85em;font-weight:bold;color:#1b5e20;text-align:center;}
+  .lc-arrow{font-size:1.5em;color:#4caf50;align-self:center;}
+  .lc-desc{background:#e8f5e9;border-radius:16px;padding:16px;margin:10px 0;font-size:1em;color:#333;text-align:center;min-height:60px;}
+
+  /* NEEDS */
+  .needs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:16px 0;}
+  .need-card{background:linear-gradient(135deg,#e8f5e9,#dcedc8);border-radius:16px;padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;border:2px solid transparent;}
+  .need-card:hover{border-color:#4caf50;transform:translateY(-3px);}
+  .need-icon{font-size:2.5em;margin-bottom:6px;}
+  .need-name{font-size:1em;font-weight:bold;color:#1b5e20;}
+  .need-desc{font-size:0.85em;color:#555;margin-top:4px;}
+
+  /* QUIZ */
+  .q-img{font-size:4em;text-align:center;margin:14px 0;}
+  .q-text{font-size:1.2em;font-weight:bold;color:#333;text-align:center;margin-bottom:16px;}
+  .q-opts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .q-opt{padding:12px 24px;border-radius:50px;border:2px solid #c8e6c9;background:white;font-family:inherit;font-size:1.1em;cursor:pointer;color:#333;transition:all 0.2s;}
+  .q-opt:hover{border-color:#4caf50;background:#e8f5e9;}
+  .q-opt.correct{border-color:#4caf50;background:#c8f7c5;color:#1b5e20;}
+  .q-opt.wrong{border-color:#e53935;background:#ffcdd2;color:#b71c1c;}
+  .feedback{font-size:1.2em;font-weight:bold;text-align:center;min-height:36px;margin-top:10px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  .action-btn{border:none;border-radius:50px;padding:12px 28px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+  @keyframes popIn{0%{transform:scale(0);opacity:0;}100%{transform:scale(1);opacity:1;}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🌱 Parts of a Plant</span>
+  <span style="color:white;font-size:0.9em">Science</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="setMode('learn',this)">🌿 Learn Parts</button>
+  <button class="tab" onclick="setMode('lifecycle',this)">🔄 Life Cycle</button>
+  <button class="tab" onclick="setMode('needs',this)">☀️ What Plants Need</button>
+  <button class="tab" onclick="setMode('quiz',this)">🧩 Quiz</button>
+</div>
+<div class="main">
+  <div class="score-row" id="scoreRow" style="display:none">
+    <div class="sc-box"><span class="val" id="sRight">0</span>✅</div>
+    <div class="sc-box"><span class="val" id="sWrong">0</span>❌</div>
+    <div class="sc-box"><span class="val" id="sStreak">0</span>🔥</div>
+  </div>
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+const parts = [
+  {id:'flower', name:'Flower', icon:'🌸', color:'#e91e63',
+   desc:'The flower is the most colourful part of the plant. It makes seeds so new plants can grow.',
+   fun:'Flowers come in many colours to attract bees and butterflies!',
+   svgX:140, svgY:20},
+  {id:'leaf', name:'Leaf', icon:'🍃', color:'#4caf50',
+   desc:'Leaves are flat and green. They catch sunlight and make food for the plant using water and air.',
+   fun:'This is called photosynthesis — leaves are like little food factories!',
+   svgX:220, svgY:100},
+  {id:'stem', name:'Stem', icon:'🪴', color:'#8bc34a',
+   desc:'The stem holds the plant up straight. It carries water and food between the roots and leaves.',
+   fun:'Some stems are hard and woody like a tree trunk — others are soft and bendy!',
+   svgX:200, svgY:200},
+  {id:'root', name:'Roots', icon:'🌿', color:'#795548',
+   desc:'Roots grow underground and hold the plant in the soil. They drink water from the ground.',
+   fun:'Some roots are very long — a tree\'s roots can stretch as wide as its branches!',
+   svgX:140, svgY:340},
+  {id:'seed', name:'Seed', icon:'🫘', color:'#ff9800',
+   desc:'Seeds are baby plants! They are inside the fruit or flower and grow into a new plant.',
+   fun:'Some seeds travel by wind, water or animals to find a new place to grow!',
+   svgX:60, svgY:120},
+  {id:'fruit', name:'Fruit', icon:'🍎', color:'#f44336',
+   desc:'The fruit grows around the seed to protect it. Many fruits are sweet and tasty!',
+   fun:'Tomatoes, cucumbers and peppers are all fruits because they have seeds inside!',
+   svgX:70, svgY:170},
+];
+
+const lifecycle = [
+  {icon:'🫘', label:'Seed', desc:'A tiny seed is planted in soil. It has everything it needs to start growing!'},
+  {icon:'🌱', label:'Sprout', desc:'With water and warmth, the seed splits open and a tiny sprout pushes up through the soil.'},
+  {icon:'🪴', label:'Seedling', desc:'The seedling grows bigger. Roots go down and leaves stretch up towards the sunlight.'},
+  {icon:'🌿', label:'Plant', desc:'The young plant grows tall with many leaves. It uses sunlight to make its food.'},
+  {icon:'🌸', label:'Flower', desc:'Beautiful flowers bloom! Bees and butterflies visit to collect nectar and spread pollen.'},
+  {icon:'🍎', label:'Fruit & Seed', desc:'The flower becomes a fruit with seeds inside. The seeds will grow into NEW plants!'},
+];
+
+const needs = [
+  {icon:'☀️', name:'Sunlight', desc:'Plants use sunlight to make their own food. Without light, leaves turn yellow!'},
+  {icon:'💧', name:'Water', desc:'Roots drink water from the soil. Water travels all the way up to the leaves!'},
+  {icon:'🌍', name:'Soil', desc:'Soil holds plants in place and gives them nutrients — like vitamins for plants!'},
+  {icon:'💨', name:'Air', desc:'Leaves breathe in carbon dioxide from the air and breathe out oxygen for us!'},
+  {icon:'🌡️', name:'Warmth', desc:'Most plants grow best in warm weather. Some seeds won\'t sprout if it\'s too cold!'},
+  {icon:'🐝', name:'Pollinators', desc:'Bees, butterflies and birds carry pollen between flowers to help make seeds!'},
+];
+
+const quizQs = [
+  {q:'Which part holds the plant in the soil?', opts:['Flower','Leaf','Roots','Stem'], ans:'Roots', icon:'🌱'},
+  {q:'Which part makes food using sunlight?', opts:['Root','Leaf','Seed','Stem'], ans:'Leaf', icon:'🍃'},
+  {q:'Which part do we plant in the soil to grow a new plant?', opts:['Flower','Leaf','Stem','Seed'], ans:'Seed', icon:'🫘'},
+  {q:'Which part carries water from roots to leaves?', opts:['Flower','Stem','Fruit','Root'], ans:'Stem', icon:'🪴'},
+  {q:'What do plants need to make food?', opts:['Music','Sunlight','Dark','Cold'], ans:'Sunlight', icon:'☀️'},
+  {q:'Where do seeds come from?', opts:['Roots','Stems','Flowers & Fruit','Leaves'], ans:'Flowers & Fruit', icon:'🌸'},
+  {q:'What do roots drink from the soil?', opts:['Juice','Milk','Water','Honey'], ans:'Water', icon:'💧'},
+  {q:'What is a baby plant called?', opts:['Seedling','Flower','Fruit','Branch'], ans:'Seedling', icon:'🌱'},
+  {q:'Which part of the plant is usually underground?', opts:['Flower','Leaf','Fruit','Roots'], ans:'Roots', icon:'🌿'},
+  {q:'What do plants breathe out that we breathe in?', opts:['Carbon dioxide','Oxygen','Steam','Smoke'], ans:'Oxygen', icon:'💨'},
+];
+
+let mode = 'learn';
+let activePart = 0;
+let activeLc = 0;
+let qIdx = 0, qRight = 0, qWrong = 0, qStreak = 0, qAnswered = false;
+
+function setMode(m, tab) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('scoreRow').style.display = m === 'quiz' ? 'flex' : 'none';
+  render();
+}
+
+function render() {
+  if (mode === 'learn') renderLearn();
+  else if (mode === 'lifecycle') renderLifecycle();
+  else if (mode === 'needs') renderNeeds();
+  else renderQuiz();
+}
+
+function renderLearn() {
+  const p = parts[activePart];
+  const plantSVG = `
+<svg viewBox="0 0 280 380" xmlns="http://www.w3.org/2000/svg">
+  <!-- Soil -->
+  <rect x="0" y="270" width="280" height="110" rx="0" fill="#795548" opacity="0.3"/>
+  <rect x="0" y="275" width="280" height="3" fill="#795548" opacity="0.5"/>
+  <!-- Roots -->
+  <path d="M140 280 C120 300 100 320 90 345" stroke="#795548" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M140 280 C150 310 170 320 185 345" stroke="#795548" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M140 285 C140 310 135 330 130 355" stroke="#795548" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <!-- Stem -->
+  <path d="M140 270 C138 230 136 190 138 150 C139 120 140 90 140 60" stroke="#4caf50" stroke-width="8" fill="none" stroke-linecap="round"/>
+  <!-- Leaves -->
+  <ellipse cx="170" cy="130" rx="45" ry="22" fill="#66bb6a" transform="rotate(-30 170 130)"/>
+  <path d="M140 130 L170 130" stroke="#4caf50" stroke-width="2"/>
+  <ellipse cx="105" cy="160" rx="40" ry="18" fill="#81c784" transform="rotate(25 105 160)"/>
+  <path d="M140 165 L105 160" stroke="#4caf50" stroke-width="2"/>
+  <!-- Fruit -->
+  <circle cx="78" cy="185" r="22" fill="#ef5350"/>
+  <path d="M78 163 C78 158 82 155 82 150" stroke="#4caf50" stroke-width="3" fill="none"/>
+  <!-- Flower -->
+  <circle cx="140" cy="38" r="14" fill="#ffc107"/>
+  <ellipse cx="140" cy="18" rx="9" ry="14" fill="#f48fb1"/>
+  <ellipse cx="157" cy="26" rx="9" ry="14" fill="#ce93d8" transform="rotate(40 157 26)"/>
+  <ellipse cx="161" cy="46" rx="9" ry="14" fill="#f48fb1" transform="rotate(80 161 46)"/>
+  <ellipse cx="148" cy="60" rx="9" ry="14" fill="#ce93d8" transform="rotate(120 148 60)"/>
+  <ellipse cx="130" cy="62" rx="9" ry="14" fill="#f48fb1" transform="rotate(160 130 62)"/>
+  <ellipse cx="120" cy="46" rx="9" ry="14" fill="#ce93d8" transform="rotate(-140 120 46)"/>
+  <ellipse cx="122" cy="26" rx="9" ry="14" fill="#f48fb1" transform="rotate(-40 122 26)"/>
+  <!-- Seed on ground -->
+  <ellipse cx="60" cy="268" rx="12" ry="8" fill="#ff9800" transform="rotate(-15 60 268)"/>
+</svg>`;
+
+  const labelsHTML = parts.map((pt, i) => `
+    <button class="plant-label-btn ${i===activePart?'active':''}"
+      style="left:${pt.svgX}px;top:${pt.svgY}px;border-color:${pt.color};${i===activePart?'background:'+pt.color+';color:white':''}"
+      onclick="activePart=${i};renderLearn()">
+      ${pt.icon} ${pt.name}
+    </button>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#1b5e20;margin-bottom:16px;text-align:center">🌻 Tap a part to learn about it!</div>
+    <div class="plant-area">
+      <div class="plant-svg-wrap">
+        ${plantSVG}
+        ${labelsHTML}
+      </div>
+      <div class="part-info">
+        <div class="part-card" style="border-left-color:${p.color}">
+          <div class="part-icon">${p.icon}</div>
+          <div class="part-name" style="color:${p.color}">${p.name}</div>
+          <div class="part-desc">${p.desc}</div>
+          <div class="part-fun">💡 Fun Fact: ${p.fun}</div>
+        </div>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="action-btn" style="background:${p.color}" onclick="speak('${p.name}. ${p.desc}')">🔊 Read It</button>
+          <button class="action-btn" style="background:#607D8B" onclick="activePart=(activePart+1)%${parts.length};renderLearn()">Next ▶</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderLifecycle() {
+  const lc = lifecycle[activeLc];
+  const stepsHTML = lifecycle.map((s, i) => `
+    <div class="lc-step ${i===activeLc?'active':''}" onclick="activeLc=${i};renderLifecycle()">
+      <div class="lc-icon">${s.icon}</div>
+      <div class="lc-label">${s.label}</div>
+    </div>
+    ${i < lifecycle.length-1 ? '<div class="lc-arrow">→</div>' : ''}`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#1b5e20;margin-bottom:12px;text-align:center">🔄 The Life Cycle of a Plant</div>
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-bottom:14px">Tap each stage to learn more!</div>
+    <div class="lifecycle-row">${stepsHTML}</div>
+    <div class="lc-desc">
+      <div style="font-size:2em;margin-bottom:6px">${lc.icon}</div>
+      <div style="font-size:1.1em;font-weight:bold;color:#1b5e20;margin-bottom:6px">Stage ${activeLc+1}: ${lc.label}</div>
+      <div style="font-size:1em;color:#333">${lc.desc}</div>
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#607D8B" onclick="activeLc=Math.max(0,activeLc-1);renderLifecycle()" ${activeLc===0?'disabled':''}>◀ Prev</button>
+      <button class="action-btn" style="background:#1b5e20" onclick="speak('Stage ${activeLc+1}. ${lc.label}. ${lc.desc}')">🔊 Read</button>
+      <button class="action-btn" style="background:#43a047" onclick="activeLc=Math.min(${lifecycle.length-1},activeLc+1);renderLifecycle()" ${activeLc===lifecycle.length-1?'disabled':''}>Next ▶</button>
+    </div>
+  `;
+}
+
+function renderNeeds() {
+  const cardsHTML = needs.map(n => `
+    <div class="need-card" onclick="speak('${n.name}. ${n.desc}')">
+      <div class="need-icon">${n.icon}</div>
+      <div class="need-name">${n.name}</div>
+      <div class="need-desc">${n.desc}</div>
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#1b5e20;margin-bottom:6px;text-align:center">☀️ What Do Plants Need to Grow?</div>
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-bottom:14px">Tap a card to hear about it!</div>
+    <div class="needs-grid">${cardsHTML}</div>
+    <div style="background:#e8f5e9;border-radius:14px;padding:14px;font-size:0.95em;color:#2e7d32;text-align:center">
+      🌱 Remember: Plants need <b>sunlight, water, soil and air</b> to grow healthy and strong!
+    </div>
+  `;
+}
+
+function renderQuiz() {
+  if (qIdx >= quizQs.length) qIdx = 0;
+  const q = quizQs[qIdx];
+  qAnswered = false;
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-bottom:6px">Question ${qIdx+1} of ${quizQs.length}</div>
+    <div class="q-img">${q.icon}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="q-opts" id="opts">
+      ${q.opts.map(o=>`<button class="q-opt" onclick="checkQ(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}')">  ${o}</button>`).join('')}
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="qIdx=0;renderQuiz()">🔄 Restart</button>
+    </div>
+  `;
+}
+
+function checkQ(btn, val, ans) {
+  if (qAnswered) return;
+  qAnswered = true;
+  document.querySelectorAll('#opts .q-opt').forEach(b => b.disabled = true);
+  const fb = document.getElementById('feedback');
+  if (val === ans) {
+    btn.classList.add('correct');
+    qRight++; qStreak++;
+    fb.textContent = '✅ Brilliant! ' + ans + ' is correct! 🌟';
+    fb.style.color = '#2e7d32';
+    speak('Brilliant! Correct!');
+    setTimeout(() => { qIdx++; renderQuiz(); }, 1800);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('#opts .q-opt').forEach(b => { if (b.textContent.trim() === ans) b.classList.add('correct'); });
+    qWrong++; qStreak = 0;
+    fb.textContent = '❌ The answer is: ' + ans;
+    fb.style.color = '#c62828';
+    setTimeout(() => { qIdx++; renderQuiz(); }, 2200);
+  }
+  document.getElementById('sRight').textContent = qRight;
+  document.getElementById('sWrong').textContent = qWrong;
+  document.getElementById('sStreak').textContent = qStreak;
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.85; u.pitch = 1.1;
+  window.speechSynthesis.speak(u);
+}
+
+render();
+</script>
+</body>
+</html>

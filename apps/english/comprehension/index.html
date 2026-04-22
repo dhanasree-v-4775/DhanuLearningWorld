@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comprehension</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#1e3c72,#2a5298);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.3);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .topbar a:hover{background:rgba(255,255,255,0.35);}
+
+  .strip{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:12px 20px;background:rgba(0,0,0,0.2);width:100%;}
+  .strip-btn{padding:7px 16px;border-radius:20px;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .strip-btn:hover{background:rgba(255,255,255,0.3);}
+  .strip-btn.active{background:#2a5298;border-color:gold;color:gold;font-weight:bold;}
+  .strip-btn.done{border-color:#4CAF50;}
+
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+
+  .score-row{width:720px;max-width:100%;display:flex;justify-content:space-between;align-items:center;color:white;font-size:1em;}
+
+  /* PASSAGE */
+  .passage-card{width:720px;max-width:100%;background:white;border-radius:24px;box-shadow:0 16px 50px rgba(0,0,0,0.35);overflow:hidden;}
+  .passage-top{padding:18px 26px 14px;display:flex;align-items:center;gap:14px;border-bottom:2px dashed #e0e0e0;}
+  .passage-emoji{font-size:3em;}
+  .passage-title{font-size:1.4em;font-weight:bold;color:#1e3c72;}
+  .passage-type{font-size:0.75em;background:#e3f2fd;color:#1565c0;padding:3px 12px;border-radius:20px;margin-top:4px;display:inline-block;}
+  .passage-text{padding:20px 26px;font-size:1.2em;line-height:2.2;color:#333;}
+  .word-click{cursor:pointer;border-bottom:2px dotted #2a5298;color:#1e3c72;transition:background 0.15s;}
+  .word-click:hover{background:#e3f2fd;}
+  .word-tip{display:none;position:fixed;background:#1e3c72;color:white;padding:8px 16px;border-radius:12px;font-size:0.9em;z-index:100;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.3);}
+  .passage-actions{padding:0 26px 18px;display:flex;gap:10px;flex-wrap:wrap;}
+  .action-btn{border:none;border-radius:50px;padding:9px 22px;font-size:0.95em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+  .btn-read{background:#1e3c72;}
+  .btn-vocab{background:#FF7043;}
+
+  /* QUESTIONS */
+  .questions-card{width:720px;max-width:100%;background:white;border-radius:24px;box-shadow:0 16px 50px rgba(0,0,0,0.35);padding:20px 26px;}
+  .q-header{font-size:1.1em;font-weight:bold;color:#1e3c72;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #e3f2fd;}
+  .question-block{margin-bottom:20px;}
+  .q-num{font-size:0.8em;font-weight:bold;color:#1565c0;margin-bottom:4px;}
+  .q-text{font-size:1.05em;color:#333;margin-bottom:8px;}
+  /* question types */
+  .mc-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .mc-opt{background:#f5f5f5;border:2px solid #ddd;border-radius:12px;padding:10px 14px;font-size:0.95em;font-family:inherit;cursor:pointer;text-align:left;color:#333;transition:all 0.2s;}
+  .mc-opt:hover{border-color:#1e3c72;background:#e3f2fd;}
+  .mc-opt.correct{background:#c8f7c5;border-color:#2e7d32;color:#1b5e20;}
+  .mc-opt.wrong{background:#ffcdd2;border-color:#c62828;color:#b71c1c;}
+  .tf-opts{display:flex;gap:10px;}
+  .tf-btn{flex:1;background:#f5f5f5;border:2px solid #ddd;border-radius:12px;padding:12px;font-size:1.05em;font-family:inherit;cursor:pointer;color:#333;text-align:center;transition:all 0.2s;}
+  .tf-btn:hover{border-color:#1e3c72;background:#e3f2fd;}
+  .tf-btn.correct{background:#c8f7c5;border-color:#2e7d32;color:#1b5e20;}
+  .tf-btn.wrong{background:#ffcdd2;border-color:#c62828;color:#b71c1c;}
+  .fill-wrap{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .fill-input{border:3px solid #ddd;border-radius:12px;padding:10px 16px;font-size:1.05em;font-family:inherit;color:#333;outline:none;flex:1;min-width:160px;}
+  .fill-input:focus{border-color:#1e3c72;}
+  .fill-input.correct{border-color:#2e7d32;background:#c8f7c5;}
+  .fill-input.wrong{border-color:#c62828;background:#ffcdd2;}
+  .check-btn{background:#1e3c72;color:white;border:none;border-radius:12px;padding:10px 20px;font-size:1em;font-family:inherit;cursor:pointer;}
+  .check-btn:hover{background:#2a5298;}
+  .q-feedback{font-size:0.9em;margin-top:6px;min-height:20px;}
+
+  .nav{display:flex;justify-content:center;align-items:center;gap:16px;padding:16px;}
+  .nav-btn{border:none;border-radius:50px;padding:12px 30px;font-size:1.1em;font-family:inherit;cursor:pointer;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.2);transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#555;cursor:not-allowed;transform:none;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🧠 Comprehension</span>
+  <span style="color:white;font-size:0.9em">English</span>
+</div>
+<div class="strip" id="strip"></div>
+<div class="main">
+  <div class="score-row">
+    <span id="scoreTxt" style="font-size:1.1em">Score: 0 / 0</span>
+    <span id="starsTxt" style="font-size:1.4em">☆☆☆☆☆</span>
+  </div>
+
+  <div class="passage-card">
+    <div class="passage-top">
+      <div class="passage-emoji" id="pEmoji">🐝</div>
+      <div>
+        <div class="passage-title" id="pTitle">Loading…</div>
+        <span class="passage-type" id="pType">Non-fiction</span>
+      </div>
+    </div>
+    <div class="passage-text" id="pText"></div>
+    <div class="passage-actions">
+      <button class="action-btn btn-read" onclick="readPassage()">🔊 Read Aloud</button>
+    </div>
+  </div>
+
+  <div class="questions-card">
+    <div class="q-header">📝 Answer These Questions</div>
+    <div id="qContainer"></div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn prev" id="prevBtn" onclick="go(-1)" disabled>◀ Prev</button>
+    <span style="color:white" id="navTxt">Passage 1 of 5</span>
+    <button class="nav-btn next" id="nextBtn" onclick="go(1)">Next ▶</button>
+  </div>
+</div>
+<div class="word-tip" id="wordTip"></div>
+
+<script>
+const passages = [
+  {
+    emoji:'🐝', title:'Busy Bees', type:'Non-fiction',
+    text:'Bees are small insects. They have six legs and two pairs of wings. Bees live together in a hive. A hive can have up to 60,000 bees! The queen bee lays eggs. Worker bees collect nectar from flowers. They make the nectar into honey. Honey is sweet and healthy. Bees also help plants grow by moving pollen from flower to flower. Without bees, many plants could not make seeds. Bees are very important to our world.',
+    vocab:{nectar:'Sweet liquid found inside flowers',pollen:'Yellow powder found in flowers',hive:'A home where bees live together',queen:'The most important female bee who lays eggs'},
+    qs:[
+      {type:'mc', q:'How many legs does a bee have?', opts:['Four','Six','Eight','Two'], ans:1},
+      {type:'mc', q:'What do worker bees collect from flowers?', opts:['Water','Seeds','Nectar','Pollen only'], ans:2},
+      {type:'tf', q:'A hive can have up to 60,000 bees.', ans:true},
+      {type:'fill', q:'Bees make nectar into ______.', ans:'honey'},
+      {type:'mc', q:'Why are bees important to plants?', opts:['They water them','They move pollen','They cut leaves','They plant seeds'], ans:1},
+    ]
+  },
+  {
+    emoji:'🌊', title:'Our Oceans', type:'Non-fiction',
+    text:'The ocean is a huge body of salt water. It covers more than half of our planet Earth. There are five oceans: the Pacific, Atlantic, Indian, Arctic, and Southern Ocean. The Pacific Ocean is the biggest. Many amazing animals live in the ocean. Fish, sharks, whales, dolphins, crabs, and jellyfish all call the ocean home. The ocean also gives us oxygen. Tiny plants called phytoplankton make half of the air we breathe. We must keep our oceans clean and safe.',
+    vocab:{oxygen:'The gas we breathe to stay alive',phytoplankton:'Tiny plants that live in the ocean',Pacific:'The largest ocean on Earth',salt:'What makes ocean water taste salty'},
+    qs:[
+      {type:'mc', q:'How many oceans are there?', opts:['Three','Four','Five','Six'], ans:2},
+      {type:'mc', q:'Which is the biggest ocean?', opts:['Atlantic','Indian','Arctic','Pacific'], ans:3},
+      {type:'tf', q:'The ocean is made of fresh water.', ans:false},
+      {type:'fill', q:'Tiny plants called ______ make half of the air we breathe.', ans:'phytoplankton'},
+      {type:'mc', q:'What should we do with our oceans?', opts:['Fill them in','Keep them clean','Make them smaller','Ignore them'], ans:1},
+    ]
+  },
+  {
+    emoji:'🌙', title:'Day and Night', type:'Non-fiction',
+    text:'Our Earth spins around once every 24 hours. When your part of Earth faces the Sun, it is daytime. When your part of Earth faces away from the Sun, it is night time. During the day, the sky is bright and blue. The Sun gives us heat and light. Animals that are active in the day are called diurnal. At night, the sky is dark and we can see the stars and the Moon. Animals that are active at night are called nocturnal. Owls and bats are nocturnal animals.',
+    vocab:{diurnal:'Animals that are active during the day',nocturnal:'Animals that are active at night',spins:'Turns around in a circle',faces:'Points towards something'},
+    qs:[
+      {type:'mc', q:'How long does it take Earth to spin once?', opts:['12 hours','24 hours','7 days','1 year'], ans:1},
+      {type:'tf', q:'Owls are diurnal animals.', ans:false},
+      {type:'mc', q:'What gives us heat and light?', opts:['The Moon','Stars','The Sun','Clouds'], ans:2},
+      {type:'fill', q:'Animals active during the day are called ______.', ans:'diurnal'},
+      {type:'mc', q:'What can we see at night?', opts:['The Sun and clouds','Stars and the Moon','Rainbows','Flowers'], ans:1},
+    ]
+  },
+  {
+    emoji:'🦋', title:'The Life of a Butterfly', type:'Non-fiction',
+    text:'A butterfly begins its life as a tiny egg on a leaf. The egg hatches and out comes a caterpillar. The caterpillar eats lots of leaves to grow big. Then it wraps itself in a hard shell called a chrysalis. Inside the chrysalis, something magical happens. The caterpillar slowly changes. After a few weeks, the shell breaks open. A beautiful butterfly comes out! It spreads its colourful wings and flies away. This whole change is called metamorphosis.',
+    vocab:{chrysalis:'The hard shell a caterpillar makes around itself',metamorphosis:'The process of changing from one form to another',hatches:'When something breaks out of an egg',spreads:'Opens out wide'},
+    qs:[
+      {type:'mc', q:'Where does a butterfly begin its life?', opts:['In water','As a chrysalis','As a tiny egg on a leaf','As a caterpillar'], ans:2},
+      {type:'tf', q:'The caterpillar eats leaves to grow big.', ans:true},
+      {type:'mc', q:'What is the hard shell called?', opts:['A cocoon','A chrysalis','A hive','A nest'], ans:1},
+      {type:'fill', q:'The whole change of a butterfly is called ______.', ans:'metamorphosis'},
+      {type:'mc', q:'What comes out of the chrysalis?', opts:['A caterpillar','An egg','A worm','A butterfly'], ans:3},
+    ]
+  },
+  {
+    emoji:'🏔️', title:'Mountains', type:'Non-fiction',
+    text:'A mountain is a large piece of land that rises high above the ground. Mountains are found all over the world. The highest mountain in the world is Mount Everest. It is in Asia. Mountains can be very cold at the top. Snow stays on the top of high mountains all year. Many animals live on mountains, such as snow leopards, eagles, and mountain goats. Rivers often begin at the top of mountains when snow melts and flows downhill. Mountains are beautiful and important parts of our world.',
+    vocab:{rises:'Goes up high','Mount Everest':'The tallest mountain in the world',melts:'Changes from solid ice to liquid water',flows:'Moves like water in a river'},
+    qs:[
+      {type:'mc', q:'What is the highest mountain in the world?', opts:['Mount Fuji','Mount Everest','The Alps','Ben Nevis'], ans:1},
+      {type:'mc', q:'Where is Mount Everest?', opts:['Africa','Europe','America','Asia'], ans:3},
+      {type:'tf', q:'It is always warm at the top of high mountains.', ans:false},
+      {type:'fill', q:'Rivers begin when mountain snow ______ and flows downhill.', ans:'melts'},
+      {type:'mc', q:'Which animal lives on mountains?', opts:['Dolphins','Snow leopards','Penguins','Crocodiles'], ans:1},
+    ]
+  },
+];
+
+let cur=0, answers={}, score=0, total=0;
+
+// Strip
+const strip=document.getElementById('strip');
+passages.forEach((p,i)=>{
+  const btn=document.createElement('button');
+  btn.className='strip-btn'+(i===0?' active':'');
+  btn.textContent=`${p.emoji} ${p.title}`;
+  btn.onclick=()=>goTo(i);
+  strip.appendChild(btn);
+});
+
+function render(){
+  const p=passages[cur];
+  document.getElementById('pEmoji').textContent=p.emoji;
+  document.getElementById('pTitle').textContent=p.title;
+  document.getElementById('pType').textContent=p.type;
+  document.getElementById('pText').innerHTML=p.text;
+  answers[cur]=answers[cur]||{};
+
+  // Questions
+  const qc=document.getElementById('qContainer');
+  qc.innerHTML='';
+  p.qs.forEach((q,qi)=>{
+    const div=document.createElement('div');
+    div.className='question-block';
+    div.innerHTML=`<div class="q-num">Question ${qi+1} of ${p.qs.length}</div><div class="q-text">${q.q}</div>`;
+
+    const done=answers[cur][qi]!==undefined;
+    if(q.type==='mc'){
+      const og=document.createElement('div');og.className='mc-opts';
+      q.opts.forEach((opt,oi)=>{
+        const btn=document.createElement('button');
+        btn.className='mc-opt';btn.textContent=opt;
+        if(done){btn.disabled=true;if(oi===q.ans)btn.classList.add('correct');else if(oi===answers[cur][qi])btn.classList.add('wrong');}
+        btn.onclick=()=>{if(done)return;answers[cur][qi]=oi;if(oi===q.ans)score++;total++;og.querySelectorAll('.mc-opt').forEach((b,i)=>{b.disabled=true;if(i===q.ans)b.classList.add('correct');else if(i===oi)b.classList.add('wrong');});updateScore();};
+        og.appendChild(btn);
+      });
+      div.appendChild(og);
+    } else if(q.type==='tf'){
+      const og=document.createElement('div');og.className='tf-opts';
+      ['✅ True','❌ False'].forEach((label,oi)=>{
+        const btn=document.createElement('button');btn.className='tf-btn';btn.textContent=label;
+        const isTrue=oi===0;
+        if(done){btn.disabled=true;if(isTrue===q.ans)btn.classList.add('correct');else if(answers[cur][qi]===isTrue)btn.classList.add('wrong');}
+        btn.onclick=()=>{if(done)return;answers[cur][qi]=isTrue;if(isTrue===q.ans)score++;total++;og.querySelectorAll('.tf-btn').forEach((b,i)=>{b.disabled=true;if((i===0)===q.ans)b.classList.add('correct');else if((i===0)===isTrue)b.classList.add('wrong');});updateScore();};
+        og.appendChild(btn);
+      });
+      div.appendChild(og);
+    } else if(q.type==='fill'){
+      const wrap=document.createElement('div');wrap.className='fill-wrap';
+      const inp=document.createElement('input');inp.className='fill-input';inp.type='text';inp.placeholder='Type your answer…';
+      if(done){inp.value=answers[cur][qi];inp.disabled=true;inp.classList.add(answers[cur][qi].toLowerCase()===q.ans.toLowerCase()?'correct':'wrong');}
+      const chk=document.createElement('button');chk.className='check-btn';chk.textContent='Check ✓';
+      if(done)chk.disabled=true;
+      chk.onclick=()=>{
+        const val=inp.value.trim();
+        answers[cur][qi]=val;
+        const ok=val.toLowerCase()===q.ans.toLowerCase();
+        if(ok)score++;total++;
+        inp.classList.add(ok?'correct':'wrong');
+        inp.disabled=true;chk.disabled=true;
+        const fb=div.querySelector('.q-feedback');
+        fb.textContent=ok?'✅ Correct!':'❌ The answer is: '+q.ans;
+        fb.style.color=ok?'#2e7d32':'#c62828';
+        updateScore();
+      };
+      const fb=document.createElement('div');fb.className='q-feedback';
+      if(done){const ok=answers[cur][qi].toLowerCase()===q.ans.toLowerCase();fb.textContent=ok?'✅ Correct!':'❌ The answer is: '+q.ans;fb.style.color=ok?'#2e7d32':'#c62828';}
+      wrap.appendChild(inp);wrap.appendChild(chk);
+      div.appendChild(wrap);div.appendChild(fb);
+    }
+    qc.appendChild(div);
+  });
+
+  document.querySelectorAll('.strip-btn').forEach((b,i)=>{
+    b.classList.toggle('active',i===cur);
+    if(Object.keys(answers[i]||{}).length>0)b.classList.add('done');
+  });
+  document.getElementById('prevBtn').disabled=cur===0;
+  document.getElementById('nextBtn').disabled=cur===passages.length-1;
+  document.getElementById('navTxt').textContent=`Passage ${cur+1} of ${passages.length}`;
+  updateScore();
+}
+
+function updateScore(){
+  document.getElementById('scoreTxt').textContent=`Score: ${score} / ${total}`;
+  const pct=total>0?score/total:0;
+  document.getElementById('starsTxt').textContent=pct>=0.8?'⭐⭐⭐⭐⭐':pct>=0.6?'⭐⭐⭐⭐☆':pct>=0.4?'⭐⭐⭐☆☆':pct>=0.2?'⭐⭐☆☆☆':'☆☆☆☆☆';
+}
+
+function readPassage(){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(passages[cur].text);
+  u.rate=0.82;u.pitch=1.0;
+  window.speechSynthesis.speak(u);
+}
+
+function go(dir){cur=Math.max(0,Math.min(passages.length-1,cur+dir));render();}
+function goTo(i){cur=i;render();}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1);});
+render();
+</script>
+</body>
+</html>

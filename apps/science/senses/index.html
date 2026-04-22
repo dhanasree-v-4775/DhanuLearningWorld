@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5 Senses – Human Body</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#4a148c,#6a1b9a,#7b1fa2);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.25);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .tabs{display:flex;gap:8px;padding:12px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:9px 20px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.12);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#4a148c;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.3);}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+  .score-row{display:flex;gap:16px;color:white;font-size:1em;justify-content:center;}
+  .sc-box{background:rgba(255,255,255,0.2);border-radius:14px;padding:8px 20px;text-align:center;}
+  .sc-box .val{font-size:1.5em;font-weight:bold;display:block;}
+  .card{width:780px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.35);padding:24px 28px;}
+
+  /* SENSE SELECTOR */
+  .sense-selector{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:20px;}
+  .sense-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 16px;border-radius:18px;border:3px solid transparent;background:#f3e5f5;cursor:pointer;transition:all 0.2s;min-width:80px;}
+  .sense-btn:hover{transform:translateY(-3px);}
+  .sense-btn.active{border-color:#6a1b9a;box-shadow:0 4px 16px rgba(106,27,154,0.3);}
+  .sense-icon{font-size:2.2em;}
+  .sense-name{font-size:0.85em;font-weight:bold;color:#4a148c;}
+
+  /* SENSE DETAIL */
+  .sense-detail{border-radius:20px;padding:20px;margin-bottom:16px;}
+  .sd-top{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+  .sd-big-icon{font-size:4em;}
+  .sd-info .sd-name{font-size:1.8em;font-weight:bold;}
+  .sd-info .sd-organ{font-size:1.1em;margin-top:4px;opacity:0.85;}
+  .sd-desc{font-size:1em;color:#333;line-height:1.6;margin-bottom:12px;}
+  .sd-examples{display:flex;flex-wrap:wrap;gap:8px;}
+  .sd-example{background:rgba(255,255,255,0.6);border-radius:12px;padding:8px 14px;text-align:center;font-size:0.9em;min-width:80px;}
+  .sd-ex-icon{font-size:1.8em;}
+  .sd-ex-label{font-size:0.85em;font-weight:bold;color:#4a148c;margin-top:2px;}
+
+  /* BODY PARTS MODE */
+  .body-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin:14px 0;}
+  .body-card{border-radius:18px;padding:16px;cursor:pointer;transition:all 0.2s;border:2px solid transparent;}
+  .body-card:hover{transform:translateY(-3px);}
+  .bc-icon{font-size:2.5em;margin-bottom:6px;}
+  .bc-name{font-size:1.1em;font-weight:bold;margin-bottom:4px;}
+  .bc-desc{font-size:0.85em;line-height:1.4;}
+  .bc-sub{font-size:0.8em;margin-top:6px;opacity:0.8;}
+
+  /* MATCH ACTIVITY */
+  .match-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:14px 0;}
+  .match-col-title{font-size:1em;font-weight:bold;color:#4a148c;text-align:center;margin-bottom:10px;padding:8px;background:#f3e5f5;border-radius:10px;}
+  .match-item{padding:12px 16px;border-radius:14px;border:2px solid #e1bee7;background:white;cursor:pointer;text-align:center;font-size:1.1em;transition:all 0.2s;margin-bottom:8px;}
+  .match-item:hover{border-color:#7b1fa2;background:#f3e5f5;}
+  .match-item.selected{border-color:#7b1fa2;background:#e1bee7;}
+  .match-item.matched{border-color:#4caf50;background:#c8f7c5;cursor:default;}
+  .match-item.wrong-m{border-color:#e53935;background:#ffcdd2;animation:shake 0.4s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
+
+  /* QUIZ */
+  .q-emoji{font-size:3.5em;text-align:center;margin:10px 0;}
+  .q-text{font-size:1.2em;font-weight:bold;color:#333;text-align:center;margin-bottom:14px;}
+  .q-opts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .q-opt{padding:12px 22px;border-radius:50px;border:2px solid #e1bee7;background:white;font-family:inherit;font-size:1.05em;cursor:pointer;color:#333;transition:all 0.2s;}
+  .q-opt:hover{border-color:#7b1fa2;background:#f3e5f5;}
+  .q-opt.correct{border-color:#4caf50;background:#c8f7c5;}
+  .q-opt.wrong{border-color:#e53935;background:#ffcdd2;}
+  .feedback{font-size:1.2em;font-weight:bold;text-align:center;min-height:36px;margin-top:10px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  .action-btn{border:none;border-radius:50px;padding:11px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">👃 5 Senses – Human Body</span>
+  <span style="color:white;font-size:0.9em">Science</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="setMode('senses',this)">👁️ 5 Senses</button>
+  <button class="tab" onclick="setMode('body',this)">🫀 Body Parts</button>
+  <button class="tab" onclick="setMode('match',this)">🎯 Match It</button>
+  <button class="tab" onclick="setMode('quiz',this)">🧩 Quiz</button>
+</div>
+<div class="main">
+  <div class="score-row" id="scoreRow" style="display:none">
+    <div class="sc-box"><span class="val" id="sRight">0</span>✅</div>
+    <div class="sc-box"><span class="val" id="sWrong">0</span>❌</div>
+    <div class="sc-box"><span class="val" id="sStreak">0</span>🔥</div>
+  </div>
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+const senses = [
+  {icon:'👁️', name:'Sight', organ:'Eyes', color:'#1565c0', bg:'#e3f2fd',
+   desc:'Our eyes let us see the world! We can see colours, shapes, light and dark, near and far things.',
+   how:'Light enters our eyes and our brain turns it into a picture.',
+   examples:[{i:'🌈',l:'Colours'},{i:'🌟',l:'Light'},{i:'📚',l:'Read'},{i:'🎨',l:'Art'},{i:'🌅',l:'Sunrise'},{i:'👥',l:'Faces'}]},
+  {icon:'👂', name:'Hearing', organ:'Ears', color:'#e65100', bg:'#fff3e0',
+   desc:'Our ears pick up sounds around us. We can hear music, voices, rain, animals and much more!',
+   how:'Sounds travel through the air as vibrations and our ears collect them.',
+   examples:[{i:'🎵',l:'Music'},{i:'🌧️',l:'Rain'},{i:'🗣️',l:'Voices'},{i:'🐦',l:'Birds'},{i:'🚗',l:'Cars'},{i:'🔔',l:'Bells'}]},
+  {icon:'👃', name:'Smell', organ:'Nose', color:'#2e7d32', bg:'#e8f5e9',
+   desc:'Our nose lets us smell wonderful smells like flowers and food, and warns us of bad smells too!',
+   how:'Tiny particles in the air enter our nose and special cells sense them.',
+   examples:[{i:'🌸',l:'Flowers'},{i:'🍕',l:'Pizza'},{i:'☕',l:'Coffee'},{i:'🌿',l:'Grass'},{i:'🧁',l:'Baking'},{i:'🌊',l:'Sea'}]},
+  {icon:'👅', name:'Taste', organ:'Tongue', color:'#c62828', bg:'#ffebee',
+   desc:'Our tongue has tiny taste buds that help us taste food! We can taste sweet, sour, salty and bitter.',
+   how:'When food touches your tongue, taste buds send signals to your brain.',
+   examples:[{i:'🍭',l:'Sweet'},{i:'🍋',l:'Sour'},{i:'🧂',l:'Salty'},{i:'🍫',l:'Bitter'},{i:'🍎',l:'Fruity'},{i:'🌶️',l:'Spicy'}]},
+  {icon:'🖐️', name:'Touch', organ:'Skin', color:'#795548', bg:'#efebe9',
+   desc:'Our skin covers our whole body and can feel textures, temperature, pain and pressure.',
+   how:'Millions of tiny sensors in our skin send touch messages to the brain.',
+   examples:[{i:'🌡️',l:'Hot/Cold'},{i:'🪨',l:'Rough'},{i:'🧸',l:'Soft'},{i:'🌬️',l:'Wind'},{i:'💧',l:'Wet'},{i:'🤲',l:'Smooth'}]},
+];
+
+const bodyParts = [
+  {icon:'🧠', name:'Brain', color:'#e91e63', bg:'#fce4ec',
+   desc:'The brain is the control centre of your body! It receives messages from all your senses.',
+   sub:'Kept safe inside your skull. Needs lots of sleep and food to work well!'},
+  {icon:'❤️', name:'Heart', color:'#f44336', bg:'#ffebee',
+   desc:'Your heart pumps blood around your whole body. It beats about 70 times every minute!',
+   sub:'You can feel it beating in your chest. Exercise makes it stronger!'},
+  {icon:'🫁', name:'Lungs', color:'#2196f3', bg:'#e3f2fd',
+   desc:'You have two lungs. They breathe in oxygen from air and breathe out carbon dioxide.',
+   sub:'Your lungs are like sponges that fill with air. Deep breaths help!'},
+  {icon:'🦴', name:'Bones', color:'#607d8b', bg:'#eceff1',
+   desc:'Your skeleton has 206 bones! Bones hold your body up and protect your organs.',
+   sub:'Bones are strong but can break. Milk and cheese make them stronger!'},
+  {icon:'💪', name:'Muscles', color:'#ff6f00', bg:'#fff8e1',
+   desc:'Muscles help you move! When muscles pull on bones, you can walk, jump and throw.',
+   sub:'You have over 600 muscles. The bigger the muscle, the stronger you are!'},
+  {icon:'🩸', name:'Blood', color:'#b71c1c', bg:'#ffebee',
+   desc:'Blood carries oxygen and food to every part of your body through tubes called blood vessels.',
+   sub:'Your body has about 5 litres of blood — that\'s like a big bottle of water!'},
+];
+
+const matchPairs = [
+  {sense:'👁️ Eyes', use:'Seeing colours and shapes'},
+  {sense:'👂 Ears', use:'Hearing music and voices'},
+  {sense:'👃 Nose', use:'Smelling flowers and food'},
+  {sense:'👅 Tongue', use:'Tasting sweet and sour'},
+  {sense:'🖐️ Skin', use:'Feeling hot and cold'},
+];
+
+const quizQs = [
+  {q:'Which sense do you use to see a rainbow?', opts:['Hearing','Sight','Smell','Touch'], ans:'Sight', emoji:'🌈'},
+  {q:'Which part of your body do you use to taste food?', opts:['Nose','Eyes','Tongue','Ears'], ans:'Tongue', emoji:'👅'},
+  {q:'What do your ears help you do?', opts:['See','Taste','Hear','Smell'], ans:'Hear', emoji:'👂'},
+  {q:'Which sense tells you if something is hot or cold?', opts:['Sight','Taste','Hearing','Touch'], ans:'Touch', emoji:'🖐️'},
+  {q:'What organ do you use to smell a flower?', opts:['Eyes','Nose','Tongue','Ears'], ans:'Nose', emoji:'🌸'},
+  {q:'How many senses do humans have?', opts:['3','4','5','6'], ans:'5', emoji:'🖐️'},
+  {q:'Which organ pumps blood around your body?', opts:['Brain','Lungs','Heart','Stomach'], ans:'Heart', emoji:'❤️'},
+  {q:'What do your lungs breathe in?', opts:['Carbon dioxide','Nitrogen','Oxygen','Steam'], ans:'Oxygen', emoji:'🫁'},
+  {q:'How many bones does your body have?', opts:['100','150','206','300'], ans:'206', emoji:'🦴'},
+  {q:'Which sense would you use to hear a dog barking?', opts:['Sight','Smell','Touch','Hearing'], ans:'Hearing', emoji:'🐕'},
+];
+
+let mode = 'senses';
+let activeSense = 0;
+let qIdx = 0, qRight = 0, qWrong = 0, qStreak = 0, qAnswered = false;
+let matchSelected = null, matchDone = new Set();
+
+function setMode(m, tab) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('scoreRow').style.display = m === 'quiz' ? 'flex' : 'none';
+  if (m === 'match') { matchSelected = null; matchDone = new Set(); }
+  render();
+}
+
+function render() {
+  if (mode === 'senses') renderSenses();
+  else if (mode === 'body') renderBody();
+  else if (mode === 'match') renderMatch();
+  else renderQuiz();
+}
+
+function renderSenses() {
+  const s = senses[activeSense];
+  const senseBtns = senses.map((sen, i) => `
+    <div class="sense-btn ${i===activeSense?'active':''}" style="${i===activeSense?'background:'+sen.bg+';border-color:'+sen.color:''}" onclick="activeSense=${i};renderSenses()">
+      <div class="sense-icon">${sen.icon}</div>
+      <div class="sense-name">${sen.name}</div>
+    </div>`).join('');
+
+  const examplesHTML = s.examples.map(e => `
+    <div class="sd-example">
+      <div class="sd-ex-icon">${e.i}</div>
+      <div class="sd-ex-label">${e.l}</div>
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div class="sense-selector">${senseBtns}</div>
+    <div class="sense-detail" style="background:${s.bg};border-left:5px solid ${s.color}">
+      <div class="sd-top">
+        <div class="sd-big-icon">${s.icon}</div>
+        <div class="sd-info">
+          <div class="sd-name" style="color:${s.color}">${s.name}</div>
+          <div class="sd-organ" style="color:${s.color}">🏷️ Organ: ${s.organ}</div>
+        </div>
+      </div>
+      <div class="sd-desc">${s.desc}</div>
+      <div style="background:rgba(255,255,255,0.6);border-radius:10px;padding:8px 12px;font-size:0.9em;color:#555;margin-bottom:12px">
+        🔬 How it works: ${s.how}
+      </div>
+      <div style="font-size:0.9em;font-weight:bold;color:#555;margin-bottom:8px">Things we can ${s.name.toLowerCase()}:</div>
+      <div class="sd-examples">${examplesHTML}</div>
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:${s.color}" onclick="speak('The sense of ${s.name}. We use our ${s.organ}. ${s.desc}')">🔊 Read</button>
+      <button class="action-btn" style="background:#607D8B" onclick="activeSense=(activeSense+1)%5;renderSenses()">Next ▶</button>
+    </div>
+  `;
+}
+
+function renderBody() {
+  const cardsHTML = bodyParts.map(b => `
+    <div class="body-card" style="background:${b.bg};border:2px solid ${b.color}" onclick="speak('${b.name}. ${b.desc}')">
+      <div class="bc-icon">${b.icon}</div>
+      <div class="bc-name" style="color:${b.color}">${b.name}</div>
+      <div class="bc-desc">${b.desc}</div>
+      <div class="bc-sub" style="color:${b.color}">${b.sub}</div>
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#4a148c;margin-bottom:6px;text-align:center">🫀 Parts of the Human Body</div>
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-bottom:14px">Tap a card to hear about it!</div>
+    <div class="body-grid">${cardsHTML}</div>
+  `;
+}
+
+function renderMatch() {
+  const senseItems = matchPairs.map((p, i) => `
+    <div class="match-item ${matchDone.has('s'+i)?'matched':matchSelected==='s'+i?'selected':''}"
+         id="mi_s${i}"
+         onclick="matchClick('s${i}',${i})">${p.sense}</div>`).join('');
+
+  const useItems = matchPairs.map((p, i) => {
+    const shuffleIdx = [2,4,0,3,1][i]; // static shuffle
+    const mp = matchPairs[shuffleIdx];
+    return `<div class="match-item ${matchDone.has('u'+shuffleIdx)?'matched':matchSelected==='u'+shuffleIdx?'selected':''}"
+         id="mi_u${shuffleIdx}"
+         onclick="matchClick('u${shuffleIdx}',${shuffleIdx})">${mp.use}</div>`;
+  }).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#4a148c;margin-bottom:14px;text-align:center">🎯 Match the Sense to its Use!</div>
+    <div style="font-size:0.9em;color:#888;text-align:center;margin-bottom:12px">Tap a sense, then tap what we use it for!</div>
+    <div class="match-grid">
+      <div>
+        <div class="match-col-title">Sense</div>
+        ${senseItems}
+      </div>
+      <div>
+        <div class="match-col-title">What we use it for</div>
+        ${useItems}
+      </div>
+    </div>
+    ${matchDone.size === matchPairs.length ? '<div style="font-size:1.3em;font-weight:bold;color:#2e7d32;text-align:center;padding:10px">🎉 Well done! You matched them all!</div>' : ''}
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="matchSelected=null;matchDone=new Set();renderMatch()">🔄 Restart</button>
+    </div>
+  `;
+}
+
+function matchClick(id, idx) {
+  if (matchDone.has(id)) return;
+  if (matchSelected === null) {
+    matchSelected = id;
+    renderMatch();
+    return;
+  }
+  // check if one is 's' and other is 'u'
+  const prevType = matchSelected[0];
+  const curType = id[0];
+  if (prevType === curType) { matchSelected = id; renderMatch(); return; }
+  const prevIdx = parseInt(matchSelected.slice(1));
+  if (prevIdx === idx) {
+    matchDone.add(matchSelected);
+    matchDone.add(id);
+    matchSelected = null;
+    speak('Correct! Great match!');
+  } else {
+    // flash wrong
+    const el1 = document.getElementById('mi_' + matchSelected);
+    const el2 = document.getElementById('mi_' + id);
+    if (el1) el1.classList.add('wrong-m');
+    if (el2) el2.classList.add('wrong-m');
+    setTimeout(() => { matchSelected = null; renderMatch(); }, 600);
+    return;
+  }
+  renderMatch();
+}
+
+function renderQuiz() {
+  if (qIdx >= quizQs.length) qIdx = 0;
+  const q = quizQs[qIdx];
+  qAnswered = false;
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-bottom:6px">Question ${qIdx+1} of ${quizQs.length}</div>
+    <div class="q-emoji">${q.emoji}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="q-opts" id="opts">
+      ${q.opts.map(o=>`<button class="q-opt" onclick="checkQ(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}')">  ${o}</button>`).join('')}
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="qIdx=0;renderQuiz()">🔄 Restart</button>
+    </div>
+  `;
+}
+
+function checkQ(btn, val, ans) {
+  if (qAnswered) return;
+  qAnswered = true;
+  document.querySelectorAll('#opts .q-opt').forEach(b => b.disabled = true);
+  const fb = document.getElementById('feedback');
+  if (val === ans) {
+    btn.classList.add('correct'); qRight++; qStreak++;
+    fb.textContent = '✅ Brilliant! ' + ans + ' is correct! 🌟';
+    fb.style.color = '#2e7d32';
+    speak('Brilliant! Correct!');
+    setTimeout(() => { qIdx++; renderQuiz(); }, 1800);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('#opts .q-opt').forEach(b => { if (b.textContent.trim() === ans) b.classList.add('correct'); });
+    qWrong++; qStreak = 0;
+    fb.textContent = '❌ The answer is: ' + ans;
+    fb.style.color = '#c62828';
+    setTimeout(() => { qIdx++; renderQuiz(); }, 2200);
+  }
+  document.getElementById('sRight').textContent = qRight;
+  document.getElementById('sWrong').textContent = qWrong;
+  document.getElementById('sStreak').textContent = qStreak;
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.85; u.pitch = 1.1;
+  window.speechSynthesis.speak(u);
+}
+
+render();
+</script>
+</body>
+</html>

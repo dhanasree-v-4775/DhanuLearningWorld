@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Healthy Habits</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#e91e63,#c2185b,#ad1457);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.25);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .tabs{display:flex;gap:8px;padding:12px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:9px 20px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.12);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#c2185b;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.3);}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+  .score-row{display:flex;gap:16px;color:white;font-size:1em;justify-content:center;}
+  .sc-box{background:rgba(255,255,255,0.2);border-radius:14px;padding:8px 20px;text-align:center;}
+  .sc-box .val{font-size:1.5em;font-weight:bold;display:block;}
+  .card{width:800px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.35);padding:24px 28px;}
+
+  /* HABIT GRID */
+  .habit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin:12px 0;}
+  .habit-card{border-radius:18px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;border:3px solid transparent;}
+  .habit-card:hover,.habit-card.sel{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+  .hc-icon{font-size:2.5em;margin-bottom:6px;}
+  .hc-name{font-size:0.9em;font-weight:bold;}
+
+  /* DETAIL */
+  .habit-detail{border-radius:20px;padding:20px;margin:12px 0;}
+  .hd-icon{font-size:3.5em;margin-bottom:8px;}
+  .hd-name{font-size:1.5em;font-weight:bold;margin-bottom:8px;}
+  .hd-desc{font-size:0.95em;color:#333;line-height:1.6;margin-bottom:12px;}
+  .hd-tips{display:flex;flex-direction:column;gap:8px;}
+  .hd-tip{background:rgba(255,255,255,0.7);border-radius:12px;padding:9px 14px;font-size:0.9em;color:#333;display:flex;gap:10px;align-items:flex-start;}
+
+  /* FOOD PLATE */
+  .food-plate{display:flex;flex-direction:column;align-items:center;gap:10px;margin:14px 0;}
+  .plate-circle{width:280px;height:280px;border-radius:50%;background:#f5f5f5;border:8px solid #e0e0e0;display:grid;grid-template-areas:"veg fruit" "grain protein";overflow:hidden;position:relative;}
+  .plate-section{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:10px;cursor:pointer;transition:all 0.2s;}
+  .plate-section:hover{filter:brightness(1.08);}
+  .ps-veg{grid-area:veg;background:#c8e6c9;border-right:3px solid white;border-bottom:3px solid white;}
+  .ps-fruit{grid-area:fruit;background:#f8bbd0;border-bottom:3px solid white;}
+  .ps-grain{grid-area:grain;background:#fff9c4;border-right:3px solid white;}
+  .ps-protein{grid-area:protein;background:#b3e5fc;}
+  .ps-icon{font-size:1.6em;}
+  .ps-label{font-size:0.7em;font-weight:bold;text-align:center;}
+  .food-examples{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:12px;background:#f5f5f5;border-radius:14px;}
+  .food-chip{background:white;border-radius:20px;padding:6px 14px;font-size:0.9em;border:2px solid #e0e0e0;cursor:pointer;transition:all 0.2s;}
+  .food-chip:hover{border-color:#e91e63;background:#fce4ec;}
+  .food-chip.healthy{border-color:#4caf50;background:#e8f5e9;}
+  .food-chip.unhealthy{border-color:#e53935;background:#ffebee;}
+
+  /* ROUTINE BUILDER */
+  .time-slot{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:14px;margin-bottom:8px;border:2px solid #f8bbd0;background:white;transition:all 0.2s;}
+  .time-slot:hover{border-color:#c2185b;background:#fce4ec;}
+  .time-badge{background:#c2185b;color:white;border-radius:10px;padding:4px 12px;font-size:0.85em;font-weight:bold;flex-shrink:0;min-width:80px;text-align:center;}
+  .slot-icon{font-size:1.8em;flex-shrink:0;}
+  .slot-text{font-size:0.95em;color:#333;flex:1;}
+  .slot-check{font-size:1.3em;cursor:pointer;flex-shrink:0;transition:all 0.2s;}
+
+  /* QUIZ */
+  .q-emoji{font-size:3.5em;text-align:center;margin:10px 0;}
+  .q-text{font-size:1.2em;font-weight:bold;color:#333;text-align:center;margin-bottom:14px;}
+  .q-opts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .q-opt{padding:12px 22px;border-radius:50px;border:2px solid #f8bbd0;background:white;font-family:inherit;font-size:1.05em;cursor:pointer;color:#333;transition:all 0.2s;}
+  .q-opt:hover{border-color:#c2185b;background:#fce4ec;}
+  .q-opt.correct{border-color:#4caf50;background:#c8f7c5;}
+  .q-opt.wrong{border-color:#e53935;background:#ffcdd2;}
+  .feedback{font-size:1.2em;font-weight:bold;text-align:center;min-height:36px;margin-top:10px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  .action-btn{border:none;border-radius:50px;padding:11px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+  @keyframes popIn{0%{transform:scale(0);}100%{transform:scale(1);}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">💪 Healthy Habits</span>
+  <span style="color:white;font-size:0.9em">EVS</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="setMode('habits',this)">💚 Good Habits</button>
+  <button class="tab" onclick="setMode('food',this)">🥗 Healthy Food</button>
+  <button class="tab" onclick="setMode('routine',this)">📅 My Day</button>
+  <button class="tab" onclick="setMode('quiz',this)">🧩 Quiz</button>
+</div>
+<div class="main">
+  <div class="score-row" id="scoreRow" style="display:none">
+    <div class="sc-box"><span class="val" id="sRight">0</span>✅</div>
+    <div class="sc-box"><span class="val" id="sWrong">0</span>❌</div>
+    <div class="sc-box"><span class="val" id="sStreak">0</span>🔥</div>
+  </div>
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+const habits = [
+  {icon:'🪥', name:'Brush Your Teeth', color:'#1565c0', bg:'#e3f2fd',
+   desc:'Brush your teeth twice a day — in the morning and before bed. Use a pea-sized amount of toothpaste and brush for 2 whole minutes!',
+   tips:['🕐 Brush for 2 minutes — try singing a song!','🌙 Always brush before bed — sugar attacks teeth at night!','💧 Spit, don\'t swallow toothpaste!','🦷 Change your toothbrush every 3 months.']},
+  {icon:'🛁', name:'Keep Clean', color:'#6a1b9a', bg:'#f3e5f5',
+   desc:'Wash your body, hair and hands every day to stay clean and healthy. Good hygiene stops germs from spreading!',
+   tips:['🧼 Wash hands with soap for at least 20 seconds.','🚿 Shower or bathe daily to wash away dirt and sweat.','💆 Wash your hair regularly with shampoo.','🤧 Cover your mouth when you sneeze or cough!']},
+  {icon:'😴', name:'Get Enough Sleep', color:'#311b92', bg:'#ede7f6',
+   desc:'Children your age need 9–11 hours of sleep every night. Sleep helps your brain grow, your body repair and keeps you feeling happy!',
+   tips:['🛏️ Go to bed at the same time each night.','📱 No screens for 1 hour before bed.','📚 Read a book instead — it helps you relax!','🌡️ Keep your bedroom cool and dark for good sleep.']},
+  {icon:'🏃', name:'Exercise & Play', color:'#c62828', bg:'#ffebee',
+   desc:'Children need at least 60 minutes of active play every day! Exercise makes your heart, muscles and bones strong.',
+   tips:['⚽ Play outside — run, jump, swim, cycle!','🎯 Try a sport you enjoy — football, dancing, gymnastics!','🏃 Take the stairs instead of the lift.','🌤️ Outdoor play boosts your mood and vitamin D!']},
+  {icon:'💧', name:'Drink Plenty of Water', color:'#0277bd', bg:'#e1f5fe',
+   desc:'Your body is 60% water! You need to drink 6–8 glasses of water every day to stay hydrated and healthy.',
+   tips:['🥤 Carry a water bottle to school.','🍵 Water is better than fizzy drinks or juice.','😴 Dehydration makes you feel tired and can\'t focus!','🍉 Eating fruit and vegetables also helps hydration.']},
+  {icon:'🥗', name:'Eat Healthy Food', color:'#2e7d32', bg:'#e8f5e9',
+   desc:'Food gives your body energy and nutrients to grow and stay healthy. Eat lots of fruits, vegetables, grains and protein every day!',
+   tips:['🍎 Eat 5 portions of fruit and vegetables a day.','🍬 Limit sweets, crisps and fizzy drinks.','🥣 Eat a good breakfast — it gives you energy for learning!','🍽️ Eat meals at regular times and don\'t skip breakfast.']},
+  {icon:'🧠', name:'Be Kind & Happy', color:'#e65100', bg:'#fff3e0',
+   desc:'Mental health is just as important as physical health! Being kind, talking about feelings and spending time with friends and family keeps your mind healthy.',
+   tips:['😊 Talk to someone you trust when you feel sad.','🤝 Be kind to others — it makes YOU feel good too!','🎨 Doing art, music or hobbies boosts your mood.','🌿 Spending time in nature calms the mind.']},
+  {icon:'🚫', name:'Stay Safe', color:'#795548', bg:'#efebe9',
+   desc:'Keeping safe means knowing what is safe and what could be dangerous. Always tell a trusted adult if something worries you.',
+   tips:['🚗 Always wear a seatbelt in the car.','🚦 Look both ways before crossing the road.','🏊 Only swim with an adult nearby.','🙅 Never talk to strangers or go with people you don\'t know.']},
+];
+
+const foodGroups = [
+  {section:'veg', label:'Vegetables', icon:'🥦', color:'#2e7d32', bg:'#c8e6c9',
+   examples:['🥦 Broccoli','🥕 Carrot','🌽 Corn','🍅 Tomato','🥬 Spinach','🧅 Onion'],
+   desc:'Vegetables give us vitamins and fibre. Fill HALF your plate with vegetables!'},
+  {section:'fruit', label:'Fruit', icon:'🍎', color:'#c62828', bg:'#f8bbd0',
+   examples:['🍎 Apple','🍌 Banana','🍇 Grapes','🍊 Orange','🍓 Strawberry','🥭 Mango'],
+   desc:'Fruit gives us vitamins and natural sugars for energy. Aim for 2 portions a day!'},
+  {section:'grain', label:'Grains', icon:'🌾', color:'#f57f17', bg:'#fff9c4',
+   examples:['🍞 Bread','🍚 Rice','🥣 Oats','🍝 Pasta','🥨 Crackers','🫓 Pitta'],
+   desc:'Grains give us carbohydrates — energy for our brain and muscles!'},
+  {section:'protein', label:'Protein', icon:'🥩', color:'#1565c0', bg:'#b3e5fc',
+   examples:['🥚 Egg','🐟 Fish','🫘 Beans','🥜 Nuts','🍗 Chicken','🧀 Cheese'],
+   desc:'Protein helps build muscles and repair our body. Include it in every meal!'},
+];
+
+const allFoods = [
+  {emoji:'🍎', label:'Apple', healthy:true},
+  {emoji:'🍕', label:'Pizza', healthy:false},
+  {emoji:'🥦', label:'Broccoli', healthy:true},
+  {emoji:'🍬', label:'Sweets', healthy:false},
+  {emoji:'🍌', label:'Banana', healthy:true},
+  {emoji:'🥤', label:'Fizzy drink', healthy:false},
+  {emoji:'🐟', label:'Fish', healthy:true},
+  {emoji:'🍟', label:'Chips', healthy:false},
+  {emoji:'🥕', label:'Carrot', healthy:true},
+  {emoji:'🍰', label:'Cake', healthy:false},
+  {emoji:'🥚', label:'Egg', healthy:true},
+  {emoji:'🍫', label:'Chocolate bar', healthy:false},
+];
+
+const routineItems = [
+  {time:'7:00 am', icon:'⏰', text:'Wake up and stretch!', checked:false},
+  {time:'7:15 am', icon:'🚿', text:'Have a wash or shower', checked:false},
+  {time:'7:30 am', icon:'👕', text:'Get dressed for school', checked:false},
+  {time:'7:45 am', icon:'🥣', text:'Eat a healthy breakfast', checked:false},
+  {time:'8:00 am', icon:'🪥', text:'Brush teeth for 2 minutes', checked:false},
+  {time:'3:30 pm', icon:'🎒', text:'After school — have a healthy snack', checked:false},
+  {time:'4:00 pm', icon:'🏃', text:'Play outside for 30+ minutes', checked:false},
+  {time:'5:30 pm', icon:'📚', text:'Do homework or reading', checked:false},
+  {time:'6:30 pm', icon:'🍽️', text:'Eat a healthy dinner with family', checked:false},
+  {time:'8:00 pm', icon:'📵', text:'Turn off screens', checked:false},
+  {time:'8:15 pm', icon:'🛁', text:'Bath/shower and put on pyjamas', checked:false},
+  {time:'8:30 pm', icon:'🪥', text:'Brush teeth again', checked:false},
+  {time:'9:00 pm', icon:'📖', text:'Read a bedtime story', checked:false},
+  {time:'9:30 pm', icon:'💤', text:'Lights out — sleep!', checked:false},
+];
+
+const quizQs = [
+  {q:'How long should you brush your teeth for?', opts:['30 seconds','1 minute','2 minutes','5 minutes'], ans:'2 minutes', emoji:'🪥'},
+  {q:'How many hours of sleep do children need each night?', opts:['5–6 hours','7–8 hours','9–11 hours','12–14 hours'], ans:'9–11 hours', emoji:'😴'},
+  {q:'How many glasses of water should you drink each day?', opts:['1–2','3–4','6–8','10–12'], ans:'6–8', emoji:'💧'},
+  {q:'Which food is the healthiest choice?', opts:['🍕 Pizza','🍬 Sweets','🥦 Broccoli','🍟 Chips'], ans:'🥦 Broccoli', emoji:'🥗'},
+  {q:'How much active play do children need each day?', opts:['10 minutes','30 minutes','60 minutes','2 hours'], ans:'60 minutes', emoji:'🏃'},
+  {q:'When should you brush your teeth?', opts:['Only at night','Only in the morning','Morning and before bed','Once a week'], ans:'Morning and before bed', emoji:'🦷'},
+  {q:'What does protein help our body do?', opts:['See better','Build muscles','Stay asleep','Run faster'], ans:'Build muscles', emoji:'💪'},
+  {q:'What should you do before crossing the road?', opts:['Run quickly','Look both ways','Close your eyes','Skip across'], ans:'Look both ways', emoji:'🚦'},
+  {q:'Which drink is BEST for your health?', opts:['Fizzy drink','Juice','Water','Milkshake'], ans:'Water', emoji:'💧'},
+  {q:'How many portions of fruit and vegetables should you eat a day?', opts:['1','3','5','10'], ans:'5', emoji:'🍎'},
+];
+
+let mode = 'habits';
+let selHabit = 0;
+let selFoodGroup = 0;
+let foodSorted = {};
+let sortedFood = null;
+let routineChecked = new Set();
+let qIdx = 0, qRight = 0, qWrong = 0, qStreak = 0, qAnswered = false;
+
+function setMode(m, tab) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('scoreRow').style.display = m === 'quiz' ? 'flex' : 'none';
+  render();
+}
+
+function render() {
+  if (mode === 'habits') renderHabits();
+  else if (mode === 'food') renderFood();
+  else if (mode === 'routine') renderRoutine();
+  else renderQuiz();
+}
+
+function renderHabits() {
+  const h = habits[selHabit];
+  const grid = habits.map((hb,i) => `
+    <div class="habit-card ${i===selHabit?'sel':''}" style="background:${hb.bg};border-color:${i===selHabit?hb.color:'transparent'}" onclick="selHabit=${i};renderHabits()">
+      <div class="hc-icon">${hb.icon}</div>
+      <div class="hc-name" style="color:${hb.color}">${hb.name}</div>
+    </div>`).join('');
+
+  const tips = h.tips.map(t=>`
+    <div class="hd-tip">
+      <div style="font-size:1.2em">${t.slice(0,2)}</div>
+      <div>${t.slice(2)}</div>
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#c2185b;margin-bottom:12px">💚 Healthy Habits – Staying Well!</div>
+    <div class="habit-grid">${grid}</div>
+    <div class="habit-detail" style="background:${h.bg};border-left:5px solid ${h.color}">
+      <div class="hd-icon">${h.icon}</div>
+      <div class="hd-name" style="color:${h.color}">${h.name}</div>
+      <div class="hd-desc">${h.desc}</div>
+      <div style="font-size:0.9em;font-weight:bold;color:#555;margin-bottom:8px">✅ Top Tips:</div>
+      <div class="hd-tips">${tips}</div>
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:${h.color}" onclick="speak('${h.name}. ${h.desc}')">🔊 Read</button>
+      <button class="action-btn" style="background:#607D8B" onclick="selHabit=(selHabit+1)%${habits.length};renderHabits()">Next ▶</button>
+    </div>
+  `;
+}
+
+function renderFood() {
+  const fg = foodGroups[selFoodGroup];
+
+  const plateSections = foodGroups.map(f=>`
+    <div class="plate-section ps-${f.section}" onclick="selFoodGroup=${foodGroups.indexOf(f)};renderFood()">
+      <div class="ps-icon">${f.icon}</div>
+      <div class="ps-label" style="color:${f.color}">${f.label}</div>
+    </div>`).join('');
+
+  const examplesHTML = fg.examples.map(e=>`
+    <div class="food-chip" onclick="speak('${e.replace(/[^\w\s]/gi,'')}')">  ${e}</div>`).join('');
+
+  // Healthy/unhealthy sort
+  const sortHTML = allFoods.map((f,i)=>{
+    const st = foodSorted[i];
+    return `<div style="display:inline-flex;flex-direction:column;align-items:center;gap:4px;padding:8px;border-radius:12px;background:${st==='healthy'?'#e8f5e9':st==='unhealthy'?'#ffebee':'#f5f5f5'};border:2px solid ${st==='healthy'?'#4caf50':st==='unhealthy'?'#e53935':'#ccc'};cursor:pointer;margin:4px;transition:all 0.2s" onclick="sortFood(${i})" title="${f.label}">
+      <span style="font-size:1.8em">${f.emoji}</span>
+      <span style="font-size:0.7em;color:#555">${f.label}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#c2185b;margin-bottom:12px;text-align:center">🥗 Healthy Eating – My Food Plate</div>
+    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;justify-content:center;margin-bottom:14px">
+      <div>
+        <div style="font-size:0.85em;font-weight:bold;color:#666;margin-bottom:8px;text-align:center">Tap a section to learn more!</div>
+        <div class="food-plate">
+          <div class="plate-circle">${plateSections}</div>
+        </div>
+      </div>
+      <div style="flex:1;min-width:220px">
+        <div style="background:${fg.bg};border-radius:16px;padding:16px;border-left:4px solid ${fg.color}">
+          <div style="font-size:1.4em;font-weight:bold;color:${fg.color};margin-bottom:6px">${fg.icon} ${fg.label}</div>
+          <div style="font-size:0.9em;color:#333;margin-bottom:10px">${fg.desc}</div>
+          <div class="food-examples">${examplesHTML}</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:1em;font-weight:bold;color:#c2185b;margin-bottom:8px">👆 Tap to sort: Healthy 💚 or Not-so-healthy 🔴?</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;padding:10px;background:#f5f5f5;border-radius:14px;margin-bottom:10px">${sortHTML}</div>
+    <div id="sortFb" style="font-size:1em;font-weight:bold;text-align:center;min-height:28px;color:#2e7d32"></div>
+    <div style="background:#e8f5e9;border-radius:14px;padding:12px;font-size:0.9em;color:#2e7d32;text-align:center">
+      🌟 Remember: All foods can be enjoyed! But we should eat <b>more</b> fruits, vegetables, grains and protein, and <b>less</b> sweets and fried food.
+    </div>
+  `;
+}
+
+let sortClickCount = {};
+function sortFood(idx) {
+  const f = allFoods[idx];
+  const current = foodSorted[idx];
+  // Toggle: unset → healthy → unhealthy → unset
+  if (!current) { foodSorted[idx]='healthy'; }
+  else if (current==='healthy') { foodSorted[idx]='unhealthy'; }
+  else { delete foodSorted[idx]; }
+  renderFood();
+  // Feedback
+  const st = foodSorted[idx];
+  const fb = document.getElementById('sortFb');
+  if (st && fb) {
+    const correct = (st==='healthy') === f.healthy;
+    fb.textContent = correct ? `✅ ${f.label} is ${f.healthy?'healthy':'not-so-healthy'}! Great!` : `❌ ${f.label} is actually ${f.healthy?'healthy':'not-so-healthy'}!`;
+    fb.style.color = correct ? '#2e7d32' : '#c62828';
+    if (correct) speak('Correct! ' + f.label + ' is ' + (f.healthy?'healthy':'not so healthy'));
+  }
+}
+
+function renderRoutine() {
+  const slots = routineItems.map((r, i) => `
+    <div class="time-slot ${routineChecked.has(i)?'':''}">
+      <div class="time-badge">${r.time}</div>
+      <div class="slot-icon">${r.icon}</div>
+      <div class="slot-text">${r.text}</div>
+      <div class="slot-check" onclick="toggleRoutine(${i})">${routineChecked.has(i)?'✅':'⬜'}</div>
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#c2185b;margin-bottom:6px;text-align:center">📅 My Healthy Day!</div>
+    <div style="font-size:0.9em;color:#888;text-align:center;margin-bottom:14px">Tick each healthy habit as you do it throughout the day! ✅</div>
+    <div>${slots}</div>
+    <div style="background:linear-gradient(135deg,#fce4ec,#f8bbd0);border-radius:16px;padding:14px;margin-top:12px;text-align:center">
+      <div style="font-size:1.5em">💪</div>
+      <div style="font-size:1em;font-weight:bold;color:#c2185b">${routineChecked.size} out of ${routineItems.length} done today!</div>
+      ${routineChecked.size===routineItems.length?'<div style="font-size:0.9em;color:#333;margin-top:4px">🌟 Amazing! You had a perfectly healthy day!</div>':''}
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="routineChecked=new Set();renderRoutine()">🔄 Start Fresh</button>
+    </div>
+  `;
+}
+
+function toggleRoutine(i) {
+  if (routineChecked.has(i)) routineChecked.delete(i);
+  else { routineChecked.add(i); speak(routineItems[i].text); }
+  renderRoutine();
+}
+
+function renderQuiz() {
+  if (qIdx >= quizQs.length) qIdx = 0;
+  const q = quizQs[qIdx]; qAnswered = false;
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-bottom:6px">Question ${qIdx+1} of ${quizQs.length}</div>
+    <div class="q-emoji">${q.emoji}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="q-opts" id="opts">
+      ${q.opts.map(o=>`<button class="q-opt" onclick="checkQ(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}')">  ${o}</button>`).join('')}
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="qIdx=0;renderQuiz()">🔄 Restart</button>
+    </div>
+  `;
+}
+
+function checkQ(btn, val, ans) {
+  if (qAnswered) return; qAnswered = true;
+  document.querySelectorAll('#opts .q-opt').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('feedback');
+  if (val===ans) {
+    btn.classList.add('correct'); qRight++; qStreak++;
+    fb.textContent='✅ Brilliant! '+ans+' is right! 🌟'; fb.style.color='#2e7d32';
+    speak('Brilliant! Correct!');
+    setTimeout(()=>{qIdx++;renderQuiz();},1800);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('#opts .q-opt').forEach(b=>{if(b.textContent.trim()===ans)b.classList.add('correct');});
+    qWrong++; qStreak=0;
+    fb.textContent='❌ The answer is: '+ans; fb.style.color='#c62828';
+    setTimeout(()=>{qIdx++;renderQuiz();},2200);
+  }
+  document.getElementById('sRight').textContent=qRight;
+  document.getElementById('sWrong').textContent=qWrong;
+  document.getElementById('sStreak').textContent=qStreak;
+}
+
+function speak(text) {
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=0.85;u.pitch=1.1;
+  window.speechSynthesis.speak(u);
+}
+
+render();
+</script>
+</body>
+</html>

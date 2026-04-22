@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community Helpers</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#0d47a1,#1565c0,#1976d2);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.25);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .tabs{display:flex;gap:8px;padding:12px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:9px 20px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.12);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#0d47a1;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.3);}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+  .score-row{display:flex;gap:16px;color:white;font-size:1em;justify-content:center;}
+  .sc-box{background:rgba(255,255,255,0.2);border-radius:14px;padding:8px 20px;text-align:center;}
+  .sc-box .val{font-size:1.5em;font-weight:bold;display:block;}
+  .card{width:800px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.35);padding:24px 28px;}
+
+  /* HELPER GRID */
+  .helper-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin:12px 0;}
+  .helper-card{border-radius:18px;padding:14px;text-align:center;cursor:pointer;transition:all 0.2s;border:3px solid transparent;}
+  .helper-card:hover,.helper-card.sel{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.15);}
+  .hc-emoji{font-size:2.8em;margin-bottom:6px;}
+  .hc-name{font-size:0.95em;font-weight:bold;}
+  .hc-role{font-size:0.8em;margin-top:2px;opacity:0.8;}
+
+  /* DETAIL */
+  .helper-detail{border-radius:20px;padding:20px;margin:12px 0;}
+  .hd-top{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+  .hd-big{font-size:4em;}
+  .hd-name{font-size:1.6em;font-weight:bold;}
+  .hd-job{font-size:1em;margin-top:4px;opacity:0.85;}
+  .hd-chips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;}
+  .hd-chip{padding:4px 12px;border-radius:20px;font-size:0.82em;font-weight:bold;color:white;}
+  .hd-desc{font-size:0.95em;color:#333;line-height:1.6;}
+  .hd-tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .hd-tool{background:rgba(255,255,255,0.6);border-radius:10px;padding:6px 12px;font-size:1.2em;text-align:center;}
+
+  /* MATCH TOOL GAME */
+  .match-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:14px 0;}
+  .match-col{flex:1;min-width:160px;max-width:260px;}
+  .match-col-title{font-size:0.95em;font-weight:bold;color:#0d47a1;text-align:center;padding:8px;background:#e3f2fd;border-radius:10px;margin-bottom:8px;}
+  .match-item{padding:12px 14px;border-radius:14px;border:2px solid #bbdefb;background:white;cursor:pointer;text-align:center;font-size:1em;transition:all 0.2s;margin-bottom:8px;}
+  .match-item:hover{border-color:#1565c0;background:#e3f2fd;}
+  .match-item.selected{border-color:#1565c0;background:#bbdefb;}
+  .match-item.matched{border-color:#4caf50;background:#c8f7c5;cursor:default;}
+  .match-item.wrong-m{border-color:#e53935;background:#ffcdd2;animation:shake 0.4s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-8px);}75%{transform:translateX(8px);}}
+
+  /* QUIZ */
+  .q-emoji{font-size:3.5em;text-align:center;margin:10px 0;}
+  .q-text{font-size:1.2em;font-weight:bold;color:#333;text-align:center;margin-bottom:14px;}
+  .q-opts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  .q-opt{padding:12px 22px;border-radius:50px;border:2px solid #bbdefb;background:white;font-family:inherit;font-size:1.05em;cursor:pointer;color:#333;transition:all 0.2s;}
+  .q-opt:hover{border-color:#1565c0;background:#e3f2fd;}
+  .q-opt.correct{border-color:#4caf50;background:#c8f7c5;}
+  .q-opt.wrong{border-color:#e53935;background:#ffcdd2;}
+  .feedback{font-size:1.2em;font-weight:bold;text-align:center;min-height:36px;margin-top:10px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  .action-btn{border:none;border-radius:50px;padding:11px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+
+  /* THANK YOU card */
+  .thankyou-wrap{display:flex;flex-direction:column;gap:14px;}
+  .ty-card{border-radius:18px;padding:16px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:all 0.2s;border:2px solid transparent;}
+  .ty-card:hover{transform:translateX(6px);}
+  .ty-emoji{font-size:2.5em;flex-shrink:0;}
+  .ty-msg{font-size:0.95em;color:#333;line-height:1.5;flex:1;}
+  .ty-name{font-size:1em;font-weight:bold;margin-bottom:4px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">👮 Community Helpers</span>
+  <span style="color:white;font-size:0.9em">EVS</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="setMode('learn',this)">👷 Meet the Helpers</button>
+  <button class="tab" onclick="setMode('tools',this)">🔧 Match the Tools</button>
+  <button class="tab" onclick="setMode('thankyou',this)">💛 Thank You!</button>
+  <button class="tab" onclick="setMode('quiz',this)">🧩 Quiz</button>
+</div>
+<div class="main">
+  <div class="score-row" id="scoreRow" style="display:none">
+    <div class="sc-box"><span class="val" id="sRight">0</span>✅</div>
+    <div class="sc-box"><span class="val" id="sWrong">0</span>❌</div>
+    <div class="sc-box"><span class="val" id="sStreak">0</span>🔥</div>
+  </div>
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+const helpers = [
+  {emoji:'👮', name:'Police Officer', role:'Keeps us safe', color:'#1565c0', bg:'#e3f2fd',
+   where:'Police station / Streets', tools:['🚔','🔦','📻','🪖','📋'],
+   desc:'Police officers protect our community. They help when there is trouble, direct traffic, and make sure everyone follows the rules.',
+   fun:'Police officers work day AND night in shifts so our community is always safe!'},
+  {emoji:'🚒', name:'Firefighter', role:'Puts out fires & rescues', color:'#c62828', bg:'#ffebee',
+   where:'Fire station', tools:['🚒','🪣','🧯','🪜','🧤'],
+   desc:'Firefighters are brave heroes who put out dangerous fires and rescue people and animals from emergencies.',
+   fun:'Firefighters can slide down a pole to reach their fire engine in just 26 seconds!'},
+  {emoji:'👩‍⚕️', name:'Doctor', role:'Helps us get better', color:'#2e7d32', bg:'#e8f5e9',
+   where:'Hospital / Clinic', tools:['💊','🩺','💉','🩹','🔬'],
+   desc:'Doctors examine patients, diagnose illnesses and prescribe medicines to help people get better and stay healthy.',
+   fun:'Doctors study for up to 10 years before they can treat patients!'},
+  {emoji:'👩‍🏫', name:'Teacher', role:'Helps us learn', color:'#f57f17', bg:'#fff8e1',
+   where:'School', tools:['📚','✏️','📏','🖥️','🎒'],
+   desc:'Teachers help children learn reading, writing, maths and so much more. They make learning fun and exciting!',
+   fun:'A teacher teaches around 30 children at once — that\'s a lot of names to remember!'},
+  {emoji:'👩‍🍳', name:'Chef / Cook', role:'Prepares our food', color:'#6a1b9a', bg:'#f3e5f5',
+   where:'Restaurant / School canteen', tools:['🍳','🔪','🥄','🧂','♨️'],
+   desc:'Chefs cook delicious meals for restaurants, schools and hospitals. They make sure food is safe and tasty!',
+   fun:'A master chef can chop vegetables 10 times faster than you!'},
+  {emoji:'🚌', name:'Bus Driver', role:'Takes us where we need to go', color:'#e65100', bg:'#fff3e0',
+   where:'Bus / Roads', tools:['🚌','🗺️','🎫','🔧','📻'],
+   desc:'Bus drivers safely transport many passengers every day. They know all the routes and keep everyone on board safe.',
+   fun:'A double-decker bus can carry up to 90 passengers at once!'},
+  {emoji:'👩‍🌾', name:'Farmer', role:'Grows our food', color:'#558b2f', bg:'#f1f8e9',
+   where:'Farm / Fields', tools:['🚜','🌱','🪣','🌾','🧺'],
+   desc:'Farmers grow the fruits, vegetables and grains we eat every day. They work very hard from sunrise to sunset!',
+   fun:'One farmer can grow enough food to feed 155 people for a whole year!'},
+  {emoji:'📮', name:'Postal Worker', role:'Delivers letters & parcels', color:'#d84315', bg:'#fbe9e7',
+   where:'Post office / Streets', tools:['✉️','📦','🚲','🗺️','📋'],
+   desc:'Postal workers collect and deliver letters and parcels to homes and businesses every day, in all weather!',
+   fun:'The world\'s first postage stamp was the Penny Black, invented in 1840!'},
+  {emoji:'🧹', name:'Sanitation Worker', role:'Keeps our streets clean', color:'#00695c', bg:'#e0f2f1',
+   where:'Streets / Public areas', tools:['🚛','🧹','🗑️','🧤','♻️'],
+   desc:'Sanitation workers collect rubbish and keep our streets clean. Without them, our towns would be very dirty!',
+   fun:'Sanitation workers often start work as early as 4am so streets are clean when you wake up!'},
+  {emoji:'🏗️', name:'Builder / Engineer', role:'Builds homes & roads', color:'#4e342e', bg:'#efebe9',
+   where:'Construction sites', tools:['🪚','🔨','🪛','⛑️','📐'],
+   desc:'Builders and engineers design and construct the houses, schools, roads and bridges we use every day.',
+   fun:'The Burj Khalifa — the world\'s tallest building — took 12,000 workers to build!'},
+];
+
+const matchPairs = [
+  {helper:'👮 Police Officer', tool:'🚔 Police Car'},
+  {helper:'🚒 Firefighter', tool:'🧯 Fire Extinguisher'},
+  {helper:'👩‍⚕️ Doctor', tool:'🩺 Stethoscope'},
+  {helper:'👩‍🏫 Teacher', tool:'📚 Books'},
+  {helper:'👩‍🍳 Chef', tool:'🍳 Frying Pan'},
+  {helper:'🚌 Bus Driver', tool:'🚌 Bus'},
+];
+
+const thankYous = [
+  {emoji:'👮', name:'Police Officer', bg:'#e3f2fd', color:'#1565c0',
+   msg:'Thank you for keeping us safe day and night, even when it is dangerous. You are our protectors!'},
+  {emoji:'🚒', name:'Firefighter', bg:'#ffebee', color:'#c62828',
+   msg:'Thank you for being brave and rushing into danger to save lives. You are true heroes!'},
+  {emoji:'👩‍⚕️', name:'Doctor & Nurse', bg:'#e8f5e9', color:'#2e7d32',
+   msg:'Thank you for making us better when we are sick and keeping us healthy. We appreciate your care!'},
+  {emoji:'👩‍🏫', name:'Teacher', bg:'#fff8e1', color:'#f57f17',
+   msg:'Thank you for teaching us new things every day and being patient and kind. You light up our future!'},
+  {emoji:'👩‍🌾', name:'Farmer', bg:'#f1f8e9', color:'#558b2f',
+   msg:'Thank you for growing all the delicious food we eat. We could not survive without you!'},
+  {emoji:'🧹', name:'Sanitation Worker', bg:'#e0f2f1', color:'#00695c',
+   msg:'Thank you for keeping our streets and town clean and healthy. Your work is so important!'},
+];
+
+const quizQs = [
+  {q:'Who helps us when there is a fire?', opts:['Farmer','Firefighter','Teacher','Doctor'], ans:'Firefighter', emoji:'🔥'},
+  {q:'Where does a doctor work?', opts:['Farm','Fire station','Hospital','School'], ans:'Hospital', emoji:'🏥'},
+  {q:'What tool does a doctor use to listen to your heart?', opts:['🪚 Saw','📏 Ruler','🩺 Stethoscope','🧹 Broom'], ans:'🩺 Stethoscope', emoji:'👩‍⚕️'},
+  {q:'Who grows the food we eat?', opts:['Bus Driver','Police Officer','Farmer','Postal Worker'], ans:'Farmer', emoji:'🌾'},
+  {q:'Who delivers letters to our home?', opts:['Teacher','Postal Worker','Chef','Builder'], ans:'Postal Worker', emoji:'📮'},
+  {q:'What does a teacher help us do?', opts:['Cook food','Fight fires','Learn new things','Drive buses'], ans:'Learn new things', emoji:'📚'},
+  {q:'Which helper keeps the streets clean?', opts:['Doctor','Police Officer','Sanitation Worker','Farmer'], ans:'Sanitation Worker', emoji:'🧹'},
+  {q:'Where does a firefighter work?', opts:['School','Fire station','Farm','Hospital'], ans:'Fire station', emoji:'🚒'},
+  {q:'Who makes sure we follow the rules on the road?', opts:['Chef','Police Officer','Builder','Farmer'], ans:'Police Officer', emoji:'🚦'},
+  {q:'What does a chef do?', opts:['Build houses','Cook food','Teach children','Deliver parcels'], ans:'Cook food', emoji:'👩‍🍳'},
+];
+
+let mode = 'learn';
+let selHelper = 0;
+let matchSelected = null, matchDone = new Set();
+let qIdx = 0, qRight = 0, qWrong = 0, qStreak = 0, qAnswered = false;
+
+function setMode(m, tab) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('scoreRow').style.display = m === 'quiz' ? 'flex' : 'none';
+  if (m === 'tools') { matchSelected = null; matchDone = new Set(); }
+  render();
+}
+
+function render() {
+  if (mode === 'learn') renderLearn();
+  else if (mode === 'tools') renderTools();
+  else if (mode === 'thankyou') renderThankYou();
+  else renderQuiz();
+}
+
+function renderLearn() {
+  const h = helpers[selHelper];
+  const grid = helpers.map((hp, i) => `
+    <div class="helper-card ${i===selHelper?'sel':''}" style="background:${hp.bg};border-color:${i===selHelper?hp.color:'transparent'}" onclick="selHelper=${i};renderLearn()">
+      <div class="hc-emoji">${hp.emoji}</div>
+      <div class="hc-name" style="color:${hp.color}">${hp.name}</div>
+      <div class="hc-role" style="color:${hp.color}">${hp.role}</div>
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#0d47a1;margin-bottom:12px">👷 Community Helpers – People Who Help Us!</div>
+    <div class="helper-grid">${grid}</div>
+    <div class="helper-detail" style="background:${h.bg};border-left:5px solid ${h.color}">
+      <div class="hd-top">
+        <div class="hd-big">${h.emoji}</div>
+        <div>
+          <div class="hd-name" style="color:${h.color}">${h.name}</div>
+          <div class="hd-job" style="color:${h.color}">📍 Works at: ${h.where}</div>
+        </div>
+      </div>
+      <div class="hd-chips">
+        <span class="hd-chip" style="background:${h.color}">🎯 ${h.role}</span>
+      </div>
+      <div class="hd-desc">${h.desc}</div>
+      <div style="font-size:0.9em;font-weight:bold;color:#555;margin:10px 0 6px">🛠️ Tools they use:</div>
+      <div class="hd-tools">${h.tools.map(t=>`<div class="hd-tool">${t}</div>`).join('')}</div>
+      <div style="background:rgba(255,255,255,0.6);border-radius:10px;padding:8px 12px;font-size:0.9em;color:${h.color};margin-top:10px">💡 Did you know? ${h.fun}</div>
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:${h.color}" onclick="speak('${h.name}. ${h.desc}')">🔊 Read</button>
+      <button class="action-btn" style="background:#607D8B" onclick="selHelper=(selHelper+1)%${helpers.length};renderLearn()">Next ▶</button>
+    </div>
+  `;
+}
+
+function renderTools() {
+  // Shuffle display order for use column
+  const shuffleOrder = [3,0,5,1,4,2];
+  const helperItems = matchPairs.map((p,i)=>`
+    <div class="match-item ${matchDone.has('h'+i)?'matched':matchSelected==='h'+i?'selected':''}" id="mh${i}" onclick="matchClick('h',${i})">${p.helper}</div>`).join('');
+  const toolItems = shuffleOrder.map(i=>{
+    const p = matchPairs[i];
+    return `<div class="match-item ${matchDone.has('t'+i)?'matched':matchSelected==='t'+i?'selected':''}" id="mt${i}" onclick="matchClick('t',${i})">${p.tool}</div>`;
+  }).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#0d47a1;margin-bottom:6px">🔧 Match the Helper to their Tool!</div>
+    <div style="font-size:0.9em;color:#888;text-align:center;margin-bottom:14px">Tap a helper, then tap their matching tool!</div>
+    <div class="match-row">
+      <div class="match-col">
+        <div class="match-col-title">👷 Helper</div>
+        ${helperItems}
+      </div>
+      <div class="match-col">
+        <div class="match-col-title">🔧 Tool</div>
+        ${toolItems}
+      </div>
+    </div>
+    ${matchDone.size===matchPairs.length*2?'<div style="font-size:1.3em;font-weight:bold;color:#2e7d32;text-align:center;padding:10px">🎉 Amazing! You matched them all!</div>':''}
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="matchSelected=null;matchDone=new Set();renderTools()">🔄 Restart</button>
+    </div>
+  `;
+}
+
+function matchClick(col, idx) {
+  if (matchDone.has(col+idx)) return;
+  if (matchSelected === null) {
+    matchSelected = col+idx;
+    renderTools();
+    return;
+  }
+  const prevCol = matchSelected[0];
+  const prevIdx = parseInt(matchSelected.slice(1));
+  if (prevCol === col) { matchSelected = col+idx; renderTools(); return; }
+  if (prevIdx === idx) {
+    matchDone.add(matchSelected); matchDone.add(col+idx);
+    matchSelected = null;
+    qRight++; qStreak++;
+    speak('Great match!');
+  } else {
+    speak('Try again!');
+    matchSelected = null;
+  }
+  document.getElementById('sRight') && (document.getElementById('sRight').textContent=qRight);
+  document.getElementById('sStreak') && (document.getElementById('sStreak').textContent=qStreak);
+  renderTools();
+}
+
+function renderThankYou() {
+  const cardsHTML = thankYous.map(ty=>`
+    <div class="ty-card" style="background:${ty.bg};border-color:${ty.color}" onclick="speak('Thank you ${ty.name}. ${ty.msg}')">
+      <div class="ty-emoji">${ty.emoji}</div>
+      <div class="ty-msg">
+        <div class="ty-name" style="color:${ty.color}">Thank you, ${ty.name}!</div>
+        ${ty.msg}
+      </div>
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#0d47a1;margin-bottom:6px;text-align:center">💛 Thank You, Community Helpers!</div>
+    <div style="font-size:0.9em;color:#888;text-align:center;margin-bottom:14px">Community helpers work hard every day to make our lives better. Let's say THANK YOU!</div>
+    <div class="thankyou-wrap">${cardsHTML}</div>
+    <div style="background:#e3f2fd;border-radius:14px;padding:12px;margin-top:14px;font-size:0.95em;color:#0d47a1;text-align:center">
+      💬 <b>Talk about it:</b> Who is YOUR favourite community helper? Why do you want to thank them?
+    </div>
+  `;
+}
+
+function renderQuiz() {
+  if (qIdx >= quizQs.length) qIdx = 0;
+  const q = quizQs[qIdx];
+  qAnswered = false;
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:0.95em;color:#888;text-align:center;margin-bottom:6px">Question ${qIdx+1} of ${quizQs.length}</div>
+    <div class="q-emoji">${q.emoji}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="q-opts" id="opts">
+      ${q.opts.map(o=>`<button class="q-opt" onclick="checkQ(this,'${o.replace(/'/g,"\\'")}','${q.ans.replace(/'/g,"\\'")}')">  ${o}</button>`).join('')}
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#9C27B0" onclick="qIdx=0;renderQuiz()">🔄 Restart</button>
+    </div>
+  `;
+}
+
+function checkQ(btn, val, ans) {
+  if (qAnswered) return; qAnswered = true;
+  document.querySelectorAll('#opts .q-opt').forEach(b=>b.disabled=true);
+  const fb = document.getElementById('feedback');
+  if (val===ans) {
+    btn.classList.add('correct'); qRight++; qStreak++;
+    fb.textContent='✅ Brilliant! '+ans+' is right! 🌟'; fb.style.color='#2e7d32';
+    speak('Brilliant! Correct!');
+    setTimeout(()=>{qIdx++;renderQuiz();},1800);
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('#opts .q-opt').forEach(b=>{if(b.textContent.trim()===ans)b.classList.add('correct');});
+    qWrong++; qStreak=0;
+    fb.textContent='❌ The answer is: '+ans; fb.style.color='#c62828';
+    setTimeout(()=>{qIdx++;renderQuiz();},2200);
+  }
+  document.getElementById('sRight').textContent=qRight;
+  document.getElementById('sWrong').textContent=qWrong;
+  document.getElementById('sStreak').textContent=qStreak;
+}
+
+function speak(text) {
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.rate=0.85;u.pitch=1.1;
+  window.speechSynthesis.speak(u);
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sight Words</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#1a0533,#2d1b69,#11998e);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.3);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .topbar a:hover{background:rgba(255,255,255,0.35);}
+
+  /* MODE TABS */
+  .tabs{display:flex;gap:10px;padding:14px 20px;justify-content:center;}
+  .tab{padding:10px 28px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.1);color:white;font-family:inherit;font-size:1em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#2d1b69;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.25);}
+
+  /* PROGRESS */
+  .prog-row{display:flex;align-items:center;gap:10px;padding:0 20px 10px;width:100%;max-width:700px;margin:0 auto;}
+  .prog-bar{flex:1;height:10px;background:rgba(255,255,255,0.15);border-radius:10px;overflow:hidden;}
+  .prog-fill{height:100%;background:linear-gradient(90deg,#f093fb,#f5576c);border-radius:10px;transition:width 0.4s;}
+  .prog-txt{color:white;font-size:0.85em;white-space:nowrap;}
+
+  /* LEARN MODE */
+  .learn-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;width:100%;}
+  .flashcard{
+    width:480px;max-width:95vw;
+    min-height:320px;
+    background:white;
+    border-radius:32px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.4);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:32px;
+    cursor:pointer;
+    transition:transform 0.15s;
+    position:relative;
+  }
+  .flashcard:hover{transform:scale(1.02);}
+  .sight-word{font-size:6em;font-weight:bold;text-align:center;transition:color 0.3s;line-height:1;}
+  .word-hint{font-size:1.3em;color:#777;margin-top:12px;text-align:center;min-height:32px;}
+  .word-sentence{font-size:1.1em;color:#555;margin-top:8px;text-align:center;font-style:italic;min-height:28px;}
+  .flip-hint{position:absolute;bottom:14px;right:20px;font-size:0.8em;color:#bbb;}
+
+  /* QUIZ MODE */
+  .quiz-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;width:100%;gap:16px;}
+  .quiz-question{
+    width:480px;max-width:95vw;
+    background:white;border-radius:24px;
+    padding:28px;
+    box-shadow:0 12px 40px rgba(0,0,0,0.3);
+    text-align:center;
+  }
+  .quiz-q-text{font-size:1.2em;color:#555;margin-bottom:12px;}
+  .quiz-word{font-size:4em;font-weight:bold;color:#2d1b69;}
+  .quiz-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:480px;max-width:95vw;}
+  .opt{
+    background:white;border:3px solid #ddd;border-radius:16px;
+    padding:14px 10px;font-size:1.1em;font-family:inherit;
+    cursor:pointer;color:#333;
+    transition:all 0.2s;text-align:center;
+  }
+  .opt:hover{border-color:#2d1b69;background:#f3e5f5;}
+  .opt.correct{background:#c8f7c5;border-color:#2e7d32;color:#1b5e20;}
+  .opt.wrong{background:#ffcdd2;border-color:#c62828;color:#b71c1c;}
+  .score-display{color:white;font-size:1.2em;text-align:center;}
+  .quiz-feedback{font-size:1.3em;font-weight:bold;text-align:center;min-height:36px;}
+
+  .nav{display:flex;justify-content:center;align-items:center;gap:16px;padding:16px;}
+  .nav-btn{border:none;border-radius:50px;padding:12px 30px;font-size:1.15em;font-family:inherit;cursor:pointer;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.2);transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#555;cursor:not-allowed;transform:none;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+  .nav-btn.speak{background:#9C27B0;}
+  .nav-count{color:white;font-size:1.1em;min-width:80px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">👁️ Sight Words</span>
+  <span style="color:white;font-size:0.9em">English</span>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="setMode('learn')">📖 Learn</button>
+  <button class="tab" onclick="setMode('quiz')">🧠 Quiz</button>
+</div>
+
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="pFill" style="width:2%"></div></div>
+  <span class="prog-txt" id="pTxt">1 / 40</span>
+</div>
+
+<!-- LEARN MODE -->
+<div class="learn-wrap" id="learnMode">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;">
+    <div class="flashcard" onclick="flipCard()">
+      <div class="sight-word" id="sightWord">the</div>
+      <div class="word-hint" id="wordHint"></div>
+      <div class="word-sentence" id="wordSentence"></div>
+      <div class="flip-hint">Tap to reveal ↩️</div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn prev" id="prevBtn" onclick="go(-1)" disabled>◀ Prev</button>
+      <button class="nav-btn speak" onclick="speakCurrent()">🔊 Say It</button>
+      <span class="nav-count" id="navCount">1 / 40</span>
+      <button class="nav-btn next" id="nextBtn" onclick="go(1)">Next ▶</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ MODE -->
+<div class="quiz-wrap" id="quizMode" style="display:none;">
+  <div class="score-display" id="scoreDisplay">Score: 0 ⭐</div>
+  <div class="quiz-question">
+    <div class="quiz-q-text">Which word means:</div>
+    <div class="quiz-word" id="quizMeaning">a small animal</div>
+  </div>
+  <div class="quiz-feedback" id="quizFeedback"></div>
+  <div class="quiz-options" id="quizOptions"></div>
+</div>
+
+<script>
+const sightWords = [
+  {w:'the',  meaning:'Most common word in English', sentence:'The cat sat on the mat.'},
+  {w:'a',    meaning:'One of something', sentence:'I have a dog.'},
+  {w:'and',  meaning:'Joins two things together', sentence:'I like cats and dogs.'},
+  {w:'is',   meaning:'To be (one person/thing)', sentence:'She is happy.'},
+  {w:'it',   meaning:'A thing or animal', sentence:'It is cold today.'},
+  {w:'in',   meaning:'Inside something', sentence:'The ball is in the box.'},
+  {w:'on',   meaning:'On top of something', sentence:'The cup is on the table.'},
+  {w:'at',   meaning:'A place or time', sentence:'I am at school.'},
+  {w:'he',   meaning:'A boy or man', sentence:'He is my friend.'},
+  {w:'she',  meaning:'A girl or woman', sentence:'She likes to read.'},
+  {w:'we',   meaning:'Me and others together', sentence:'We go to school.'},
+  {w:'be',   meaning:'To exist', sentence:'I want to be a doctor.'},
+  {w:'me',   meaning:'Yourself', sentence:'She gave the book to me.'},
+  {w:'go',   meaning:'To move from one place', sentence:'Let us go to the park.'},
+  {w:'do',   meaning:'To carry out an action', sentence:'Do your homework.'},
+  {w:'no',   meaning:'The opposite of yes', sentence:'No, I do not want cake.'},
+  {w:'to',   meaning:'Moving towards something', sentence:'I go to school.'},
+  {w:'up',   meaning:'Moving higher', sentence:'The bird flew up.'},
+  {w:'see',  meaning:'To look at something', sentence:'I can see the stars.'},
+  {w:'can',  meaning:'Able to do something', sentence:'I can run fast.'},
+  {w:'run',  meaning:'To move very fast', sentence:'I like to run.'},
+  {w:'my',   meaning:'Belonging to me', sentence:'This is my book.'},
+  {w:'you',  meaning:'The person I am talking to', sentence:'I like you.'},
+  {w:'was',  meaning:'Existed in the past', sentence:'She was happy.'},
+  {w:'are',  meaning:'To be (more than one)', sentence:'They are my friends.'},
+  {w:'for',  meaning:'Meant for a person or thing', sentence:'This gift is for you.'},
+  {w:'had',  meaning:'Owned something in the past', sentence:'I had a dog.'},
+  {w:'his',  meaning:'Belonging to him', sentence:'That is his hat.'},
+  {w:'her',  meaning:'Belonging to her', sentence:'I like her smile.'},
+  {w:'but',  meaning:'However, on the other hand', sentence:'I am tired but happy.'},
+  {w:'not',  meaning:'The negative', sentence:'I do not like bugs.'},
+  {w:'all',  meaning:'Everything or everyone', sentence:'We all love sunshine.'},
+  {w:'one',  meaning:'The number 1', sentence:'I have one pet.'},
+  {w:'said', meaning:'Spoke words out loud', sentence:'She said hello.'},
+  {w:'big',  meaning:'Large in size', sentence:'That is a big elephant!'},
+  {w:'day',  meaning:'24 hours of time', sentence:'Today is a good day.'},
+  {w:'play', meaning:'To have fun and enjoy', sentence:'Let us play together.'},
+  {w:'look', meaning:'To use your eyes', sentence:'Look at that rainbow!'},
+  {w:'here', meaning:'In this place', sentence:'Come and sit here.'},
+  {w:'like', meaning:'To enjoy something', sentence:'I like ice cream.'},
+];
+
+const colors = ['#E53935','#D81B60','#8E24AA','#3949AB','#1E88E5','#039BE5',
+  '#00ACC1','#00897B','#43A047','#7CB342','#C0CA33','#FDD835','#FFB300',
+  '#FB8C00','#F4511E','#6D4C41','#546E7A','#5E35B1','#00897B','#F4511E',
+  '#E53935','#D81B60','#8E24AA','#3949AB','#1E88E5','#039BE5','#00ACC1',
+  '#00897B','#43A047','#7CB342','#C0CA33','#FDD835','#FFB300','#FB8C00',
+  '#F4511E','#6D4C41','#546E7A','#5E35B1','#E53935','#D81B60'];
+
+let cur=0, mode='learn', shown=false, score=0, qCur=0;
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('learnMode').style.display = m==='learn'?'flex':'none';
+  document.getElementById('quizMode').style.display = m==='quiz'?'flex':'none';
+  if (m==='quiz') newQuiz();
+}
+
+function render() {
+  const d = sightWords[cur];
+  const col = colors[cur];
+  shown = false;
+  document.getElementById('sightWord').textContent = d.w;
+  document.getElementById('sightWord').style.color = col;
+  document.getElementById('wordHint').textContent = '';
+  document.getElementById('wordSentence').textContent = '';
+  document.getElementById('prevBtn').disabled = cur===0;
+  document.getElementById('nextBtn').disabled = cur===sightWords.length-1;
+  document.getElementById('navCount').textContent = `${cur+1} / ${sightWords.length}`;
+  document.getElementById('pFill').style.width = `${((cur+1)/sightWords.length)*100}%`;
+  document.getElementById('pTxt').textContent = `${cur+1} / ${sightWords.length}`;
+}
+
+function flipCard() {
+  if (shown) return;
+  shown = true;
+  const d = sightWords[cur];
+  document.getElementById('wordHint').textContent = '💡 ' + d.meaning;
+  document.getElementById('wordSentence').textContent = '📝 ' + d.sentence;
+  speakCurrent();
+}
+
+function speakCurrent() {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const d = sightWords[cur];
+  const u1 = new SpeechSynthesisUtterance(d.w);
+  u1.rate=0.7; u1.pitch=1.2;
+  const u2 = new SpeechSynthesisUtterance(d.sentence);
+  u2.rate=0.85; u2.pitch=1.0;
+  window.speechSynthesis.speak(u1);
+  window.speechSynthesis.speak(u2);
+}
+
+function go(dir){cur=Math.max(0,Math.min(sightWords.length-1,cur+dir));render();}
+
+// QUIZ
+function newQuiz() {
+  qCur = Math.floor(Math.random()*sightWords.length);
+  const correct = sightWords[qCur];
+  document.getElementById('quizMeaning').textContent = correct.meaning;
+  document.getElementById('quizFeedback').textContent = '';
+
+  // pick 3 wrong options
+  let opts = [correct.w];
+  while (opts.length < 4) {
+    const rw = sightWords[Math.floor(Math.random()*sightWords.length)].w;
+    if (!opts.includes(rw)) opts.push(rw);
+  }
+  opts = opts.sort(() => Math.random()-0.5);
+
+  const container = document.getElementById('quizOptions');
+  container.innerHTML = '';
+  opts.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = opt;
+    btn.onclick = () => checkAnswer(opt, correct.w, btn);
+    container.appendChild(btn);
+  });
+}
+
+function checkAnswer(chosen, correct, btn) {
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach(o => o.onclick = null);
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    score++;
+    document.getElementById('quizFeedback').textContent = '✅ Correct! Well done! 🌟';
+    document.getElementById('quizFeedback').style.color = '#2e7d32';
+  } else {
+    btn.classList.add('wrong');
+    opts.forEach(o => { if (o.textContent===correct) o.classList.add('correct'); });
+    document.getElementById('quizFeedback').textContent = `❌ The answer is "${correct}"`;
+    document.getElementById('quizFeedback').style.color = '#c62828';
+  }
+  document.getElementById('scoreDisplay').textContent = `Score: ${score} ⭐`;
+  setTimeout(newQuiz, 2000);
+}
+
+document.addEventListener('keydown',e=>{
+  if(mode==='learn'){if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1);if(e.key===' ')flipCard();}
+});
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Very Hungry Caterpillar</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+    background: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(0,0,0,0.3);
+    color: white;
+  }
+  .topbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 1.1em;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 14px;
+    border-radius: 20px;
+    transition: background 0.2s;
+  }
+  .topbar a:hover { background: rgba(255,255,255,0.35); }
+  .topbar .title { font-size: 1.1em; font-weight: bold; }
+  .page-indicator { font-size: 0.95em; opacity: 0.8; }
+
+  /* BOOK STAGE */
+  .stage {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 20px;
+    position: relative;
+  }
+
+  .book {
+    width: 780px;
+    max-width: 100%;
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    overflow: hidden;
+    position: relative;
+    min-height: 480px;
+  }
+
+  .page {
+    display: none;
+    min-height: 480px;
+  }
+  .page.active { display: flex; }
+
+  /* Page layouts */
+  .pg-full {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+  }
+  .pg-split {
+    flex-direction: row;
+  }
+  .pg-split .left, .pg-split .right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 24px;
+  }
+
+  /* Typography */
+  .story-text {
+    font-size: 1.35em;
+    line-height: 1.7;
+    color: #333;
+    text-align: center;
+    max-width: 520px;
+  }
+  .story-text .day {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #E8400C;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .story-text .still-hungry {
+    color: #888;
+    font-style: italic;
+    font-size: 0.9em;
+    margin-top: 6px;
+    display: block;
+  }
+
+  /* Illustrations */
+  .illus { font-size: 5em; margin: 16px 0; line-height: 1.2; }
+  .illus-lg { font-size: 7em; }
+  .illus-sm { font-size: 3em; }
+  .food-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; font-size: 2.8em; }
+
+  /* Cover */
+  .cover-bg {
+    background: linear-gradient(160deg, #56ab2f, #a8e063);
+    min-height: 480px;
+  }
+  .cover-title {
+    font-size: 2.4em;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+  .cover-sub {
+    font-size: 1.1em;
+    color: rgba(255,255,255,0.9);
+    margin-top: 8px;
+  }
+
+  /* Individual page colors */
+  .bg-night   { background: linear-gradient(160deg, #1a1a3e, #2d2d6b); }
+  .bg-morning { background: linear-gradient(160deg, #fff9c4, #fff3e0); }
+  .bg-monday  { background: linear-gradient(160deg, #ffcdd2, #fff); }
+  .bg-tuesday { background: linear-gradient(160deg, #c8e6c9, #fff); }
+  .bg-wednesday { background: linear-gradient(160deg, #e1bee7, #fff); }
+  .bg-thursday { background: linear-gradient(160deg, #ffcdd2, #fff9c4); }
+  .bg-friday  { background: linear-gradient(160deg, #ffe0b2, #fff); }
+  .bg-saturday { background: linear-gradient(160deg, #fce4ec, #fff8e1); }
+  .bg-leaf    { background: linear-gradient(160deg, #e8f5e9, #f1f8e9); }
+  .bg-cocoon  { background: linear-gradient(160deg, #e0f2f1, #e8eaf6); }
+  .bg-butterfly { background: linear-gradient(160deg, #fff8e1, #fce4ec); }
+  .bg-end     { background: linear-gradient(160deg, #e3f2fd, #fce4ec); }
+
+  /* NAVIGATION */
+  .nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 18px;
+  }
+  .nav-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 32px;
+    font-size: 1.2em;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.2s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .nav-btn:hover { transform: scale(1.05); background: #43A047; }
+  .nav-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+  .nav-btn.prev { background: #FF7043; }
+  .nav-btn.prev:hover { background: #F4511E; }
+
+  .read-btn {
+    background: #9C27B0;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 24px;
+    font-size: 1em;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .read-btn:hover { transform: scale(1.05); }
+
+  /* Progress dots */
+  .dots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0 20px 16px;
+  }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #ccc;
+    transition: background 0.3s;
+  }
+  .dot.active { background: #4CAF50; transform: scale(1.3); }
+  .dot.done { background: #A5D6A7; }
+
+  /* Night page stars */
+  .stars-anim span {
+    display: inline-block;
+    animation: twinkle 2s infinite;
+    font-size: 1.5em;
+  }
+  .stars-anim span:nth-child(2) { animation-delay: 0.3s; }
+  .stars-anim span:nth-child(3) { animation-delay: 0.6s; }
+  @keyframes twinkle {
+    0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+  }
+
+  /* Butterfly animation */
+  .butterfly-anim {
+    animation: flutter 1.5s ease-in-out infinite;
+    display: inline-block;
+  }
+  @keyframes flutter {
+    0%,100% { transform: rotate(-5deg) translateY(0); }
+    50% { transform: rotate(5deg) translateY(-15px); }
+  }
+
+  /* Caterpillar wiggle */
+  .wiggle {
+    display: inline-block;
+    animation: wiggle 1s ease-in-out infinite;
+  }
+  @keyframes wiggle {
+    0%,100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../../index.html">🏠 Home</a>
+  <span class="title">📖 The Very Hungry Caterpillar</span>
+  <span class="page-indicator" id="pageIndicator">Page 1 of 13</span>
+</div>
+
+<div class="stage">
+  <div class="book">
+
+    <!-- PAGE 1: COVER -->
+    <div class="page active pg-full cover-bg">
+      <div class="illus-lg wiggle">🐛</div>
+      <div class="cover-title">The Very Hungry<br>Caterpillar</div>
+      <div class="illus" style="font-size:2.5em">🍎 🍐 🍊 🍓</div>
+      <div class="cover-sub">Inspired by Eric Carle • Turn the page to start! ➡️</div>
+    </div>
+
+    <!-- PAGE 2: THE EGG -->
+    <div class="page pg-full bg-night">
+      <div class="stars-anim" style="margin-bottom:10px">
+        <span>⭐</span><span>✨</span><span>🌟</span><span>⭐</span><span>✨</span>
+      </div>
+      <div class="illus">🌙</div>
+      <div class="illus" style="font-size:3em">🍃🥚🍃</div>
+      <div class="story-text" style="color:white">
+        On a warm moonlit night,<br>
+        a tiny egg rested quietly<br>
+        on a fresh green leaf.
+      </div>
+    </div>
+
+    <!-- PAGE 3: CATERPILLAR HATCHES -->
+    <div class="page pg-full bg-morning">
+      <div class="illus">☀️</div>
+      <div class="illus wiggle" style="font-size:4em">🐛</div>
+      <div class="story-text">
+        On Sunday morning, the warm sun<br>
+        rose up, and — <strong>POP!</strong><br>
+        Out came a tiny, very <strong style="color:#E8400C">hungry</strong> caterpillar!
+      </div>
+    </div>
+
+    <!-- PAGE 4: MONDAY -->
+    <div class="page pg-split bg-monday">
+      <div class="left">
+        <div class="story-text">
+          <span class="day">🗓 Monday</span>
+          He nibbled through<br>
+          <strong>one</strong> big red apple.<br>
+          <span class="still-hungry">But he was still hungry!</span>
+        </div>
+      </div>
+      <div class="right">
+        <div style="font-size: 6em">🍎</div>
+        <div style="font-size: 2.5em; color: #E8400C; font-weight: bold;">1</div>
+      </div>
+    </div>
+
+    <!-- PAGE 5: TUESDAY -->
+    <div class="page pg-split bg-tuesday">
+      <div class="left">
+        <div style="font-size: 4em">🍐🍐</div>
+        <div style="font-size: 2.5em; color: #2e7d32; font-weight: bold;">2</div>
+      </div>
+      <div class="right">
+        <div class="story-text">
+          <span class="day">🗓 Tuesday</span>
+          He munched through<br>
+          <strong>two</strong> sweet pears.<br>
+          <span class="still-hungry">But he was still hungry!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 6: WEDNESDAY -->
+    <div class="page pg-split bg-wednesday">
+      <div class="left">
+        <div class="story-text">
+          <span class="day">🗓 Wednesday</span>
+          He chomped through<br>
+          <strong>three</strong> purple plums.<br>
+          <span class="still-hungry">But he was still hungry!</span>
+        </div>
+      </div>
+      <div class="right">
+        <div style="font-size: 3.5em">🍇🍇🍇</div>
+        <div style="font-size: 2.5em; color: #7b1fa2; font-weight: bold;">3</div>
+      </div>
+    </div>
+
+    <!-- PAGE 7: THURSDAY -->
+    <div class="page pg-split bg-thursday">
+      <div class="left">
+        <div style="font-size: 2.8em">🍓🍓<br>🍓🍓</div>
+        <div style="font-size: 2.5em; color: #c62828; font-weight: bold;">4</div>
+      </div>
+      <div class="right">
+        <div class="story-text">
+          <span class="day">🗓 Thursday</span>
+          He gobbled through<br>
+          <strong>four</strong> juicy strawberries.<br>
+          <span class="still-hungry">But he was still hungry!</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 8: FRIDAY -->
+    <div class="page pg-split bg-friday">
+      <div class="left">
+        <div class="story-text">
+          <span class="day">🗓 Friday</span>
+          He crunched through<br>
+          <strong>five</strong> yummy oranges.<br>
+          <span class="still-hungry">But he was <em>still</em> hungry!</span>
+        </div>
+      </div>
+      <div class="right">
+        <div style="font-size: 2.5em">🍊🍊🍊<br>🍊🍊</div>
+        <div style="font-size: 2.5em; color: #e65100; font-weight: bold;">5</div>
+      </div>
+    </div>
+
+    <!-- PAGE 9: SATURDAY FEAST -->
+    <div class="page pg-full bg-saturday">
+      <div class="story-text">
+        <span class="day" style="font-size:1.3em">🗓 Saturday — Big Feast!</span>
+        He ate through <strong>everything!</strong>
+      </div>
+      <div class="food-row" style="margin: 16px 0; max-width: 500px;">
+        🍰 🍦 🥒 🍩 🍭 🎂 🍧 🌮 🍕 🍉
+      </div>
+      <div class="story-text" style="color: #c62828; font-size: 1.2em; margin-top:8px">
+        That night he had a <strong>tummy ache!</strong> 🤢
+      </div>
+    </div>
+
+    <!-- PAGE 10: GREEN LEAF -->
+    <div class="page pg-full bg-leaf">
+      <div class="illus">🍃</div>
+      <div class="story-text">
+        The next day, he ate<br>
+        just <strong>one</strong> tiny green leaf.
+      </div>
+      <div class="story-text" style="margin-top: 16px; color: #2e7d32; font-size: 1.1em">
+        And he felt <strong>much better!</strong> 😌
+      </div>
+      <div class="illus wiggle" style="font-size:4em; margin-top: 10px">🐛</div>
+      <div class="story-text" style="margin-top:10px">
+        Now he was big and fat.
+      </div>
+    </div>
+
+    <!-- PAGE 11: COCOON -->
+    <div class="page pg-full bg-cocoon">
+      <div class="story-text">
+        He built a small house around himself,<br>
+        called a <strong>cocoon</strong>.
+      </div>
+      <div style="font-size: 5em; margin: 20px 0">🫘</div>
+      <div class="story-text">
+        He stayed inside for <strong>two whole weeks</strong>.<br>
+        <br>
+        What would happen next? 🤔
+      </div>
+    </div>
+
+    <!-- PAGE 12: BUTTERFLY -->
+    <div class="page pg-full bg-butterfly">
+      <div class="story-text" style="font-size:1.2em">
+        He pushed… and pushed…<br>
+        and <strong>nibbled</strong> through the cocoon…
+      </div>
+      <div style="margin: 20px 0">
+        <span class="butterfly-anim" style="font-size: 8em">🦋</span>
+      </div>
+      <div class="story-text" style="color: #c2185b; font-size: 1.3em">
+        He was a <strong>beautiful butterfly!</strong>
+      </div>
+    </div>
+
+    <!-- PAGE 13: THE END -->
+    <div class="page pg-full" style="background: linear-gradient(135deg,#667eea,#764ba2)">
+      <div class="illus butterfly-anim" style="font-size: 6em">🦋</div>
+      <div style="font-size: 3em; font-weight: bold; color: white; text-shadow: 2px 2px 6px rgba(0,0,0,0.3); margin: 16px 0">
+        The End
+      </div>
+      <div style="font-size: 1.2em; color: rgba(255,255,255,0.9); margin-bottom: 20px">
+        🐛 → 🥚 → 🐛 → 🫘 → 🦋<br>
+        <small>This is called <strong>metamorphosis!</strong></small>
+      </div>
+      <a href="../../index.html" style="
+        background: white; color: #764ba2;
+        padding: 12px 28px; border-radius: 30px;
+        text-decoration: none; font-size: 1.1em; font-weight: bold;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      ">🏠 Back to Home</a>
+    </div>
+
+  </div><!-- end .book -->
+</div><!-- end .stage -->
+
+<!-- PROGRESS DOTS -->
+<div class="dots" id="dots"></div>
+
+<!-- NAVIGATION -->
+<div class="nav">
+  <button class="nav-btn prev" id="prevBtn" onclick="changePage(-1)" disabled>◀ Prev</button>
+  <button class="read-btn" onclick="readPage()">🔊 Read Aloud</button>
+  <button class="nav-btn" id="nextBtn" onclick="changePage(1)">Next ▶</button>
+</div>
+
+<script>
+  const pages = document.querySelectorAll('.page');
+  const totalPages = pages.length;
+  let current = 0;
+
+  // Build dots
+  const dotsEl = document.getElementById('dots');
+  pages.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => goTo(i);
+    d.style.cursor = 'pointer';
+    dotsEl.appendChild(d);
+  });
+
+  function updateUI() {
+    pages.forEach((p, i) => p.classList.toggle('active', i === current));
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.className = 'dot' + (i === current ? ' active' : i < current ? ' done' : '');
+    });
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').disabled = current === totalPages - 1;
+    document.getElementById('pageIndicator').textContent = `Page ${current + 1} of ${totalPages}`;
+  }
+
+  function changePage(dir) {
+    current = Math.max(0, Math.min(totalPages - 1, current + dir));
+    updateUI();
+  }
+
+  function goTo(i) {
+    current = i;
+    updateUI();
+  }
+
+  // Read aloud using Web Speech API
+  const pageTexts = [
+    "The Very Hungry Caterpillar! A beautiful picture book.",
+    "On a warm moonlit night, a tiny egg rested quietly on a fresh green leaf.",
+    "On Sunday morning, the warm sun rose up, and POP! Out came a tiny, very hungry caterpillar!",
+    "On Monday, he nibbled through one big red apple. But he was still hungry!",
+    "On Tuesday, he munched through two sweet pears. But he was still hungry!",
+    "On Wednesday, he chomped through three purple plums. But he was still hungry!",
+    "On Thursday, he gobbled through four juicy strawberries. But he was still hungry!",
+    "On Friday, he crunched through five yummy oranges. But he was still hungry!",
+    "On Saturday he ate through everything! Cake, ice cream, pie, sausage, cupcake, and watermelon! That night he had a terrible tummy ache!",
+    "The next day, he ate just one tiny green leaf. And he felt much better! Now he was big and fat.",
+    "He built a small house around himself, called a cocoon. He stayed inside for two whole weeks. What would happen next?",
+    "He pushed and pushed and nibbled through the cocoon. He was a beautiful butterfly!",
+    "The End! The caterpillar became a beautiful butterfly. This amazing change is called metamorphosis!"
+  ];
+
+  function readPage() {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(pageTexts[current]);
+      u.rate = 0.85;
+      u.pitch = 1.1;
+      window.speechSynthesis.speak(u);
+    } else {
+      alert('Read aloud is not supported in this browser.');
+    }
+  }
+
+  // Keyboard nav
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') changePage(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   changePage(-1);
+  });
+
+  updateUI();
+</script>
+</body>
+</html>

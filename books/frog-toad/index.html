@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frog and Toad are Friends</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:#0d2b0d;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.4);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .topbar a:hover{background:rgba(255,255,255,0.35);}
+  .stage{flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding:20px;}
+  .book{width:780px;max-width:100%;background:white;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,0.5);overflow:hidden;min-height:480px;}
+  .page{display:none;min-height:480px;}
+  .page.active{display:flex;}
+  .pg-full{flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;}
+  .pg-split{flex-direction:row;}
+  .pg-split .left,.pg-split .right{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;}
+  .story-text{font-size:1.25em;line-height:1.85;color:#333;text-align:center;max-width:500px;}
+  .chapter-title{font-size:1.6em;font-weight:bold;color:#1b5e20;margin-bottom:12px;border-bottom:3px solid #a5d6a7;padding-bottom:8px;width:100%;text-align:center;}
+  .speech-f{background:#e8f5e9;border:3px solid #43a047;border-radius:16px;padding:10px 16px;font-size:1.1em;color:#1b5e20;margin:8px 0;max-width:280px;text-align:center;}
+  .speech-t{background:#fff3e0;border:3px solid #fb8c00;border-radius:16px;padding:10px 16px;font-size:1.1em;color:#e65100;margin:8px 0;max-width:280px;text-align:center;}
+  .name-f{font-size:0.75em;font-weight:bold;color:#2e7d32;margin-bottom:2px;}
+  .name-t{font-size:0.75em;font-weight:bold;color:#e65100;margin-bottom:2px;}
+
+  .cover{background:linear-gradient(160deg,#1b5e20,#2e7d32,#43a047);}
+  .cover-title{font-size:2.4em;font-weight:bold;color:white;text-shadow:2px 2px 8px rgba(0,0,0,0.3);line-height:1.2;margin:12px 0;}
+  .cover-sub{font-size:1em;color:rgba(255,255,255,0.9);margin-top:8px;}
+  .bg-spring{background:linear-gradient(160deg,#e8f5e9,#f1f8e9);}
+  .bg-bedroom{background:linear-gradient(160deg,#fff8e1,#fffde7);}
+  .bg-outside{background:linear-gradient(160deg,#e0f7fa,#b2ebf2);}
+  .bg-letter{background:linear-gradient(160deg,#e8eaf6,#ede7f6);}
+  .bg-wait{background:linear-gradient(160deg,#fce4ec,#f8bbd0);}
+  .bg-happy{background:linear-gradient(160deg,#e8f5e9,#c8e6c9);}
+  .bg-button{background:linear-gradient(160deg,#fff3e0,#ffe0b2);}
+  .bg-swim{background:linear-gradient(160deg,#e3f2fd,#bbdefb);}
+  .bg-end{background:linear-gradient(135deg,#1b5e20,#43a047);}
+
+  .bounce{display:inline-block;animation:bounce 1.5s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+  .wiggle{display:inline-block;animation:wiggle 1s ease-in-out infinite;}
+  @keyframes wiggle{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
+  .sleep{display:inline-block;animation:sleep 2s ease-in-out infinite;}
+  @keyframes sleep{0%,100%{transform:scale(1);}50%{transform:scale(0.95);}}
+
+  .nav{display:flex;justify-content:center;align-items:center;gap:20px;padding:18px;}
+  .nav-btn{border:none;border-radius:50px;padding:12px 32px;font-size:1.2em;font-family:inherit;cursor:pointer;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.2);transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+  .read-btn{background:#9C27B0;color:white;border:none;border-radius:50px;padding:12px 24px;font-size:1em;font-family:inherit;cursor:pointer;transition:transform 0.15s;}
+  .read-btn:hover{transform:scale(1.05);}
+  .dots{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:0 20px 14px;}
+  .dot{width:10px;height:10px;border-radius:50%;background:#ccc;cursor:pointer;transition:background 0.3s;}
+  .dot.active{background:#43a047;transform:scale(1.4);}
+  .dot.done{background:#a5d6a7;}
+  .chapter-badge{display:inline-block;background:#1b5e20;color:white;font-size:0.8em;padding:4px 14px;border-radius:20px;margin-bottom:12px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🐸 Frog and Toad are Friends</span>
+  <span id="pageIndicator" style="color:white;font-size:0.95em">Page 1 of 16</span>
+</div>
+<div class="stage"><div class="book">
+
+  <!-- 1. COVER -->
+  <div class="page active pg-full cover">
+    <div style="display:flex;gap:24px;justify-content:center;align-items:flex-end;margin-bottom:12px">
+      <div style="text-align:center"><span class="bounce" style="font-size:5em">🐸</span><div style="color:white;font-weight:bold;font-size:0.9em">Frog</div></div>
+      <div style="text-align:center"><span class="wiggle" style="font-size:5em">🐊</span><div style="color:white;font-weight:bold;font-size:0.9em">Toad</div></div>
+    </div>
+    <div class="cover-title">Frog and Toad<br>are Friends</div>
+    <div style="font-size:1.8em;margin:10px 0">🌸 📮 🔘 🏊 📖</div>
+    <div class="cover-sub">Inspired by Arnold Lobel • 5 cozy friendship stories!</div>
+  </div>
+
+  <!-- ── STORY 1: SPRING ── -->
+  <!-- 2. -->
+  <div class="page pg-full bg-bedroom">
+    <div class="chapter-badge">Story 1</div>
+    <div class="chapter-title">🌸 Spring</div>
+    <div style="font-size:4em" class="sleep">🐊🛌</div>
+    <div class="story-text" style="margin-top:16px">
+      Toad was in bed, fast asleep.<br>
+      He had been sleeping all winter long.<br>
+      <em style="color:#888">Snore… snore… snore…</em> 💤
+    </div>
+  </div>
+
+  <!-- 3. -->
+  <div class="page pg-split bg-spring">
+    <div class="left">
+      <div class="bounce" style="font-size:5em">🐸</div>
+      <div class="name-f">Frog</div>
+      <div class="speech-f">Toad! Wake up!<br>It is spring!<br>🌸☀️🌱</div>
+    </div>
+    <div class="right">
+      <div class="sleep" style="font-size:5em">🐊</div>
+      <div class="name-t">Toad</div>
+      <div class="speech-t">Blah!<br>Go away!<br>I am sleeping! 💤</div>
+    </div>
+  </div>
+
+  <!-- 4. -->
+  <div class="page pg-full bg-bedroom">
+    <div class="story-text" style="margin-bottom:16px">
+      Frog ran to Toad's calendar<br>on the wall.<br>He tore off all the winter pages —
+    </div>
+    <div style="font-size:3em">📅✂️</div>
+    <div style="font-size:2.5em;margin:10px 0">❄️❌ 🌸✅</div>
+    <div class="story-text" style="margin-top:10px">
+      <strong style="color:#2e7d32">"Look, Toad! The page says MAY!<br>It really IS spring!"</strong>
+    </div>
+  </div>
+
+  <!-- 5. -->
+  <div class="page pg-split bg-spring">
+    <div class="left">
+      <div style="font-size:4em">🐊</div>
+      <div class="name-t">Toad</div>
+      <div class="speech-t">Oh my!<br>You are right!<br>It IS spring! 🌸</div>
+    </div>
+    <div class="right">
+      <div style="font-size:3.5em;margin-bottom:10px">🐸🐊</div>
+      <div class="story-text">They ran outside together<br>into the warm sunshine<br>to play all day long! ☀️🌿</div>
+    </div>
+  </div>
+
+  <!-- ── STORY 2: THE LETTER ── -->
+  <!-- 6. -->
+  <div class="page pg-full bg-letter">
+    <div class="chapter-badge">Story 2</div>
+    <div class="chapter-title">📮 The Letter</div>
+    <div style="font-size:4em">🐊😔</div>
+    <div class="story-text" style="margin-top:16px">
+      Toad sat on his porch, looking sad.<br><br>
+      <strong style="color:#e65100">"What is wrong?"</strong> asked Frog.<br><br>
+      <em>"I am waiting for the mail,<br>but I never get any letters.<br>Nobody ever writes to me."</em>
+    </div>
+  </div>
+
+  <!-- 7. -->
+  <div class="page pg-split bg-letter">
+    <div class="left">
+      <div style="font-size:4em">🐊😢</div>
+      <div class="name-t">Toad</div>
+      <div class="speech-t">It is sad to have<br>no letters. Nobody<br>thinks about me.</div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em" class="bounce">🐸</div>
+      <div class="name-f">Frog</div>
+      <div class="speech-f">I think about you!<br>Don't worry, Toad.<br><em>Wait right here!</em></div>
+    </div>
+  </div>
+
+  <!-- 8. -->
+  <div class="page pg-full bg-happy">
+    <div class="story-text" style="margin-bottom:16px">
+      Frog ran home and wrote Toad a letter:
+    </div>
+    <div style="background:white;border:3px solid #43a047;border-radius:16px;padding:20px 28px;max-width:360px;text-align:left;font-size:1.1em;line-height:1.9;color:#333;box-shadow:0 4px 12px rgba(0,0,0,0.1)">
+      <em>Dear Toad,</em><br><br>
+      I am so glad that you<br>
+      are my best friend.<br><br>
+      <em>Your best friend,<br>
+      <strong style="color:#2e7d32">Frog 🐸</strong></em>
+    </div>
+    <div style="font-size:2.5em;margin-top:16px">✉️🐌📮</div>
+    <div style="font-size:1em;color:#555;margin-top:8px"><em>He gave it to a snail to deliver.</em></div>
+  </div>
+
+  <!-- 9. -->
+  <div class="page pg-split bg-wait">
+    <div class="left">
+      <div style="font-size:4em">🐸🐊</div>
+      <div class="story-text" style="font-size:1.1em;margin-top:10px">
+        Frog and Toad waited<br>and waited for the snail.<br>They waited all day…
+      </div>
+    </div>
+    <div class="right">
+      <div style="font-size:3.5em">🐌🐌🐌</div>
+      <div style="font-size:1em;color:#e91e63;font-style:italic;margin-top:10px">
+        The snail was<br>very, very slow.
+      </div>
+      <div style="font-size:3em;margin-top:10px">🐸😴 🐊😴</div>
+    </div>
+  </div>
+
+  <!-- 10. -->
+  <div class="page pg-split bg-happy">
+    <div class="left">
+      <div style="font-size:4em" class="bounce">🐊😁</div>
+      <div class="name-t">Toad</div>
+      <div class="speech-t">A letter!<br>A letter for ME!<br>🎉📮❤️</div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em">🐸😊</div>
+      <div class="name-f">Frog</div>
+      <div class="speech-f">I am so happy<br>you are happy,<br>Toad! 😄</div>
+    </div>
+  </div>
+
+  <!-- ── STORY 3: A LOST BUTTON ── -->
+  <!-- 11. -->
+  <div class="page pg-full bg-button">
+    <div class="chapter-badge">Story 3</div>
+    <div class="chapter-title">🔘 A Lost Button</div>
+    <div style="font-size:3.5em;margin:10px 0">🐊😟🧥</div>
+    <div class="story-text">
+      Toad lost a button from his jacket<br>while walking with Frog.<br><br>
+      <strong style="color:#e65100">"Oh no! My big white button<br>with four holes — it is GONE!"</strong><br><br>
+      They searched everywhere. 🔍
+    </div>
+  </div>
+
+  <!-- 12. -->
+  <div class="page pg-full bg-button">
+    <div style="font-size:2.5em;margin-bottom:14px">🐸🐊</div>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;font-size:2.5em;margin:10px 0">
+      <span title="black button">⚫</span>
+      <span title="two holes">🔵</span>
+      <span title="not white">🟤</span>
+      <span title="too small">⚪</span>
+    </div>
+    <div class="story-text" style="margin-top:14px">
+      They found buttons everywhere —<br>
+      black ones, blue ones, small ones —<br>
+      but <strong>none</strong> was Toad's button!<br><br>
+      <em style="color:#e65100">"This is not my button!"</em> cried Toad.
+    </div>
+  </div>
+
+  <!-- 13. -->
+  <div class="page pg-split bg-happy">
+    <div class="left">
+      <div style="font-size:4em">🐊😊🧥</div>
+      <div class="story-text" style="font-size:1.1em;margin-top:10px">
+        When Toad got home,<br>he found his button<br>on the floor! 🔘
+      </div>
+    </div>
+    <div class="right">
+      <div style="font-size:3em;margin-bottom:10px">🧵🔘🎁</div>
+      <div class="story-text">
+        Toad sewed ALL the found buttons<br>onto his jacket<br>and gave it to Frog as a gift!
+      </div>
+      <div style="font-size:2.5em;margin-top:10px">🐸🥹❤️</div>
+    </div>
+  </div>
+
+  <!-- ── STORY 4: THE SWIM ── -->
+  <!-- 14. -->
+  <div class="page pg-full bg-swim">
+    <div class="chapter-badge">Story 4</div>
+    <div class="chapter-title">🏊 The Swim</div>
+    <div style="font-size:3.5em;margin:10px 0">🐊🩳😳</div>
+    <div class="story-text">
+      Frog invited Toad to go swimming.<br><br>
+      Toad said he would swim,<br>but he did <strong>NOT</strong> want anyone<br>to see him in his bathing suit!<br><br>
+      <em style="color:#01579b">"I look funny in my bathing suit."</em>
+    </div>
+  </div>
+
+  <!-- 15. -->
+  <div class="page pg-split bg-swim">
+    <div class="left">
+      <div style="font-size:4em">🐸🦆🐢🐍</div>
+      <div style="font-size:1em;color:#01579b;margin-top:8px;font-style:italic">All the animals laughed!</div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em">🐊😠</div>
+      <div class="name-t">Toad</div>
+      <div class="speech-t">Now I know why<br>you wanted me to<br>swim with you!<br>So they could laugh! 😤</div>
+    </div>
+  </div>
+
+  <!-- 16. THE END -->
+  <div class="page pg-full bg-end">
+    <div style="display:flex;gap:16px;justify-content:center;font-size:4em;margin-bottom:14px">
+      <span class="bounce">🐸</span><span>🤝</span><span class="bounce" style="animation-delay:0.3s">🐊</span>
+    </div>
+    <div style="font-size:3em;font-weight:bold;color:white;text-shadow:2px 2px 6px rgba(0,0,0,0.3);margin:12px 0">The End!</div>
+    <div style="font-size:1.1em;color:rgba(255,255,255,0.9);margin-bottom:20px">
+      True friends stick together<br>through every season! 🌸🍂❄️☀️
+    </div>
+    <a href="../../index.html" style="background:white;color:#1b5e20;padding:12px 28px;border-radius:30px;text-decoration:none;font-size:1.1em;font-weight:bold;">🏠 Back to Home</a>
+  </div>
+
+</div></div>
+<div class="dots" id="dots"></div>
+<div class="nav">
+  <button class="nav-btn prev" id="prevBtn" onclick="changePage(-1)" disabled>◀ Prev</button>
+  <button class="read-btn" onclick="readPage()">🔊 Read Aloud</button>
+  <button class="nav-btn next" id="nextBtn" onclick="changePage(1)">Next ▶</button>
+</div>
+<script>
+const pages=document.querySelectorAll('.page'),totalPages=pages.length;let current=0;
+const dotsEl=document.getElementById('dots');
+pages.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);d.style.cursor='pointer';dotsEl.appendChild(d);});
+function updateUI(){pages.forEach((p,i)=>p.classList.toggle('active',i===current));document.querySelectorAll('.dot').forEach((d,i)=>{d.className='dot'+(i===current?' active':i<current?' done':'');});document.getElementById('prevBtn').disabled=current===0;document.getElementById('nextBtn').disabled=current===totalPages-1;document.getElementById('pageIndicator').textContent=`Page ${current+1} of ${totalPages}`;}
+function changePage(dir){current=Math.max(0,Math.min(totalPages-1,current+dir));updateUI();}
+function goTo(i){current=i;updateUI();}
+const pageTexts=["Frog and Toad are Friends! Five cozy friendship stories.","Story one: Spring. Toad was in bed, fast asleep. He had been sleeping all winter long.","Toad! Wake up! It is spring! said Frog. Blah! Go away! I am sleeping! said Toad.","Frog ran to Toad's calendar and tore off all the winter pages. Look Toad! The page says May! It really IS spring!","Oh my! You are right! It IS spring! said Toad. They ran outside together into the warm sunshine.","Story two: The Letter. Toad sat on his porch looking sad. I am waiting for the mail but I never get any letters. Nobody ever writes to me.","It is sad to have no letters. Nobody thinks about me, said Toad. I think about you! Wait right here! said Frog.","Frog ran home and wrote Toad a letter. Dear Toad, I am so glad that you are my best friend. Your best friend, Frog. He gave it to a snail to deliver.","Frog and Toad waited and waited for the snail. They waited all day. The snail was very very slow.","A letter! A letter for ME! said Toad happily. I am so happy you are happy, Toad! said Frog.","Story three: A Lost Button. Toad lost a big white button from his jacket. Oh no! My big white button with four holes is GONE!","They found buttons everywhere, black ones, blue ones, small ones, but none was Toad's button. This is not my button! cried Toad.","When Toad got home, he found his button on the floor! He sewed all the found buttons onto his jacket and gave it to Frog as a gift!","Story four: The Swim. Frog invited Toad to go swimming. Toad said he would swim but did not want anyone to see him in his bathing suit. I look funny in my bathing suit.","All the animals laughed at Toad. Now I know why you wanted me to swim with you! So they could laugh! said Toad.","The End! True friends stick together through every season!"];
+function readPage(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(pageTexts[current]);u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')changePage(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')changePage(-1);});
+updateUI();
+</script>
+</body>
+</html>

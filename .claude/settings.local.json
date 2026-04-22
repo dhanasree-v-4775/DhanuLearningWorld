@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -m http.server 3000)",
+      "Bash(open http://localhost:3000)",
+      "Bash(python3 -m http.server 8080)",
+      "Bash(open http://localhost:8080)",
+      "Bash(python3 -m http.server 8181)",
+      "Bash(open http://localhost:8181)",
+      "Bash(python3 -m http.server 4000)",
+      "Bash(open http://localhost:4000)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ]
+  }
+}

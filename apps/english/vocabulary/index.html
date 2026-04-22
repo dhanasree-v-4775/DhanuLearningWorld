@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#0f3443,#34e89e);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.3);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .topbar a:hover{background:rgba(255,255,255,0.35);}
+
+  /* CATEGORY TABS */
+  .cat-strip{display:flex;flex-wrap:wrap;gap:8px;padding:12px 20px;background:rgba(0,0,0,0.2);width:100%;justify-content:center;}
+  .cat-btn{padding:8px 18px;border-radius:20px;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .cat-btn:hover{background:rgba(255,255,255,0.3);}
+  .cat-btn.active{background:white;color:#0f3443;font-weight:bold;border-color:white;}
+
+  /* MODE TABS */
+  .mode-tabs{display:flex;gap:8px;padding:10px 20px;justify-content:center;}
+  .mode-tab{padding:8px 20px;border-radius:50px;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .mode-tab.active{background:white;color:#0f3443;font-weight:bold;}
+  .mode-tab:hover{background:rgba(255,255,255,0.25);}
+
+  /* PROGRESS */
+  .prog-row{width:90%;max-width:720px;display:flex;align-items:center;gap:10px;margin:4px auto 10px;}
+  .prog-bar{flex:1;height:8px;background:rgba(255,255,255,0.15);border-radius:8px;overflow:hidden;}
+  .prog-fill{height:100%;background:linear-gradient(90deg,#34e89e,#0f3443);border-radius:8px;transition:width 0.4s;}
+  .prog-txt{color:white;font-size:0.85em;}
+
+  /* LEARN CARD */
+  .learn-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:14px;width:100%;}
+  .vocab-card{width:680px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.35);overflow:hidden;}
+  .vc-top{padding:28px;display:flex;align-items:center;gap:24px;border-bottom:3px dashed #e0e0e0;}
+  .vc-emoji{font-size:7em;line-height:1;animation:popIn 0.4s ease;}
+  @keyframes popIn{0%{transform:scale(0.5);opacity:0;}70%{transform:scale(1.1);}100%{transform:scale(1);opacity:1;}}
+  .vc-info{flex:1;}
+  .vc-word{font-size:3em;font-weight:bold;line-height:1.1;transition:color 0.3s;}
+  .vc-type{font-size:0.8em;background:#e8f5e9;color:#2e7d32;border-radius:20px;padding:3px 12px;display:inline-block;margin:6px 0;}
+  .vc-body{padding:20px 28px;display:flex;flex-direction:column;gap:10px;}
+  .vc-meaning{font-size:1.2em;color:#333;line-height:1.7;}
+  .vc-meaning strong{color:#0f3443;}
+  .vc-example{font-size:1.05em;color:#555;font-style:italic;background:#f5f5f5;border-radius:10px;padding:10px 14px;border-left:4px solid #34e89e;}
+  .vc-antonym{font-size:0.95em;color:#888;}
+  .vc-actions{padding:0 28px 20px;display:flex;gap:10px;flex-wrap:wrap;}
+  .vc-btn{border:none;border-radius:50px;padding:10px 22px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .vc-btn:hover{transform:scale(1.05);}
+
+  /* QUIZ CARD */
+  .quiz-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px;gap:14px;width:100%;}
+  .quiz-card{width:680px;max-width:100%;background:white;border-radius:24px;box-shadow:0 16px 50px rgba(0,0,0,0.3);padding:26px;}
+  .quiz-q{font-size:1.15em;color:#555;margin-bottom:8px;}
+  .quiz-emoji{font-size:5em;text-align:center;margin:8px 0;}
+  .quiz-hint{font-size:1.5em;font-weight:bold;color:#0f3443;text-align:center;margin-bottom:16px;}
+  .quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .quiz-opt{background:#f5f5f5;border:3px solid #ddd;border-radius:16px;padding:12px 10px;font-size:1em;font-family:inherit;cursor:pointer;color:#333;text-align:center;transition:all 0.2s;}
+  .quiz-opt:hover{border-color:#0f3443;background:#e0f7fa;}
+  .quiz-opt.correct{background:#c8f7c5;border-color:#2e7d32;color:#1b5e20;}
+  .quiz-opt.wrong{background:#ffcdd2;border-color:#c62828;color:#b71c1c;}
+  .quiz-score{color:white;font-size:1.1em;text-align:center;}
+  .quiz-feedback{font-size:1.2em;font-weight:bold;text-align:center;min-height:36px;}
+
+  .nav{display:flex;justify-content:center;align-items:center;gap:14px;padding:14px;}
+  .nav-btn{border:none;border-radius:50px;padding:11px 28px;font-size:1.1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#555;cursor:not-allowed;transform:none;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+  .nav-count{color:white;font-size:1em;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">📖 Vocabulary</span>
+  <span style="color:white;font-size:0.9em">English</span>
+</div>
+
+<div class="cat-strip" id="catStrip"></div>
+<div class="mode-tabs">
+  <button class="mode-tab active" onclick="setMode('learn',this)">📖 Learn</button>
+  <button class="mode-tab" onclick="setMode('quiz',this)">🧠 Quiz</button>
+</div>
+<div class="prog-row">
+  <div class="prog-bar"><div class="prog-fill" id="pFill"></div></div>
+  <span class="prog-txt" id="pTxt">1/10</span>
+</div>
+
+<!-- LEARN -->
+<div class="learn-wrap" id="learnMode">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:14px;width:100%;">
+    <div class="vocab-card">
+      <div class="vc-top">
+        <div class="vc-emoji" id="vcEmoji">🐶</div>
+        <div class="vc-info">
+          <div class="vc-word" id="vcWord">Dog</div>
+          <span class="vc-type" id="vcType">Noun</span>
+        </div>
+      </div>
+      <div class="vc-body">
+        <div class="vc-meaning" id="vcMeaning"></div>
+        <div class="vc-example" id="vcExample"></div>
+        <div class="vc-antonym" id="vcAntonym"></div>
+      </div>
+      <div class="vc-actions">
+        <button class="vc-btn" style="background:#0f3443" onclick="speakWord()">🔊 Say It</button>
+        <button class="vc-btn" style="background:#34e89e;color:#0f3443" onclick="speakExample()">🔊 Example</button>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn prev" id="prevBtn" onclick="go(-1)" disabled>◀ Prev</button>
+      <span class="nav-count" id="navCount">1 / 10</span>
+      <button class="nav-btn next" id="nextBtn" onclick="go(1)">Next ▶</button>
+    </div>
+  </div>
+</div>
+
+<!-- QUIZ -->
+<div class="quiz-wrap" id="quizMode" style="display:none;">
+  <div class="quiz-score" id="qScore">Score: 0 ⭐</div>
+  <div class="quiz-card">
+    <div class="quiz-q">What word matches this picture and clue?</div>
+    <div class="quiz-emoji" id="qEmoji">🐶</div>
+    <div class="quiz-hint" id="qHint">A loyal pet that barks</div>
+    <div class="quiz-opts" id="qOpts"></div>
+  </div>
+  <div class="quiz-feedback" id="qFeedback"></div>
+</div>
+
+<script>
+const categories = {
+  '🐾 Animals': [
+    {w:'Dog',    e:'🐶', t:'Noun', m:'A loyal animal that barks and loves to play', ex:'My dog runs fast in the park.', ant:''},
+    {w:'Cat',    e:'🐱', t:'Noun', m:'A soft, furry animal that purrs and meows', ex:'The cat sat on the warm mat.', ant:''},
+    {w:'Bird',   e:'🐦', t:'Noun', m:'An animal with wings and feathers that can fly', ex:'The bird sang a lovely song.', ant:''},
+    {w:'Fish',   e:'🐟', t:'Noun', m:'An animal that lives in water and has fins', ex:'The fish swims in the blue sea.', ant:''},
+    {w:'Elephant',e:'🐘',t:'Noun', m:'The largest land animal with a long trunk', ex:'The elephant drank water with its trunk.', ant:''},
+    {w:'Lion',   e:'🦁', t:'Noun', m:'A big wild cat known as the king of the jungle', ex:'The lion roared loudly in the jungle.', ant:''},
+    {w:'Rabbit', e:'🐰', t:'Noun', m:'A small furry animal with long ears that hops', ex:'The rabbit hopped across the garden.', ant:''},
+    {w:'Frog',   e:'🐸', t:'Noun', m:'A small green animal that jumps and lives near water', ex:'The frog jumped into the pond.', ant:''},
+    {w:'Butterfly',e:'🦋',t:'Noun',m:'A colourful insect with large patterned wings', ex:'The butterfly rested on the flower.', ant:''},
+    {w:'Penguin',e:'🐧', t:'Noun', m:'A black and white bird that cannot fly but can swim', ex:'The penguin waddled across the ice.', ant:''},
+  ],
+  '🍎 Food': [
+    {w:'Apple',  e:'🍎', t:'Noun', m:'A round, sweet fruit that is red or green', ex:'I eat one apple every day.', ant:''},
+    {w:'Bread',  e:'🍞', t:'Noun', m:'A food made from flour and baked in an oven', ex:'She spread butter on the bread.', ant:''},
+    {w:'Milk',   e:'🥛', t:'Noun', m:'A white drink that comes from cows', ex:'He drinks a glass of milk each morning.', ant:''},
+    {w:'Rice',   e:'🍚', t:'Noun', m:'Small white grains that are cooked and eaten', ex:'We had rice and vegetables for lunch.', ant:''},
+    {w:'Carrot', e:'🥕', t:'Noun', m:'An orange vegetable that grows underground', ex:'The rabbit ate a big orange carrot.', ant:''},
+    {w:'Egg',    e:'🥚', t:'Noun', m:'An oval food with a shell, laid by birds', ex:'She fried two eggs for breakfast.', ant:''},
+    {w:'Banana', e:'🍌', t:'Noun', m:'A long yellow fruit that monkeys love', ex:'I peeled the banana and ate it.', ant:''},
+    {w:'Soup',   e:'🍲', t:'Noun', m:'A warm liquid food made by cooking vegetables or meat', ex:'Mum made hot tomato soup for dinner.', ant:''},
+    {w:'Orange', e:'🍊', t:'Noun', m:'A round, sweet citrus fruit with orange skin', ex:'I squeezed the orange to make juice.', ant:''},
+    {w:'Cookie', e:'🍪', t:'Noun', m:'A small sweet baked treat', ex:'She baked ten chocolate cookies.', ant:''},
+  ],
+  '😊 Feelings': [
+    {w:'Happy',  e:'😊', t:'Adjective', m:'Feeling joyful and pleased', ex:'I am happy when I play with my friends.', ant:'Opposite: Sad'},
+    {w:'Sad',    e:'😢', t:'Adjective', m:'Feeling unhappy or sorrowful', ex:'She felt sad when she lost her toy.', ant:'Opposite: Happy'},
+    {w:'Angry',  e:'😠', t:'Adjective', m:'Feeling very upset or cross', ex:'He was angry when someone broke his toy.', ant:'Opposite: Calm'},
+    {w:'Scared', e:'😱', t:'Adjective', m:'Feeling frightened or afraid', ex:'She was scared of the loud thunder.', ant:'Opposite: Brave'},
+    {w:'Excited',e:'🤩', t:'Adjective', m:'Feeling very happy about something coming', ex:'He was excited about his birthday party.', ant:'Opposite: Bored'},
+    {w:'Tired',  e:'😴', t:'Adjective', m:'Feeling like you need to sleep or rest', ex:'She was tired after running all day.', ant:'Opposite: Energetic'},
+    {w:'Proud',  e:'😤', t:'Adjective', m:'Feeling very pleased with what you have done', ex:'I felt proud when I got full marks.', ant:'Opposite: Ashamed'},
+    {w:'Surprised',e:'😮',t:'Adjective',m:'Feeling shocked by something unexpected', ex:'He was surprised by the birthday cake.', ant:'Opposite: Expecting'},
+    {w:'Calm',   e:'😌', t:'Adjective', m:'Feeling quiet, peaceful and not worried', ex:'She stayed calm during the storm.', ant:'Opposite: Angry'},
+    {w:'Brave',  e:'💪', t:'Adjective', m:'Not scared; willing to do hard things', ex:'The brave boy helped the lost puppy.', ant:'Opposite: Scared'},
+  ],
+  '🌈 Describing': [
+    {w:'Big',    e:'🐘', t:'Adjective', m:'Large in size', ex:'The elephant is a big animal.', ant:'Opposite: Small'},
+    {w:'Small',  e:'🐭', t:'Adjective', m:'Little in size', ex:'The mouse is a small animal.', ant:'Opposite: Big'},
+    {w:'Fast',   e:'🏃', t:'Adjective', m:'Moving quickly', ex:'The cheetah is the fastest animal.', ant:'Opposite: Slow'},
+    {w:'Slow',   e:'🐢', t:'Adjective', m:'Moving without speed', ex:'The tortoise walks in a slow way.', ant:'Opposite: Fast'},
+    {w:'Bright', e:'☀️', t:'Adjective', m:'Giving out a strong light', ex:'The sun is bright in the sky.', ant:'Opposite: Dark'},
+    {w:'Dark',   e:'🌑', t:'Adjective', m:'Without much light', ex:'It was dark inside the cave.', ant:'Opposite: Bright'},
+    {w:'Soft',   e:'🧸', t:'Adjective', m:'Gentle to touch, not hard', ex:'The teddy bear is soft and fluffy.', ant:'Opposite: Hard'},
+    {w:'Hard',   e:'🪨', t:'Adjective', m:'Firm and not easy to press', ex:'The rock is very hard.', ant:'Opposite: Soft'},
+    {w:'Loud',   e:'📣', t:'Adjective', m:'Making a lot of noise', ex:'The drum made a loud sound.', ant:'Opposite: Quiet'},
+    {w:'Quiet',  e:'🤫', t:'Adjective', m:'Making very little noise', ex:'The library is a quiet place.', ant:'Opposite: Loud'},
+  ],
+  '🏠 Around Us': [
+    {w:'House',  e:'🏠', t:'Noun', m:'A building where people live', ex:'We live in a yellow house.', ant:''},
+    {w:'School', e:'🏫', t:'Noun', m:'A place where children go to learn', ex:'I walk to school every morning.', ant:''},
+    {w:'Garden', e:'🌻', t:'Noun', m:'An outdoor space with plants and flowers', ex:'Mum grows roses in the garden.', ant:''},
+    {w:'Road',   e:'🛣️', t:'Noun', m:'A path that cars and people travel on', ex:'Look both ways before crossing the road.', ant:''},
+    {w:'Market', e:'🛒', t:'Noun', m:'A place where food and goods are sold', ex:'We bought fresh fruit at the market.', ant:''},
+    {w:'Park',   e:'🌳', t:'Noun', m:'A public outdoor area with grass and trees', ex:'Children play in the park after school.', ant:''},
+    {w:'Library',e:'📚', t:'Noun', m:'A place where you can borrow books', ex:'She borrowed a story book from the library.', ant:''},
+    {w:'Bridge', e:'🌉', t:'Noun', m:'A structure built over water or a gap', ex:'We crossed the bridge over the river.', ant:''},
+    {w:'Farm',   e:'🚜', t:'Noun', m:'A place where animals are kept and crops are grown', ex:'The farm has cows, hens, and sheep.', ant:''},
+    {w:'Hospital',e:'🏥',t:'Noun', m:'A place where sick or hurt people are treated', ex:'The doctor works at the hospital.', ant:''},
+  ],
+};
+
+const catNames = Object.keys(categories);
+let curCat=0, cur=0, mode='learn', qScore=0;
+
+// Build category strip
+const catStrip=document.getElementById('catStrip');
+catNames.forEach((name,i)=>{
+  const btn=document.createElement('button');
+  btn.className='cat-btn'+(i===0?' active':'');
+  btn.textContent=name;
+  btn.onclick=()=>{
+    curCat=i;cur=0;
+    document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    render();
+  };
+  catStrip.appendChild(btn);
+});
+
+function getWords(){return categories[catNames[curCat]];}
+
+function render(){
+  const words=getWords();
+  const d=words[cur];
+
+  // emoji pop
+  const ee=document.getElementById('vcEmoji');
+  ee.style.animation='none';ee.offsetHeight;ee.style.animation='popIn 0.4s ease';
+  ee.textContent=d.e;
+
+  document.getElementById('vcWord').textContent=d.w;
+  document.getElementById('vcWord').style.color=`hsl(${cur*36},60%,35%)`;
+  document.getElementById('vcType').textContent=d.t;
+  document.getElementById('vcMeaning').innerHTML=`<strong>Meaning:</strong> ${d.m}`;
+  document.getElementById('vcExample').innerHTML=`💬 "${d.ex}"`;
+  document.getElementById('vcAntonym').textContent=d.ant;
+
+  document.getElementById('prevBtn').disabled=cur===0;
+  document.getElementById('nextBtn').disabled=cur===words.length-1;
+  document.getElementById('navCount').textContent=`${cur+1} / ${words.length}`;
+  document.getElementById('pFill').style.width=`${((cur+1)/words.length)*100}%`;
+  document.getElementById('pTxt').textContent=`${cur+1}/${words.length}`;
+}
+
+function go(dir){cur=Math.max(0,Math.min(getWords().length-1,cur+dir));render();}
+
+function speakWord(){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(getWords()[cur].w);
+  u.rate=0.7;u.pitch=1.2;window.speechSynthesis.speak(u);
+}
+
+function speakExample(){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(getWords()[cur].ex);
+  u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);
+}
+
+// QUIZ
+function newQuiz(){
+  const words=getWords();
+  const qi=Math.floor(Math.random()*words.length);
+  const correct=words[qi];
+  document.getElementById('qEmoji').textContent=correct.e;
+  document.getElementById('qHint').textContent=correct.m;
+  document.getElementById('qFeedback').textContent='';
+
+  let opts=[correct.w];
+  while(opts.length<4){
+    const rw=words[Math.floor(Math.random()*words.length)].w;
+    if(!opts.includes(rw))opts.push(rw);
+  }
+  opts=opts.sort(()=>Math.random()-0.5);
+
+  const container=document.getElementById('qOpts');
+  container.innerHTML='';
+  opts.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.className='quiz-opt';btn.textContent=opt;
+    btn.onclick=()=>{
+      container.querySelectorAll('.quiz-opt').forEach(b=>b.onclick=null);
+      if(opt===correct.w){btn.classList.add('correct');qScore++;document.getElementById('qFeedback').textContent='✅ Correct! 🌟';document.getElementById('qFeedback').style.color='#2e7d32';}
+      else{btn.classList.add('wrong');container.querySelectorAll('.quiz-opt').forEach(b=>{if(b.textContent===correct.w)b.classList.add('correct');});document.getElementById('qFeedback').textContent=`❌ The answer is "${correct.w}"`;document.getElementById('qFeedback').style.color='#c62828';}
+      document.getElementById('qScore').textContent=`Score: ${qScore} ⭐`;
+      setTimeout(newQuiz,2000);
+    };
+    container.appendChild(btn);
+  });
+}
+
+function setMode(m,tab){
+  mode=m;
+  document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('learnMode').style.display=m==='learn'?'flex':'none';
+  document.getElementById('quizMode').style.display=m==='quiz'?'flex':'none';
+  if(m==='quiz')newQuiz();
+}
+
+document.addEventListener('keydown',e=>{
+  if(mode==='learn'){if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1);}
+});
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blending – Join Sounds to Make Words</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.3);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .topbar a:hover{background:rgba(255,255,255,0.35);}
+
+  .progress-bar{width:90%;max-width:700px;height:10px;background:rgba(255,255,255,0.15);border-radius:10px;margin:14px auto 4px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#4ecdc4,#44a8a2);border-radius:10px;transition:width 0.4s;}
+  .progress-label{color:rgba(255,255,255,0.7);font-size:0.85em;text-align:right;width:90%;max-width:700px;margin:0 auto 10px;}
+
+  /* NUM STRIP */
+  .num-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:10px 20px;background:rgba(0,0,0,0.2);width:100%;}
+  .num-btn{min-width:38px;height:38px;border-radius:10px;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:white;font-size:0.9em;font-family:inherit;font-weight:bold;cursor:pointer;transition:transform 0.15s,background 0.2s;padding:0 6px;}
+  .num-btn:hover{transform:scale(1.15);background:rgba(255,255,255,0.3);}
+  .num-btn.active{border-color:#4ecdc4;background:#4ecdc4;color:#0f2027;}
+
+  /* CARD */
+  .card-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;width:100%;}
+  .card{width:720px;max-width:100%;background:white;border-radius:32px;box-shadow:0 20px 60px rgba(0,0,0,0.4);overflow:hidden;padding:32px;}
+
+  .word-label{font-size:1em;color:#888;text-align:center;margin-bottom:6px;}
+  .emoji-display{font-size:6em;text-align:center;margin:10px 0;animation:popIn 0.4s ease;}
+  @keyframes popIn{0%{transform:scale(0.5);opacity:0;}70%{transform:scale(1.1);}100%{transform:scale(1);opacity:1;}}
+
+  /* LETTER TILES */
+  .tiles-row{display:flex;justify-content:center;gap:12px;margin:20px 0;}
+  .tile{
+    width:90px;height:100px;
+    border-radius:18px;
+    font-size:3.5em;font-weight:bold;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    border:4px solid transparent;
+    transition:transform 0.15s,box-shadow 0.15s;
+    box-shadow:0 6px 16px rgba(0,0,0,0.15);
+    color:white;
+    user-select:none;
+  }
+  .tile:hover{transform:translateY(-6px) scale(1.05);box-shadow:0 12px 24px rgba(0,0,0,0.2);}
+  .tile.lit{animation:lit 0.5s ease;}
+  @keyframes lit{0%,100%{transform:scale(1);}50%{transform:scale(1.15) rotate(5deg);}}
+  .tile-c{background:linear-gradient(135deg,#e74c3c,#c0392b);}
+  .tile-v{background:linear-gradient(135deg,#2ecc71,#27ae60);}
+  .tile-c2{background:linear-gradient(135deg,#3498db,#2980b9);}
+
+  /* BLEND ARROW */
+  .blend-row{display:flex;align-items:center;justify-content:center;gap:16px;margin:8px 0;}
+  .blend-arrow{font-size:2em;color:#aaa;}
+  .blended-word{
+    font-size:3.5em;font-weight:bold;
+    background:linear-gradient(135deg,#f7971e,#ffd200);
+    color:white;
+    padding:10px 32px;
+    border-radius:20px;
+    box-shadow:0 6px 18px rgba(247,151,30,0.4);
+    display:none;
+    animation:popIn 0.4s ease;
+  }
+
+  /* BUTTONS */
+  .btn-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px;}
+  .btn{border:none;border-radius:50px;padding:12px 28px;font-size:1.1em;font-family:inherit;cursor:pointer;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.2);transition:transform 0.15s;}
+  .btn:hover{transform:scale(1.05);}
+  .btn-blend{background:linear-gradient(135deg,#f7971e,#ffd200);color:#333;font-weight:bold;}
+  .btn-speak{background:#9C27B0;}
+  .btn-reset{background:#607D8B;}
+
+  /* word info */
+  .word-info{text-align:center;margin-top:12px;font-size:1.05em;color:#555;min-height:32px;}
+
+  .nav{display:flex;justify-content:center;align-items:center;gap:16px;padding:16px;}
+  .nav-btn{border:none;border-radius:50px;padding:12px 30px;font-size:1.15em;font-family:inherit;cursor:pointer;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.2);transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#555;cursor:not-allowed;transform:none;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+  .nav-count{color:white;font-size:1.1em;min-width:80px;text-align:center;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🔗 Blending – Join Sounds to Make Words</span>
+  <span style="color:white;font-size:0.9em">English</span>
+</div>
+
+<div class="num-strip" id="numStrip"></div>
+<div class="progress-bar"><div class="progress-fill" id="pFill"></div></div>
+<div class="progress-label" id="pLabel">1 of 20</div>
+
+<div class="card-wrap">
+<div class="card">
+  <div class="word-label">Tap each letter to hear its sound, then BLEND! 🎯</div>
+  <div class="emoji-display" id="emojiDisp">🐱</div>
+
+  <div class="tiles-row" id="tilesRow"></div>
+
+  <div class="blend-row">
+    <div class="blend-arrow">→</div>
+    <div class="blended-word" id="blendedWord">CAT</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-reset" onclick="resetBlend()">🔄 Reset</button>
+    <button class="btn btn-blend" onclick="doBlend()">✨ BLEND!</button>
+    <button class="btn btn-speak" onclick="speakWord()">🔊 Say It!</button>
+  </div>
+
+  <div class="word-info" id="wordInfo"></div>
+</div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn prev" id="prevBtn" onclick="go(-1)" disabled>◀ Prev</button>
+  <span class="nav-count" id="navCount">1 / 20</span>
+  <button class="nav-btn next" id="nextBtn" onclick="go(1)">Next ▶</button>
+</div>
+
+<script>
+const words = [
+  {w:'CAT', emoji:'🐱', meaning:'A furry pet that meows'},
+  {w:'DOG', emoji:'🐶', meaning:'A loyal pet that barks'},
+  {w:'BIG', emoji:'🐘', meaning:'Very large in size'},
+  {w:'HOT', emoji:'🔥', meaning:'Very warm to touch'},
+  {w:'SUN', emoji:'☀️', meaning:'The bright star in our sky'},
+  {w:'RED', emoji:'🍎', meaning:'A bright warm colour'},
+  {w:'MAP', emoji:'🗺️', meaning:'A picture that shows places'},
+  {w:'PIG', emoji:'🐷', meaning:'A pink farm animal that oinks'},
+  {w:'CUP', emoji:'☕', meaning:'A container we drink from'},
+  {w:'BED', emoji:'🛏️', meaning:'We sleep in this at night'},
+  {w:'FAN', emoji:'🌀', meaning:'A machine that blows air'},
+  {w:'SIT', emoji:'🪑', meaning:'To rest on a chair'},
+  {w:'LOG', emoji:'🪵', meaning:'A piece of cut tree'},
+  {w:'RUN', emoji:'🏃', meaning:'To move very fast on foot'},
+  {w:'HEN', emoji:'🐔', meaning:'A female chicken'},
+  {w:'MOP', emoji:'🧹', meaning:'A tool used to clean floors'},
+  {w:'JAM', emoji:'🍓', meaning:'A sweet spread for bread'},
+  {w:'WEB', emoji:'🕸️', meaning:'A net made by a spider'},
+  {w:'BUS', emoji:'🚌', meaning:'A large vehicle for travel'},
+  {w:'HIT', emoji:'⚾', meaning:'To strike something hard'},
+];
+
+const tileColors = [
+  ['tile-c','tile-v','tile-c'],
+];
+
+let cur = 0, blended = false;
+
+// Build strip
+const strip = document.getElementById('numStrip');
+words.forEach((d,i) => {
+  const btn = document.createElement('button');
+  btn.className = 'num-btn'+(i===0?' active':'');
+  btn.textContent = d.w;
+  btn.onclick = () => goTo(i);
+  strip.appendChild(btn);
+});
+
+function render() {
+  const d = words[cur];
+  blended = false;
+
+  // Emoji
+  const e = document.getElementById('emojiDisp');
+  e.style.animation='none'; e.offsetHeight; e.style.animation='popIn 0.4s ease';
+  e.textContent = d.emoji;
+
+  // Tiles
+  const row = document.getElementById('tilesRow');
+  row.innerHTML = '';
+  const classes = ['tile-c','tile-v','tile-c'];
+  d.w.split('').forEach((letter, i) => {
+    const tile = document.createElement('div');
+    tile.className = `tile ${classes[i] || 'tile-c'}`;
+    tile.textContent = letter;
+    tile.onclick = () => {
+      tile.classList.add('lit');
+      setTimeout(() => tile.classList.remove('lit'), 500);
+      speakSound(letter);
+    };
+    row.appendChild(tile);
+  });
+
+  document.getElementById('blendedWord').style.display = 'none';
+  document.getElementById('blendedWord').textContent = d.w;
+  document.getElementById('wordInfo').textContent = '';
+
+  // Strip
+  document.querySelectorAll('.num-btn').forEach((b,i) => {
+    b.classList.toggle('active', i===cur);
+    b.style.background = i===cur ? '#4ecdc4' : '';
+    b.style.color = i===cur ? '#0f2027' : '';
+  });
+
+  document.getElementById('prevBtn').disabled = cur===0;
+  document.getElementById('nextBtn').disabled = cur===words.length-1;
+  document.getElementById('navCount').textContent = `${cur+1} / ${words.length}`;
+  document.getElementById('pFill').style.width = `${((cur+1)/words.length)*100}%`;
+  document.getElementById('pLabel').textContent = `${cur+1} of ${words.length}`;
+}
+
+function doBlend() {
+  if (blended) return;
+  blended = true;
+  const d = words[cur];
+  const bw = document.getElementById('blendedWord');
+  bw.style.display = 'block';
+  bw.style.animation = 'none'; bw.offsetHeight; bw.style.animation = 'popIn 0.4s ease';
+  document.getElementById('wordInfo').textContent = '💡 ' + d.meaning;
+  speakWord();
+}
+
+function resetBlend() {
+  blended = false;
+  document.getElementById('blendedWord').style.display='none';
+  document.getElementById('wordInfo').textContent='';
+}
+
+function speakSound(letter) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(letter);
+  u.rate = 0.7; u.pitch = 1.2;
+  window.speechSynthesis.speak(u);
+}
+
+function speakWord() {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const d = words[cur];
+  const letters = d.w.split('').join('... ');
+  const u1 = new SpeechSynthesisUtterance(letters);
+  u1.rate = 0.6; u1.pitch = 1.2;
+  const u2 = new SpeechSynthesisUtterance(d.w);
+  u2.rate = 0.8; u2.pitch = 1.1;
+  window.speechSynthesis.speak(u1);
+  window.speechSynthesis.speak(u2);
+}
+
+function go(dir){cur=Math.max(0,Math.min(words.length-1,cur+dir));render();}
+function goTo(i){cur=i;render();}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')go(1);if(e.key==='ArrowLeft')go(-1);if(e.key===' ')doBlend();});
+render();
+</script>
+</body>
+</html>

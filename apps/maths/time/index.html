@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Telling Time</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#1c3c6e,#1a6ebd);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.25);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .tabs{display:flex;gap:8px;padding:12px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:10px 22px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.15);color:white;font-family:inherit;font-size:0.95em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#1c3c6e;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.3);}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+
+  /* CARD */
+  .card{width:720px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.3);padding:28px;}
+  .card-title{font-size:1.2em;font-weight:bold;color:#1c3c6e;margin-bottom:16px;text-align:center;}
+
+  /* CLOCK */
+  .clock-container{display:flex;justify-content:center;align-items:center;gap:32px;flex-wrap:wrap;margin:16px 0;}
+  .clock-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;}
+  .clock-label{font-size:1em;color:#888;}
+  svg.clock{filter:drop-shadow(0 8px 20px rgba(0,0,0,0.2));}
+
+  /* LEARN MODE */
+  .time-display{font-size:2.5em;font-weight:bold;color:#1c3c6e;text-align:center;margin:8px 0;}
+  .time-word{font-size:1.5em;color:#555;text-align:center;margin-bottom:8px;}
+  .time-desc{font-size:1.05em;color:#777;text-align:center;margin-bottom:14px;font-style:italic;}
+  .time-strip{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:10px 20px;background:rgba(0,0,0,0.08);width:100%;}
+  .time-btn{padding:6px 12px;border-radius:12px;border:2px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.15);color:white;font-family:inherit;font-size:0.8em;cursor:pointer;transition:all 0.2s;}
+  .time-btn.active{background:white;color:#1c3c6e;font-weight:bold;}
+  .time-btn:hover{background:rgba(255,255,255,0.4);}
+
+  /* QUIZ */
+  .q-text{font-size:1.15em;color:#555;text-align:center;margin-bottom:10px;}
+  .quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px;}
+  .quiz-opt{background:#f5f5f5;border:3px solid #ddd;border-radius:16px;padding:14px;font-size:1.1em;font-family:inherit;cursor:pointer;text-align:center;color:#333;transition:all 0.2s;}
+  .quiz-opt:hover{border-color:#1c3c6e;background:#e3f2fd;}
+  .quiz-opt.correct{background:#c8f7c5;border-color:#2e7d32;color:#1b5e20;}
+  .quiz-opt.wrong{background:#ffcdd2;border-color:#c62828;color:#b71c1c;}
+  .feedback{font-size:1.2em;font-weight:bold;text-align:center;min-height:36px;margin-top:8px;}
+  .score-txt{color:white;font-size:1.1em;text-align:center;}
+
+  /* DAILY ROUTINE */
+  .routine-list{display:flex;flex-direction:column;gap:10px;margin-top:8px;}
+  .routine-item{display:flex;align-items:center;gap:14px;background:#f5f5f5;border-radius:14px;padding:12px 16px;}
+  .routine-item .time-label{font-size:1.1em;font-weight:bold;color:#1c3c6e;min-width:110px;}
+  .routine-item .act{font-size:1.05em;color:#333;flex:1;}
+  .routine-item .emoji{font-size:2em;}
+
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  .action-btn{border:none;border-radius:50px;padding:11px 26px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+  .nav{display:flex;justify-content:center;align-items:center;gap:14px;padding:14px;}
+  .nav-btn{border:none;border-radius:50px;padding:11px 28px;font-size:1.1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#555;cursor:not-allowed;transform:none;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🕐 Telling Time</span>
+  <span style="color:white;font-size:0.9em">Maths</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="setMode('learn',this)">🕐 Learn to Read Time</button>
+  <button class="tab" onclick="setMode('quiz',this)">🧠 Quiz</button>
+  <button class="tab" onclick="setMode('routine',this)">📅 Daily Routine</button>
+</div>
+
+<!-- TIME STRIP (only for learn) -->
+<div class="time-strip" id="timeStrip"></div>
+
+<div class="main">
+  <!-- LEARN MODE -->
+  <div id="learnMode" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:14px;">
+    <div class="card">
+      <div class="card-title">🕐 What time is it?</div>
+      <div class="clock-container">
+        <div class="clock-wrap">
+          <canvas id="learnClock" width="200" height="200"></canvas>
+          <div class="clock-label">Analogue Clock</div>
+        </div>
+        <div style="text-align:center">
+          <div class="time-display" id="learnTimeDisplay">3:00</div>
+          <div class="time-word" id="learnTimeWord">Three o'clock</div>
+          <div class="time-desc" id="learnTimeDesc">The short hand points to 3, the long hand points to 12.</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="action-btn" style="background:#1c3c6e" onclick="speakTime()">🔊 Say the Time</button>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn prev" id="lPrev" onclick="lGo(-1)" disabled>◀ Prev</button>
+      <span style="color:white" id="lCount">1 / 12</span>
+      <button class="nav-btn next" id="lNext" onclick="lGo(1)">Next ▶</button>
+    </div>
+  </div>
+
+  <!-- QUIZ MODE -->
+  <div id="quizMode" style="display:none;flex-direction:column;align-items:center;gap:14px;width:100%;">
+    <div class="score-txt" id="qScoreTxt">Score: 0 ⭐</div>
+    <div class="card">
+      <div class="q-text">What time does the clock show?</div>
+      <div style="display:flex;justify-content:center;margin:12px 0">
+        <canvas id="quizClock" width="180" height="180"></canvas>
+      </div>
+      <div class="quiz-opts" id="quizOpts"></div>
+      <div class="feedback" id="qFeedback"></div>
+    </div>
+  </div>
+
+  <!-- ROUTINE MODE -->
+  <div id="routineMode" style="display:none;width:100%;display:none;flex-direction:column;align-items:center;">
+    <div class="card">
+      <div class="card-title">📅 A Day in My Life</div>
+      <div class="routine-list" id="routineList"></div>
+      <div class="btn-row">
+        <button class="action-btn" style="background:#1c3c6e" onclick="readRoutine()">🔊 Read My Day</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// Times to learn: o'clock and half past
+const times=[
+  {h:1,m:0,display:"1:00",word:"One o'clock",desc:"Short hand → 1, Long hand → 12"},
+  {h:2,m:0,display:"2:00",word:"Two o'clock",desc:"Short hand → 2, Long hand → 12"},
+  {h:3,m:0,display:"3:00",word:"Three o'clock",desc:"Short hand → 3, Long hand → 12"},
+  {h:4,m:0,display:"4:00",word:"Four o'clock",desc:"Short hand → 4, Long hand → 12"},
+  {h:5,m:0,display:"5:00",word:"Five o'clock",desc:"Short hand → 5, Long hand → 12"},
+  {h:6,m:0,display:"6:00",word:"Six o'clock",desc:"Short hand → 6, Long hand → 12"},
+  {h:7,m:0,display:"7:00",word:"Seven o'clock",desc:"Short hand → 7, Long hand → 12"},
+  {h:8,m:0,display:"8:00",word:"Eight o'clock",desc:"Short hand → 8, Long hand → 12"},
+  {h:1,m:30,display:"1:30",word:"Half past one",desc:"Short hand → between 1 and 2, Long hand → 6"},
+  {h:2,m:30,display:"2:30",word:"Half past two",desc:"Short hand → between 2 and 3, Long hand → 6"},
+  {h:3,m:30,display:"3:30",word:"Half past three",desc:"Short hand → between 3 and 4, Long hand → 6"},
+  {h:6,m:30,display:"6:30",word:"Half past six",desc:"Short hand → between 6 and 7, Long hand → 6"},
+];
+
+function drawClock(canvasId, hour, minute, size=200){
+  const canvas=document.getElementById(canvasId);
+  const ctx=canvas.getContext('2d');
+  const cx=canvas.width/2, cy=canvas.height/2, r=cx-8;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Face
+  ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);
+  ctx.fillStyle='#fff';ctx.fill();
+  ctx.strokeStyle='#1c3c6e';ctx.lineWidth=5;ctx.stroke();
+
+  // Hour marks
+  for(let i=0;i<12;i++){
+    const angle=(i/12)*Math.PI*2 - Math.PI/2;
+    const inner=i%3===0?r-18:r-10;
+    ctx.beginPath();
+    ctx.moveTo(cx+Math.cos(angle)*inner, cy+Math.sin(angle)*inner);
+    ctx.lineTo(cx+Math.cos(angle)*(r-4), cy+Math.sin(angle)*(r-4));
+    ctx.strokeStyle=i%3===0?'#1c3c6e':'#90a4ae';
+    ctx.lineWidth=i%3===0?4:2;ctx.stroke();
+  }
+
+  // Numbers
+  ctx.fillStyle='#1c3c6e';ctx.font=`bold ${r*0.22}px Comic Sans MS`;ctx.textAlign='center';ctx.textBaseline='middle';
+  [12,1,2,3,4,5,6,7,8,9,10,11].forEach((n,i)=>{
+    const angle=(i/12)*Math.PI*2 - Math.PI/2;
+    ctx.fillText(n, cx+Math.cos(angle)*(r-30), cy+Math.sin(angle)*(r-30));
+  });
+
+  // Hour hand
+  const hourAngle=((hour%12 + minute/60)/12)*Math.PI*2 - Math.PI/2;
+  ctx.beginPath();ctx.moveTo(cx,cy);
+  ctx.lineTo(cx+Math.cos(hourAngle)*(r*0.55), cy+Math.sin(hourAngle)*(r*0.55));
+  ctx.strokeStyle='#1c3c6e';ctx.lineWidth=7;ctx.lineCap='round';ctx.stroke();
+
+  // Minute hand
+  const minAngle=(minute/60)*Math.PI*2 - Math.PI/2;
+  ctx.beginPath();ctx.moveTo(cx,cy);
+  ctx.lineTo(cx+Math.cos(minAngle)*(r*0.78), cy+Math.sin(minAngle)*(r*0.78));
+  ctx.strokeStyle='#E53935';ctx.lineWidth=5;ctx.stroke();
+
+  // Centre dot
+  ctx.beginPath();ctx.arc(cx,cy,7,0,Math.PI*2);ctx.fillStyle='#333';ctx.fill();
+}
+
+// Build time strip
+const strip=document.getElementById('timeStrip');
+times.forEach((t,i)=>{
+  const btn=document.createElement('button');
+  btn.className='time-btn'+(i===0?' active':'');
+  btn.textContent=t.display;
+  btn.onclick=()=>learnGoTo(i);
+  strip.appendChild(btn);
+});
+
+let lCur=0;
+function renderLearn(){
+  const t=times[lCur];
+  drawClock('learnClock',t.h,t.m);
+  document.getElementById('learnTimeDisplay').textContent=t.display;
+  document.getElementById('learnTimeWord').textContent=t.word;
+  document.getElementById('learnTimeDesc').textContent=t.desc;
+  document.querySelectorAll('.time-btn').forEach((b,i)=>b.classList.toggle('active',i===lCur));
+  document.getElementById('lPrev').disabled=lCur===0;
+  document.getElementById('lNext').disabled=lCur===times.length-1;
+  document.getElementById('lCount').textContent=`${lCur+1} / ${times.length}`;
+}
+function lGo(dir){lCur=Math.max(0,Math.min(times.length-1,lCur+dir));renderLearn();}
+function learnGoTo(i){lCur=i;renderLearn();}
+function speakTime(){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  const t=times[lCur];
+  const u=new SpeechSynthesisUtterance(`The time is ${t.word}. ${t.desc}`);
+  u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);
+}
+
+// QUIZ
+let qScore=0;
+function newQuiz(){
+  const qi=Math.floor(Math.random()*times.length);
+  const correct=times[qi];
+  drawClock('quizClock',correct.h,correct.m,180);
+  document.getElementById('qFeedback').textContent='';
+  let opts=[correct.word];
+  while(opts.length<4){const rw=times[Math.floor(Math.random()*times.length)].word;if(!opts.includes(rw))opts.push(rw);}
+  opts=opts.sort(()=>Math.random()-0.5);
+  const container=document.getElementById('quizOpts');
+  container.innerHTML='';
+  opts.forEach(opt=>{
+    const btn=document.createElement('button');
+    btn.className='quiz-opt';btn.textContent=opt;
+    btn.onclick=()=>{
+      container.querySelectorAll('.quiz-opt').forEach(b=>b.onclick=null);
+      if(opt===correct.word){btn.classList.add('correct');qScore++;document.getElementById('qFeedback').textContent='✅ Correct! 🌟';document.getElementById('qFeedback').style.color='#2e7d32';}
+      else{btn.classList.add('wrong');container.querySelectorAll('.quiz-opt').forEach(b=>{if(b.textContent===correct.word)b.classList.add('correct');});document.getElementById('qFeedback').textContent=`❌ It is ${correct.word}`;document.getElementById('qFeedback').style.color='#c62828';}
+      document.getElementById('qScoreTxt').textContent=`Score: ${qScore} ⭐`;
+      setTimeout(newQuiz,2200);
+    };
+    container.appendChild(btn);
+  });
+}
+
+// ROUTINE
+const routine=[
+  {time:"7:00",word:"Seven o'clock",emoji:"☀️",act:"Wake up and stretch!"},
+  {time:"7:30",word:"Half past seven",emoji:"🪥",act:"Brush teeth and wash face"},
+  {time:"8:00",word:"Eight o'clock",emoji:"🍳",act:"Have breakfast"},
+  {time:"8:30",word:"Half past eight",emoji:"🚌",act:"Get on the school bus"},
+  {time:"9:00",word:"Nine o'clock",emoji:"🏫",act:"School starts — morning lessons"},
+  {time:"11:00",word:"Eleven o'clock",emoji:"🍎",act:"Snack time!"},
+  {time:"12:00",word:"Twelve o'clock",emoji:"🍱",act:"Lunch time"},
+  {time:"1:00",word:"One o'clock",emoji:"📖",act:"Afternoon lessons"},
+  {time:"3:00",word:"Three o'clock",emoji:"🏃",act:"School ends — play time!"},
+  {time:"5:00",word:"Five o'clock",emoji:"📚",act:"Homework time"},
+  {time:"7:00",word:"Seven o'clock",emoji:"🍽️",act:"Dinner with family"},
+  {time:"8:30",word:"Half past eight",emoji:"🛁",act:"Bath and bedtime story"},
+  {time:"9:00",word:"Nine o'clock",emoji:"😴",act:"Goodnight! Sleep well!"},
+];
+const rl=document.getElementById('routineList');
+routine.forEach(r=>{
+  const div=document.createElement('div');div.className='routine-item';
+  div.innerHTML=`<div class="emoji">${r.emoji}</div><div class="time-label">${r.time}<br><small style="font-size:0.75em;color:#888">${r.word}</small></div><div class="act">${r.act}</div>`;
+  rl.appendChild(div);
+});
+function readRoutine(){
+  if(!('speechSynthesis' in window))return;
+  window.speechSynthesis.cancel();
+  routine.forEach((r,i)=>{
+    const u=new SpeechSynthesisUtterance(`At ${r.word}: ${r.act}`);
+    u.rate=0.85;u.pitch=1.0;
+    setTimeout(()=>window.speechSynthesis.speak(u),i*3000);
+  });
+}
+
+function setMode(m,tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  document.getElementById('learnMode').style.display='none';
+  document.getElementById('quizMode').style.display='none';
+  document.getElementById('routineMode').style.display='none';
+  document.getElementById('timeStrip').style.display=m==='learn'?'flex':'none';
+  if(m==='learn'){document.getElementById('learnMode').style.display='flex';}
+  else if(m==='quiz'){document.getElementById('quizMode').style.display='flex';newQuiz();}
+  else{document.getElementById('routineMode').style.display='flex';}
+}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')lGo(1);if(e.key==='ArrowLeft')lGo(-1);});
+renderLearn();
+drawClock('quizClock',3,0);
+</script>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Father's Dragon</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:#1a0f00;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.4);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .topbar a:hover{background:rgba(255,255,255,0.35);}
+  .stage{flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding:20px;}
+  .book{width:780px;max-width:100%;background:white;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,0.6);overflow:hidden;min-height:480px;}
+  .page{display:none;min-height:480px;}
+  .page.active{display:flex;}
+  .pg-full{flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;}
+  .pg-split{flex-direction:row;}
+  .pg-split .left,.pg-split .right{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;}
+  .story-text{font-size:1.25em;line-height:1.85;color:#333;text-align:center;max-width:500px;}
+  .item-card{background:#fff9e6;border:3px solid #ffc107;border-radius:16px;padding:12px 18px;font-size:1em;color:#4e342e;margin:8px 0;text-align:left;max-width:280px;}
+  .item-card strong{color:#e65100;}
+  .chapter-badge{display:inline-block;background:#4e342e;color:white;font-size:0.8em;padding:4px 14px;border-radius:20px;margin-bottom:10px;}
+  .animal-block{background:#fff3e0;border-left:5px solid #ff6d00;border-radius:8px;padding:10px 16px;font-size:1.05em;color:#4e342e;margin:6px 0;max-width:320px;text-align:left;}
+
+  .cover{background:linear-gradient(160deg,#1b0000,#4e342e,#6d4c41);}
+  .cover-title{font-size:2.4em;font-weight:bold;color:white;text-shadow:2px 2px 8px rgba(0,0,0,0.4);line-height:1.2;margin:12px 0;}
+  .cover-sub{font-size:1em;color:rgba(255,255,255,0.85);margin-top:8px;}
+  .bg-city{background:linear-gradient(160deg,#e8eaf6,#ede7f6);}
+  .bg-jungle{background:linear-gradient(160deg,#e8f5e9,#c8e6c9);}
+  .bg-dark{background:linear-gradient(160deg,#1a2e0a,#2d4a1a);}
+  .bg-river{background:linear-gradient(160deg,#e3f2fd,#b3e5fc);}
+  .bg-tiger{background:linear-gradient(160deg,#fff3e0,#ffe0b2);}
+  .bg-croc{background:linear-gradient(160deg,#e0f2f1,#b2dfdb);}
+  .bg-lion{background:linear-gradient(160deg,#fff8e1,#ffecb3);}
+  .bg-gorilla{background:linear-gradient(160deg,#fce4ec,#f8bbd0);}
+  .bg-rescue{background:linear-gradient(160deg,#fffde7,#fff9c4);}
+  .bg-fly{background:linear-gradient(160deg,#e8f5e9,#b2dfdb);}
+  .bg-end{background:linear-gradient(135deg,#4e342e,#ff6d00);}
+
+  .bounce{display:inline-block;animation:bounce 1.5s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
+  .fly{display:inline-block;animation:fly 2s ease-in-out infinite;}
+  @keyframes fly{0%,100%{transform:translateY(0) rotate(-5deg);}50%{transform:translateY(-18px) rotate(5deg);}}
+  .roar{display:inline-block;animation:roar 1.2s ease-in-out infinite;}
+  @keyframes roar{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
+  .knapsack-items{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;font-size:1.8em;margin:10px 0;}
+
+  .nav{display:flex;justify-content:center;align-items:center;gap:20px;padding:18px;}
+  .nav-btn{border:none;border-radius:50px;padding:12px 32px;font-size:1.2em;font-family:inherit;cursor:pointer;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.2);transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+  .read-btn{background:#9C27B0;color:white;border:none;border-radius:50px;padding:12px 24px;font-size:1em;font-family:inherit;cursor:pointer;transition:transform 0.15s;}
+  .read-btn:hover{transform:scale(1.05);}
+  .dots{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:0 20px 14px;}
+  .dot{width:10px;height:10px;border-radius:50%;background:#ccc;cursor:pointer;transition:background 0.3s;}
+  .dot.active{background:#ff6d00;transform:scale(1.4);}
+  .dot.done{background:#ffcc80;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🐉 My Father's Dragon</span>
+  <span id="pageIndicator" style="color:white;font-size:0.95em">Page 1 of 15</span>
+</div>
+<div class="stage"><div class="book">
+
+  <!-- 1. COVER -->
+  <div class="page active pg-full cover">
+    <div class="fly" style="font-size:6em">🐉</div>
+    <div class="cover-title">My Father's Dragon</div>
+    <div style="font-size:2em;margin:10px 0">🧒 🌴 🐅 🐊 🦁 🦍 🐉</div>
+    <div class="cover-sub">Inspired by Ruth Stiles Gannett • A jungle rescue adventure!</div>
+  </div>
+
+  <!-- 2. ELMER MEETS THE CAT -->
+  <div class="page pg-split bg-city">
+    <div class="left">
+      <div style="font-size:5em">🧒</div>
+      <div style="font-weight:bold;color:#4e342e;margin-top:6px">Elmer Elevator</div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em">🐱</div>
+      <div class="story-text" style="font-size:1.1em;margin-top:12px">
+        One rainy day, Elmer found<br>a stray old cat.<br><br>
+        The cat told him a secret:
+      </div>
+      <div style="background:#fff3e0;border:3px solid #ff6d00;border-radius:14px;padding:14px 18px;font-size:1.05em;color:#4e342e;margin-top:10px;text-align:center">
+        <em>"A baby dragon is trapped<br>on Wild Island!<br>You must rescue him!"</em> 🐉
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. THE KNAPSACK -->
+  <div class="page pg-full bg-city">
+    <div class="story-text" style="margin-bottom:16px">
+      Elmer packed his knapsack with<br>everything he might need!
+    </div>
+    <div class="knapsack-items">🍭🍭🍭 🪥🪥🪥 🔍 ✂️ 🎀 🫧 🦴 🍫</div>
+    <div class="item-card">
+      🍭 <strong>Lollipops</strong> – lots of them<br>
+      🪥 <strong>Toothbrushes</strong> – 7 of them<br>
+      🔍 <strong>Magnifying glass</strong><br>
+      ✂️ <strong>Scissors & ribbons</strong><br>
+      🫧 <strong>Bubble gum</strong><br>
+      🦴 <strong>Rubber bones</strong>
+    </div>
+    <div style="font-size:1em;color:#888;margin-top:10px;font-style:italic">
+      Why these things? You'll see! 😏
+    </div>
+  </div>
+
+  <!-- 4. WILD ISLAND -->
+  <div class="page pg-full bg-dark">
+    <div class="story-text" style="color:white;margin-bottom:16px">
+      Elmer sailed across the ocean<br>and reached <strong style="color:#ffd54f">Wild Island!</strong>
+    </div>
+    <div style="font-size:4em;margin:10px 0">⛵ 🌊 🌴🌿🌴</div>
+    <div class="story-text" style="color:rgba(255,255,255,0.9)">
+      The jungle was dark and thick.<br>
+      Wild animals lived everywhere!<br><br>
+      <em style="color:#ffd54f">"I must find the baby dragon…"</em><br>
+      said Elmer bravely. 💪
+    </div>
+  </div>
+
+  <!-- 5. THE TIGERS -->
+  <div class="page pg-split bg-tiger">
+    <div class="left">
+      <div class="roar" style="font-size:4em">🐅🐅🐅🐅</div>
+      <div class="animal-block">
+        <strong>6 tigers</strong> blocked the path!<br>
+        "We are going to eat you!"
+      </div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em" class="bounce">🧒</div>
+      <div class="story-text" style="margin-top:10px">
+        <em>"Would you like some lollipops?"</em><br>said Elmer.<br><br>
+        <strong style="color:#e65100">🍭🍭🍭🍭🍭🍭</strong><br><br>
+        The tigers were SO happy,<br>they let Elmer pass! 🎉
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. THE RHINOCEROS -->
+  <div class="page pg-split bg-jungle">
+    <div class="left">
+      <div class="roar" style="font-size:4em">🦏</div>
+      <div class="animal-block">
+        A <strong>rhinoceros</strong> blocked the path!<br>
+        "You cannot pass!"
+      </div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em">🧒🔍</div>
+      <div class="story-text" style="margin-top:10px">
+        Elmer pulled out his<br><strong>magnifying glass!</strong><br><br>
+        <em>"Look at that tiny bug<br>on your horn!"</em><br><br>
+        The rhino looked and looked<br>and Elmer ran past! 🏃
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. THE LIONS -->
+  <div class="page pg-split bg-lion">
+    <div class="left">
+      <div class="roar" style="font-size:4em">🦁🦁🦁</div>
+      <div class="animal-block">
+        <strong>Lions</strong> blocked the path!<br>
+        "We will eat you for lunch!"
+      </div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em">🧒✂️🎀</div>
+      <div class="story-text" style="margin-top:10px">
+        <em>"Would you like a haircut<br>and pretty ribbons?"</em><br><br>
+        <strong style="color:#ff8f00">✂️🎀✂️🎀✂️🎀</strong><br><br>
+        The lions LOVED their new look<br>and let Elmer pass! 😄
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. THE GORILLAS -->
+  <div class="page pg-split bg-gorilla">
+    <div class="left">
+      <div class="roar" style="font-size:4em">🦍🦍🦍🦍🦍</div>
+      <div class="animal-block">
+        <strong>Gorillas</strong> blocked the path!<br>
+        "We won't let you through!"
+      </div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em">🧒🫧</div>
+      <div class="story-text" style="margin-top:10px">
+        <em>"Want some bubble gum?"</em><br><br>
+        <strong style="color:#e91e63">🫧🫧🫧🫧🫧</strong><br><br>
+        The gorillas chewed and blew<br>enormous bubbles!<br>
+        They forgot all about Elmer! 😂
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. THE CROCODILES -->
+  <div class="page pg-split bg-croc">
+    <div class="left">
+      <div class="roar" style="font-size:3.5em">🐊🐊🐊🐊🐊🐊🐊</div>
+      <div class="animal-block">
+        <strong>7 crocodiles</strong> in the river!<br>
+        "We'll snap you up!"
+      </div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em">🧒🪥</div>
+      <div class="story-text" style="margin-top:10px">
+        <em>"Would you like a toothbrush<br>each?"</em><br><br>
+        <strong style="color:#00897b">🪥🪥🪥🪥🪥🪥🪥</strong><br><br>
+        The crocodiles brushed their teeth<br>and Elmer used them as<br>stepping stones to cross! 🦶
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. FINDS THE DRAGON -->
+  <div class="page pg-full bg-rescue">
+    <div class="story-text" style="margin-bottom:16px">
+      Finally — Elmer found the<br>
+      <strong style="color:#ff6d00">baby dragon!</strong><br>
+      He was tied up with a rope. 😢
+    </div>
+    <div style="font-size:5em;margin:10px 0">🐉⛓️</div>
+    <div class="story-text">
+      <em>"Don't worry!"</em> said Elmer.<br>
+      <em>"I will set you free!"</em><br><br>
+      He used his scissors to cut<br>the rope — <strong>SNIP! SNIP! SNIP!</strong> ✂️
+    </div>
+  </div>
+
+  <!-- 11. FREE! -->
+  <div class="page pg-split bg-rescue">
+    <div class="left">
+      <div class="bounce" style="font-size:5em">🐉</div>
+      <div style="font-size:1.2em;font-weight:bold;color:#ff6d00;margin-top:8px">The dragon is FREE!</div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em">🧒😁</div>
+      <div class="story-text" style="margin-top:10px">
+        The dragon was SO happy!<br><br>
+        He nuzzled Elmer with his<br>golden-yellow wings. 💛<br><br>
+        <em>"Let's fly home!"</em> said Elmer.
+      </div>
+    </div>
+  </div>
+
+  <!-- 12. FLYING HOME -->
+  <div class="page pg-full bg-fly">
+    <div class="fly" style="font-size:6em">🐉</div>
+    <div style="font-size:3em;margin:10px 0">🧒 ↑ ☁️ 🌈 ☁️</div>
+    <div class="story-text" style="margin-top:10px">
+      Together they soared up<br>into the bright blue sky!<br><br>
+      Over the ocean, over the clouds,<br>all the way home! 🏠❤️
+    </div>
+  </div>
+
+  <!-- 13. THE ANIMALS' REACTION -->
+  <div class="page pg-full bg-dark">
+    <div style="font-size:3em;margin-bottom:14px">🐅🦏🦁🦍🐊</div>
+    <div class="story-text" style="color:white">
+      Back on Wild Island,<br>all the animals looked up.<br><br>
+      <em style="color:#ffd54f">"The dragon is gone!"</em><br><br>
+      They were <strong style="color:#ffd54f">very surprised.</strong><br><br>
+      But a small boy with a<br>knapsack full of treats<br>had outsmarted them all! 😏
+    </div>
+  </div>
+
+  <!-- 14. LESSONS -->
+  <div class="page pg-full bg-jungle">
+    <div style="font-size:4em;margin-bottom:16px">💡</div>
+    <div class="story-text" style="font-size:1.3em">
+      <strong style="color:#e65100">What did Elmer teach us?</strong><br><br>
+      🧠 Being clever beats being strong<br><br>
+      ❤️ Kindness can win over anyone<br><br>
+      🎒 Always be prepared!<br><br>
+      🐉 Friendship is worth any adventure
+    </div>
+  </div>
+
+  <!-- 15. THE END -->
+  <div class="page pg-full bg-end">
+    <div class="fly" style="font-size:6em">🐉</div>
+    <div style="font-size:3em;font-weight:bold;color:white;text-shadow:2px 2px 6px rgba(0,0,0,0.3);margin:16px 0">The End!</div>
+    <div style="font-size:1.1em;color:rgba(255,255,255,0.9);margin-bottom:20px">
+      Bravery + cleverness = any adventure! 🌟
+    </div>
+    <a href="../../index.html" style="background:white;color:#4e342e;padding:12px 28px;border-radius:30px;text-decoration:none;font-size:1.1em;font-weight:bold;">🏠 Back to Home</a>
+  </div>
+
+</div></div>
+<div class="dots" id="dots"></div>
+<div class="nav">
+  <button class="nav-btn prev" id="prevBtn" onclick="changePage(-1)" disabled>◀ Prev</button>
+  <button class="read-btn" onclick="readPage()">🔊 Read Aloud</button>
+  <button class="nav-btn next" id="nextBtn" onclick="changePage(1)">Next ▶</button>
+</div>
+<script>
+const pages=document.querySelectorAll('.page'),totalPages=pages.length;let current=0;
+const dotsEl=document.getElementById('dots');
+pages.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);d.style.cursor='pointer';dotsEl.appendChild(d);});
+function updateUI(){pages.forEach((p,i)=>p.classList.toggle('active',i===current));document.querySelectorAll('.dot').forEach((d,i)=>{d.className='dot'+(i===current?' active':i<current?' done':'');});document.getElementById('prevBtn').disabled=current===0;document.getElementById('nextBtn').disabled=current===totalPages-1;document.getElementById('pageIndicator').textContent=`Page ${current+1} of ${totalPages}`;}
+function changePage(dir){current=Math.max(0,Math.min(totalPages-1,current+dir));updateUI();}
+function goTo(i){current=i;updateUI();}
+const pageTexts=["My Father's Dragon! A jungle rescue adventure.","One rainy day, Elmer found a stray old cat. The cat told him a secret. A baby dragon is trapped on Wild Island! You must rescue him!","Elmer packed his knapsack with lollipops, toothbrushes, a magnifying glass, scissors, ribbons, bubble gum, and rubber bones.","Elmer sailed across the ocean and reached Wild Island! The jungle was dark and thick. Wild animals lived everywhere!","Six tigers blocked the path! We are going to eat you! Would you like some lollipops? said Elmer. The tigers were so happy they let Elmer pass!","A rhinoceros blocked the path! You cannot pass! Elmer pulled out his magnifying glass. Look at that tiny bug on your horn! The rhino looked and Elmer ran past!","Lions blocked the path! Would you like a haircut and pretty ribbons? The lions loved their new look and let Elmer pass!","Gorillas blocked the path! Want some bubble gum? The gorillas chewed and blew enormous bubbles and forgot all about Elmer!","Seven crocodiles were in the river! Would you like a toothbrush each? The crocodiles brushed their teeth and Elmer used them as stepping stones!","Finally Elmer found the baby dragon tied up with a rope. Don't worry! I will set you free! He used his scissors to cut the rope. Snip snip snip!","The dragon was free! He was so happy! He nuzzled Elmer with his golden yellow wings. Let's fly home! said Elmer.","Together they soared up into the bright blue sky! Over the ocean, over the clouds, all the way home!","Back on Wild Island, all the animals looked up. The dragon is gone! They were very surprised. A small boy had outsmarted them all!","What did Elmer teach us? Being clever beats being strong. Kindness can win over anyone. Always be prepared. Friendship is worth any adventure.","The End! Bravery plus cleverness equals any adventure!"];
+function readPage(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(pageTexts[current]);u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')changePage(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')changePage(-1);});
+updateUI();
+</script>
+</body>
+</html>

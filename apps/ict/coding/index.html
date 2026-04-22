@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coding Blocks – ScratchJr Style</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#1a237e,#283593,#e53935,#c62828);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.3);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .tabs{display:flex;gap:8px;padding:12px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:9px 20px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.12);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#1a237e;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.3);}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+  .card{width:820px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.35);padding:20px 24px;}
+
+  /* BLOCK TYPES */
+  .block{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:12px;font-size:1em;font-weight:bold;cursor:pointer;user-select:none;border:none;font-family:inherit;color:white;transition:all 0.2s;position:relative;}
+  .block:hover{transform:scale(1.05);}
+  .block.move{background:#4caf50;}
+  .block.turn{background:#ff9800;}
+  .block.repeat{background:#9c27b0;}
+  .block.say{background:#2196f3;}
+  .block.sound{background:#e91e63;}
+  .block.wait{background:#607d8b;}
+  .block.start{background:#43a047;border-radius:20px 12px 12px 20px;}
+  .block.end{background:#c62828;border-radius:12px 20px 20px 12px;}
+
+  /* PALETTE */
+  .palette{display:flex;flex-wrap:wrap;gap:10px;padding:14px;background:#f5f5f5;border-radius:16px;margin-bottom:14px;}
+  .palette-section{flex:1;min-width:150px;}
+  .palette-title{font-size:0.8em;font-weight:bold;color:#666;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+
+  /* PROGRAM AREA */
+  .program-area{min-height:130px;background:#e8eaf6;border-radius:16px;padding:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;border:3px dashed #9fa8da;transition:all 0.2s;}
+  .program-area.has-blocks{border-color:#3f51b5;border-style:solid;}
+  .prog-block{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;font-size:0.95em;font-weight:bold;color:white;cursor:pointer;position:relative;}
+  .prog-block::after{content:'×';position:absolute;top:-6px;right:-6px;background:#e53935;color:white;border-radius:50%;width:18px;height:18px;font-size:0.75em;display:flex;align-items:center;justify-content:center;line-height:18px;}
+  .prog-block:hover::after{background:#b71c1c;}
+
+  /* CANVAS / STAGE */
+  .stage-wrap{position:relative;border-radius:16px;overflow:hidden;background:#e3f2fd;border:2px solid #90caf9;}
+  .stage-wrap canvas{display:block;}
+  .stage-controls{display:flex;gap:10px;justify-content:center;margin-top:10px;}
+
+  /* CHALLENGES */
+  .challenge-card{background:linear-gradient(135deg,#e8eaf6,#c5cae9);border-radius:18px;padding:16px;margin:10px 0;cursor:pointer;border:2px solid transparent;transition:all 0.2s;}
+  .challenge-card:hover{border-color:#3f51b5;transform:translateY(-2px);}
+  .challenge-card.done{border-color:#4caf50;background:linear-gradient(135deg,#e8f5e9,#c8e6c9);}
+  .ch-title{font-size:1em;font-weight:bold;color:#1a237e;margin-bottom:4px;}
+  .ch-desc{font-size:0.85em;color:#555;}
+  .ch-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:0.75em;color:white;margin-top:6px;}
+
+  .feedback{font-size:1.1em;font-weight:bold;text-align:center;min-height:32px;margin-top:8px;}
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-top:12px;}
+  .action-btn{border:none;border-radius:50px;padding:11px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+
+  .arrow{font-size:1.5em;color:#9fa8da;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🤖 Coding Blocks – ScratchJr Style</span>
+  <span style="color:white;font-size:0.9em">ICT</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="setMode('learn',this)">📖 Learn Blocks</button>
+  <button class="tab" onclick="setMode('build',this)">🏗️ Build & Run</button>
+  <button class="tab" onclick="setMode('challenges',this)">🏆 Challenges</button>
+  <button class="tab" onclick="setMode('debug',this)">🐛 Debug It!</button>
+</div>
+<div class="main">
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+const blockTypes = [
+  {type:'start', icon:'🏁', label:'Start', color:'#43a047', desc:'Every program starts here! This is the first block.'},
+  {type:'move', icon:'➡️', label:'Move Forward', color:'#4caf50', desc:'Move the character forward by steps.', param:true, paramLabel:'steps', default:1},
+  {type:'turn', icon:'🔄', label:'Turn Right', color:'#ff9800', desc:'Turn the character to the right.', param:true, paramLabel:'turns', default:1},
+  {type:'turnl', icon:'↩️', label:'Turn Left', color:'#ff6f00', desc:'Turn the character to the left.', param:true, paramLabel:'turns', default:1},
+  {type:'repeat', icon:'🔁', label:'Repeat', color:'#9c27b0', desc:'Do something again and again!', param:true, paramLabel:'times', default:2},
+  {type:'say', icon:'💬', label:'Say', color:'#2196f3', desc:'Make the character say something!', textParam:true, default:'Hello!'},
+  {type:'sound', icon:'🎵', label:'Play Sound', color:'#e91e63', desc:'Play a fun sound!'},
+  {type:'wait', icon:'⏸️', label:'Wait', color:'#607d8b', desc:'Pause for a moment.', param:true, paramLabel:'seconds', default:1},
+  {type:'end', icon:'🏁', label:'End', color:'#c62828', desc:'The program finishes here!'},
+];
+
+const challenges = [
+  {title:'Challenge 1: Say Hello!', desc:'Make the cat say "Hello!"', difficulty:'Easy',
+   solution:[{type:'start'},{type:'say',text:'Hello!'},{type:'end'}],
+   hint:'Use: Start → Say "Hello!" → End'},
+  {title:'Challenge 2: Walk Forward', desc:'Make the cat move 3 steps forward', difficulty:'Easy',
+   solution:[{type:'start'},{type:'move',n:3},{type:'end'}],
+   hint:'Use: Start → Move 3 → End'},
+  {title:'Challenge 3: Draw a Line', desc:'Move forward 5 steps, then say "Done!"', difficulty:'Medium',
+   solution:[{type:'start'},{type:'move',n:5},{type:'say',text:'Done!'},{type:'end'}],
+   hint:'Start → Move 5 → Say Done → End'},
+  {title:'Challenge 4: Turn Around', desc:'Move forward 2 steps then turn right', difficulty:'Medium',
+   solution:[{type:'start'},{type:'move',n:2},{type:'turn',n:1},{type:'end'}],
+   hint:'Start → Move 2 → Turn Right → End'},
+  {title:'Challenge 5: Do it 3 Times!', desc:'Use Repeat 3 to move forward', difficulty:'Hard',
+   solution:[{type:'start'},{type:'repeat',n:3},{type:'move',n:1},{type:'end'}],
+   hint:'Start → Repeat 3 → Move 1 → End'},
+];
+
+const debugPrograms = [
+  {title:'Bug 1: Missing Start!', desc:'This program is missing the Start block. Which block is wrong?',
+   blocks:[{type:'move',n:2},{type:'say',text:'Hi!'},{type:'end'}],
+   bug:0, fix:{type:'start'},
+   explain:'Every program MUST start with a Start block! Without it, the computer doesn\'t know when to begin.'},
+  {title:'Bug 2: Wrong order!', desc:'The cat says "Hi" BEFORE moving. Fix the order!',
+   blocks:[{type:'start'},{type:'say',text:'Hi!'},{type:'move',n:3},{type:'end'}],
+   bug:1, explanation:'Say should come AFTER move in this challenge.'},
+  {title:'Bug 3: Too many steps!', desc:'The cat should move 2 steps, but it moves 10! Which block is wrong?',
+   blocks:[{type:'start'},{type:'move',n:10},{type:'say',text:'Done!'},{type:'end'}],
+   bug:1, correctVal:2,
+   explain:'The move block says 10 but it should say 2!'},
+];
+
+let mode = 'learn';
+let learnIdx = 0;
+let program = [];
+let catX = 200, catY = 150, catAngle = 0;
+let doneChallenges = new Set();
+let debugIdx = 0;
+let debugSelected = null;
+
+function setMode(m, tab) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  render();
+}
+
+function render() {
+  if (mode==='learn') renderLearn();
+  else if (mode==='build') renderBuild();
+  else if (mode==='challenges') renderChallenges();
+  else renderDebug();
+}
+
+// ========== LEARN ==========
+function renderLearn() {
+  const b = blockTypes[learnIdx];
+  const allBlocksHTML = blockTypes.map((bt,i)=>`
+    <div class="block ${bt.type}" onclick="learnIdx=${i};renderLearn()" style="background:${bt.color};${i===learnIdx?'outline:3px solid #333;transform:scale(1.08)':''}">
+      ${bt.icon} ${bt.label}
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#1a237e;margin-bottom:12px">📖 Coding Blocks – What does each block do?</div>
+    <div class="palette">${allBlocksHTML}</div>
+    <div style="background:#e8eaf6;border-radius:18px;padding:20px;border-left:5px solid ${b.color}">
+      <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px">
+        <div class="block ${b.type}" style="background:${b.color};font-size:1.3em;pointer-events:none">${b.icon} ${b.label}</div>
+      </div>
+      <div style="font-size:1em;color:#333;line-height:1.6">${b.desc}</div>
+      ${b.param ? `<div style="margin-top:10px;font-size:0.9em;color:#555">⚙️ This block has a <b>${b.paramLabel}</b> setting. You can change how many!</div>` : ''}
+      ${b.textParam ? `<div style="margin-top:10px;font-size:0.9em;color:#555">⌨️ You can type any message for the character to say!</div>` : ''}
+    </div>
+    <div style="background:#fff3e0;border-radius:14px;padding:12px;margin-top:12px;font-size:0.9em;color:#e65100">
+      💡 <b>Tip:</b> In coding, these building blocks are called <b>commands</b>. Put them together to make a <b>program</b>!
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#607D8B" onclick="learnIdx=Math.max(0,learnIdx-1);renderLearn()" ${learnIdx===0?'disabled':''}>◀ Prev</button>
+      <button class="action-btn" style="background:#1a237e" onclick="speak('${b.label}. ${b.desc}')">🔊 Read</button>
+      <button class="action-btn" style="background:#43a047" onclick="learnIdx=Math.min(${blockTypes.length-1},learnIdx+1);renderLearn()" ${learnIdx===blockTypes.length-1?'disabled':''}>Next ▶</button>
+    </div>
+    <div style="text-align:center;margin-top:10px">
+      ${blockTypes.map((_,i)=>`<span style="display:inline-block;width:10px;height:10px;border-radius:50%;margin:2px;background:${i===learnIdx?'#1a237e':'#ddd'}"></span>`).join('')}
+    </div>
+  `;
+}
+
+// ========== BUILD & RUN ==========
+function renderBuild() {
+  // Draw cat on canvas
+  const paletteHTML = blockTypes.map(bt=>`
+    <div class="block ${bt.type}" style="background:${bt.color};margin:4px" onclick="addBlock('${bt.type}')">
+      ${bt.icon} ${bt.label}
+    </div>`).join('');
+
+  const programHTML = program.length ? program.map((b,i)=>`
+    <div class="prog-block ${b.type}" style="background:${blockTypes.find(bt=>bt.type===b.type)?.color||'#999'}" onclick="removeBlock(${i})">
+      ${getBlockEmoji(b.type)} ${getBlockLabel(b)}
+    </div>`).join('<span class="arrow">→</span>') : '<span style="color:#9fa8da;font-size:0.95em">👈 Click blocks from the palette to build your program!</span>';
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.1em;font-weight:bold;color:#1a237e;margin-bottom:10px">🏗️ Build Your Program!</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start">
+      <div>
+        <div style="font-size:0.85em;font-weight:bold;color:#666;margin-bottom:8px">🧩 BLOCK PALETTE — tap to add:</div>
+        <div class="palette" style="flex-direction:column">${paletteHTML}</div>
+      </div>
+      <div>
+        <div style="font-size:0.85em;font-weight:bold;color:#666;margin-bottom:8px">📝 YOUR PROGRAM (tap block to remove):</div>
+        <div class="program-area ${program.length?'has-blocks':''}" id="progArea">${programHTML}</div>
+        <div class="stage-wrap" style="margin-top:12px">
+          <canvas id="stage" width="280" height="200"></canvas>
+        </div>
+        <div id="catSpeech" style="text-align:center;font-size:1em;color:#2196f3;font-weight:bold;min-height:24px;margin-top:4px"></div>
+        <div class="feedback" id="feedback"></div>
+        <div class="btn-row">
+          <button class="action-btn" style="background:#43a047" onclick="runProgram()">▶ Run!</button>
+          <button class="action-btn" style="background:#9C27B0" onclick="program=[];catX=140;catY=100;catAngle=0;renderBuild()">🗑️ Clear</button>
+        </div>
+      </div>
+    </div>
+  `;
+  drawCat();
+}
+
+function getBlockEmoji(type) {
+  const b = blockTypes.find(bt=>bt.type===type);
+  return b ? b.icon : '❓';
+}
+
+function getBlockLabel(b) {
+  const bt = blockTypes.find(t=>t.type===b.type);
+  if (!bt) return b.type;
+  if (b.text) return bt.label + ': "' + b.text + '"';
+  if (b.n) return bt.label + ' ' + b.n;
+  return bt.label;
+}
+
+function addBlock(type) {
+  const bt = blockTypes.find(t=>t.type===type);
+  const block = {type};
+  if (bt?.param) block.n = bt.default || 1;
+  if (bt?.textParam) block.text = bt.default || 'Hello!';
+  program.push(block);
+  renderBuild();
+}
+
+function removeBlock(i) {
+  program.splice(i,1);
+  renderBuild();
+}
+
+function drawCat(angle) {
+  const canvas = document.getElementById('stage');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // Grid
+  ctx.strokeStyle = '#e0e0e0'; ctx.lineWidth=1;
+  for(let x=0;x<canvas.width;x+=20){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();}
+  for(let y=0;y<canvas.height;y+=20){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
+
+  const x = catX, y = catY;
+  const a = (catAngle||0) * Math.PI/180;
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(a);
+  // Draw cat emoji
+  ctx.font='36px serif';
+  ctx.textAlign='center';
+  ctx.textBaseline='middle';
+  ctx.fillText('😺',0,0);
+  // Direction arrow
+  ctx.strokeStyle='#f57f17';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(0,-22);ctx.lineTo(0,-32);
+  ctx.lineTo(-5,-27);ctx.moveTo(0,-32);ctx.lineTo(5,-27);
+  ctx.stroke();
+  ctx.restore();
+}
+
+async function runProgram() {
+  if (!program.length) { document.getElementById('feedback').textContent='Add some blocks first!'; return; }
+  catX=140; catY=100; catAngle=0;
+  drawCat();
+  const fb = document.getElementById('feedback');
+  fb.textContent='▶ Running...';
+  fb.style.color='#2196f3';
+
+  for (let i=0; i<program.length; i++) {
+    const b = program[i];
+    await sleep(400);
+    if (b.type==='move') {
+      const rad = catAngle * Math.PI/180;
+      catX += Math.sin(rad) * (b.n||1) * 20;
+      catY -= Math.cos(rad) * (b.n||1) * 20;
+      catX = Math.max(20, Math.min(260, catX));
+      catY = Math.max(20, Math.min(180, catY));
+      drawCat();
+    } else if (b.type==='turn') {
+      catAngle += 90;
+      drawCat();
+    } else if (b.type==='turnl') {
+      catAngle -= 90;
+      drawCat();
+    } else if (b.type==='say') {
+      const sp = document.getElementById('catSpeech');
+      if(sp) { sp.textContent='💬 "' + (b.text||'Hello!') + '"'; }
+      speak(b.text||'Hello!');
+      await sleep(1000);
+      if(sp) sp.textContent='';
+    } else if (b.type==='sound') {
+      speak('Beep boop! I am a robot!');
+      await sleep(800);
+    } else if (b.type==='wait') {
+      await sleep((b.n||1)*600);
+    } else if (b.type==='repeat') {
+      // Simple: mark repeat, visual only
+    }
+  }
+  fb.textContent = '✅ Program finished! 🎉';
+  fb.style.color='#2e7d32';
+  speak('Program finished!');
+}
+
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
+
+// ========== CHALLENGES ==========
+function renderChallenges() {
+  const cardsHTML = challenges.map((c,i)=>`
+    <div class="challenge-card ${doneChallenges.has(i)?'done':''}" onclick="startChallenge(${i})">
+      <div class="ch-title">${doneChallenges.has(i)?'✅ ':''} ${c.title}</div>
+      <div class="ch-desc">${c.desc}</div>
+      <span class="ch-badge" style="background:${c.difficulty==='Easy'?'#43a047':c.difficulty==='Medium'?'#ff9800':'#e53935'}">${c.difficulty}</span>
+      ${doneChallenges.has(i)?'<span class="ch-badge" style="background:#4caf50;margin-left:6px">⭐ Done!</span>':''}
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#1a237e;margin-bottom:6px">🏆 Coding Challenges</div>
+    <div style="font-size:0.9em;color:#888;margin-bottom:14px;text-align:center">Build the right program to complete each challenge!</div>
+    ${cardsHTML}
+    <div style="background:#e8eaf6;border-radius:14px;padding:12px;margin-top:10px;font-size:0.9em;color:#1a237e;text-align:center">
+      ⭐ Completed: ${doneChallenges.size} / ${challenges.length}
+    </div>
+  `;
+}
+
+function startChallenge(idx) {
+  const c = challenges[idx];
+  program = [];
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.1em;font-weight:bold;color:#1a237e;margin-bottom:6px">${c.title}</div>
+    <div style="font-size:0.95em;color:#555;margin-bottom:4px">${c.desc}</div>
+    <div style="background:#fff3e0;border-radius:10px;padding:8px 14px;font-size:0.9em;color:#e65100;margin-bottom:12px">💡 Hint: ${c.hint}</div>
+
+    <div style="font-size:0.85em;font-weight:bold;color:#666;margin-bottom:8px">🧩 Add blocks:</div>
+    <div class="palette">
+      ${blockTypes.map(bt=>`<div class="block ${bt.type}" style="background:${bt.color}" onclick="addChallengeBlock('${bt.type}',${idx})">${bt.icon} ${bt.label}</div>`).join('')}
+    </div>
+
+    <div style="font-size:0.85em;font-weight:bold;color:#666;margin:8px 0">📝 Your program:</div>
+    <div class="program-area ${program.length?'has-blocks':''}" id="progArea">
+      ${program.length ? program.map((b,i)=>`<div class="prog-block ${b.type}" style="background:${blockTypes.find(bt=>bt.type===b.type)?.color||'#999'}" onclick="removeChallengeBlock(${i},${idx})">${getBlockEmoji(b.type)} ${getBlockLabel(b)}</div>`).join('<span class="arrow">→</span>') : '<span style="color:#9fa8da">👈 Add blocks!</span>'}
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#43a047" onclick="checkChallenge(${idx})">✅ Check!</button>
+      <button class="action-btn" style="background:#9C27B0" onclick="program=[];startChallenge(${idx})">🗑️ Clear</button>
+      <button class="action-btn" style="background:#607D8B" onclick="renderChallenges()">← Back</button>
+    </div>
+  `;
+}
+
+function addChallengeBlock(type, cIdx) { addBlock(type); startChallenge(cIdx); }
+function removeChallengeBlock(i, cIdx) { program.splice(i,1); startChallenge(cIdx); }
+
+function checkChallenge(idx) {
+  const c = challenges[idx];
+  const fb = document.getElementById('feedback');
+  // Simple check: match types
+  const pTypes = program.map(b=>b.type);
+  const sTypes = c.solution.map(b=>b.type);
+  const match = pTypes.join(',') === sTypes.join(',');
+  if (match) {
+    doneChallenges.add(idx);
+    fb.textContent = '🎉 Brilliant! Challenge complete! ⭐';
+    fb.style.color = '#2e7d32';
+    speak('Brilliant! Challenge complete!');
+  } else {
+    fb.textContent = '❌ Not quite right. Check your blocks and try again!';
+    fb.style.color = '#c62828';
+  }
+}
+
+// ========== DEBUG ==========
+function renderDebug() {
+  const dp = debugPrograms[debugIdx];
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#c62828;margin-bottom:6px">🐛 Debug It! Find the Bug!</div>
+    <div style="font-size:0.9em;color:#888;margin-bottom:14px;text-align:center">In coding, a <b>bug</b> is a mistake in the program. Find the wrong block!</div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px">
+      ${debugPrograms.map((d,i)=>`<button style="padding:7px 16px;border-radius:50px;border:2px solid ${i===debugIdx?'#c62828':'#ccc'};background:${i===debugIdx?'#c62828':'white'};color:${i===debugIdx?'white':'#333'};font-family:inherit;font-size:0.9em;cursor:pointer" onclick="debugIdx=${i};debugSelected=null;renderDebug()">${d.title.split(':')[0]}</button>`).join('')}
+    </div>
+    <div style="background:#ffebee;border-radius:14px;padding:14px;margin-bottom:14px;border-left:4px solid #c62828">
+      <div style="font-size:1em;font-weight:bold;color:#c62828;margin-bottom:6px">${dp.title}</div>
+      <div style="font-size:0.9em;color:#555">${dp.desc}</div>
+    </div>
+    <div style="font-size:0.9em;font-weight:bold;color:#666;margin-bottom:8px">👇 Tap the block that has the bug:</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:14px;background:#f5f5f5;border-radius:14px;margin-bottom:12px">
+      ${dp.blocks.map((b,i)=>`
+        <div class="block ${b.type}" style="background:${blockTypes.find(bt=>bt.type===b.type)?.color||'#999'};${debugSelected===i?'outline:3px solid #333;transform:scale(1.08)':''}" onclick="selectDebugBlock(${i})">
+          ${getBlockEmoji(b.type)} ${getBlockLabel(b)}
+        </div>
+        ${i<dp.blocks.length-1?'<span class="arrow">→</span>':''}`).join('')}
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#607D8B" onclick="debugIdx=Math.max(0,debugIdx-1);debugSelected=null;renderDebug()" ${debugIdx===0?'disabled':''}>◀ Prev</button>
+      <button class="action-btn" style="background:#43a047" onclick="debugIdx=Math.min(${debugPrograms.length-1},debugIdx+1);debugSelected=null;renderDebug()" ${debugIdx===debugPrograms.length-1?'disabled':''}>Next ▶</button>
+    </div>
+  `;
+}
+
+function selectDebugBlock(i) {
+  debugSelected = i;
+  const dp = debugPrograms[debugIdx];
+  const fb = document.getElementById('feedback');
+  if (i === dp.bug) {
+    fb.textContent = '🎉 You found the bug! 🐛 ' + (dp.explain||'Great debugging!');
+    fb.style.color = '#2e7d32';
+    speak('You found the bug! Great debugging!');
+  } else {
+    fb.textContent = '❌ That block is fine! Look more carefully...';
+    fb.style.color = '#c62828';
+  }
+  renderDebug();
+  document.getElementById('feedback').textContent = fb.textContent;
+  document.getElementById('feedback').style.color = fb.style.color;
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate=0.85; u.pitch=1.1;
+  window.speechSynthesis.speak(u);
+}
+
+render();
+</script>
+</body>
+</html>

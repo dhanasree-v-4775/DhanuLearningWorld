@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Counting 1–20</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Comic Sans MS', 'Chalkboard SE', cursive;
+    min-height: 100vh;
+    background: #0f2027;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .topbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(0,0,0,0.3);
+    color: white;
+  }
+  .topbar a {
+    color: white; text-decoration: none;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 14px; border-radius: 20px;
+    transition: background 0.2s;
+  }
+  .topbar a:hover { background: rgba(255,255,255,0.35); }
+
+  /* NUMBER STRIP */
+  .num-strip {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 20px;
+    background: rgba(0,0,0,0.2);
+    width: 100%;
+  }
+  .num-btn {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    font-size: 1em;
+    font-family: inherit;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.2s;
+  }
+  .num-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.3); }
+  .num-btn.active { border-color: gold; background: gold; color: #333; transform: scale(1.2); }
+  .num-btn.done { background: rgba(100,220,100,0.4); border-color: #4CAF50; }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    width: 90%; max-width: 700px;
+    padding: 10px 0 4px;
+  }
+  .progress-bar {
+    height: 10px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f7971e, #ffd200);
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+  .progress-label {
+    color: rgba(255,255,255,0.7);
+    font-size: 0.85em;
+    text-align: right;
+    padding-top: 4px;
+  }
+
+  /* MAIN CARD */
+  .card-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    width: 100%;
+  }
+  .card {
+    width: 720px;
+    max-width: 100%;
+    background: white;
+    border-radius: 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 32px 16px;
+    gap: 20px;
+  }
+  .num-big {
+    font-size: 9em;
+    font-weight: bold;
+    line-height: 1;
+    transition: color 0.4s;
+    min-width: 160px;
+    text-align: center;
+    animation: popIn 0.4s ease;
+  }
+  @keyframes popIn {
+    0% { transform: scale(0.4); opacity:0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity:1; }
+  }
+  .num-word {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #555;
+    text-align: center;
+    flex: 1;
+    border-left: 3px dashed #eee;
+    padding-left: 24px;
+  }
+  .num-word span { display: block; font-size: 0.5em; color: #999; font-weight: normal; }
+
+  /* OBJECTS GRID */
+  .objects-section {
+    padding: 10px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .objects-label {
+    font-size: 1em;
+    color: #888;
+    text-align: center;
+  }
+  .objects-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    max-width: 560px;
+  }
+  .obj {
+    font-size: 2.5em;
+    cursor: pointer;
+    transition: transform 0.15s;
+    animation: dropIn 0.3s ease both;
+    user-select: none;
+    filter: grayscale(0%);
+  }
+  .obj:hover { transform: scale(1.3) rotate(10deg); }
+  @keyframes dropIn {
+    0% { transform: scale(0) rotate(-20deg); opacity:0; }
+    100% { transform: scale(1) rotate(0); opacity:1; }
+  }
+  .obj.counted {
+    filter: drop-shadow(0 0 6px gold);
+    transform: scale(1.1);
+  }
+
+  /* COUNT BUTTON */
+  .count-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0 28px 24px;
+  }
+  .count-btn {
+    background: #9C27B0;
+    color: white; border: none;
+    border-radius: 50px;
+    padding: 12px 28px;
+    font-size: 1.1em;
+    font-family: inherit;
+    cursor: pointer;
+    transition: transform 0.15s;
+    box-shadow: 0 4px 12px rgba(156,39,176,0.4);
+  }
+  .count-btn:hover { transform: scale(1.05); }
+  .count-btn.reset { background: #FF7043; box-shadow: 0 4px 12px rgba(255,112,67,0.4); }
+
+  .count-display {
+    font-size: 1.3em;
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 50px;
+    background: #f5f5f5;
+    color: #333;
+    min-width: 140px;
+    text-align: center;
+  }
+
+  /* NAVIGATION */
+  .nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    padding: 14px;
+  }
+  .nav-btn {
+    border: none; border-radius: 50px;
+    padding: 12px 30px;
+    font-size: 1.15em;
+    font-family: inherit;
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    transition: transform 0.15s;
+  }
+  .nav-btn.prev { background: #FF7043; }
+  .nav-btn.next { background: #4CAF50; }
+  .nav-btn:hover { transform: scale(1.05); }
+  .nav-btn:disabled { background: #555; cursor: not-allowed; transform: none; }
+  .nav-count { color: white; font-size: 1.1em; min-width: 80px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🔢 Counting 1 – 20</span>
+  <span style="color:white;font-size:0.9em">Grade 1 Maths</span>
+</div>
+
+<div class="num-strip" id="numStrip"></div>
+
+<div class="progress-wrap">
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div class="progress-label" id="progressLabel">1 of 20</div>
+</div>
+
+<div class="card-wrap">
+  <div class="card" id="mainCard">
+    <div class="card-top">
+      <div class="num-big" id="numBig">1</div>
+      <div class="num-word" id="numWord">One<span>number word</span></div>
+    </div>
+    <div class="objects-section">
+      <div class="objects-label">Tap each 🎯 to count them!</div>
+      <div class="objects-grid" id="objectsGrid"></div>
+    </div>
+    <div class="count-row">
+      <button class="count-btn reset" onclick="resetCount()">🔄 Reset</button>
+      <div class="count-display" id="countDisplay">Counted: 0</div>
+      <button class="count-btn" onclick="speakNumber()">🔊 Say It!</button>
+    </div>
+  </div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn prev" id="prevBtn" onclick="go(-1)" disabled>◀ Prev</button>
+  <span class="nav-count" id="navCount">1 / 20</span>
+  <button class="nav-btn next" id="nextBtn" onclick="go(1)">Next ▶</button>
+</div>
+
+<script>
+const data = [
+  { n:1,  word:'One',       emoji:'⭐' },
+  { n:2,  word:'Two',       emoji:'🍎' },
+  { n:3,  word:'Three',     emoji:'🐸' },
+  { n:4,  word:'Four',      emoji:'🌸' },
+  { n:5,  word:'Five',      emoji:'🦋' },
+  { n:6,  word:'Six',       emoji:'🍊' },
+  { n:7,  word:'Seven',     emoji:'🌈' },
+  { n:8,  word:'Eight',     emoji:'🐢' },
+  { n:9,  word:'Nine',      emoji:'🍇' },
+  { n:10, word:'Ten',       emoji:'🎈' },
+  { n:11, word:'Eleven',    emoji:'🌻' },
+  { n:12, word:'Twelve',    emoji:'🐠' },
+  { n:13, word:'Thirteen',  emoji:'🍓' },
+  { n:14, word:'Fourteen',  emoji:'🐝' },
+  { n:15, word:'Fifteen',   emoji:'🌙' },
+  { n:16, word:'Sixteen',   emoji:'🦄' },
+  { n:17, word:'Seventeen', emoji:'🍉' },
+  { n:18, word:'Eighteen',  emoji:'🐙' },
+  { n:19, word:'Nineteen',  emoji:'🌺' },
+  { n:20, word:'Twenty',    emoji:'🏆' },
+];
+
+const colors = [
+  '#E53935','#D81B60','#8E24AA','#3949AB','#1E88E5',
+  '#039BE5','#00ACC1','#00897B','#43A047','#7CB342',
+  '#C0CA33','#FDD835','#FFB300','#FB8C00','#F4511E',
+  '#6D4C41','#546E7A','#5E35B1','#00897B','#FF8F00'
+];
+
+let cur = 0;
+let countedItems = new Set();
+
+// Build number strip
+const strip = document.getElementById('numStrip');
+data.forEach((d, i) => {
+  const btn = document.createElement('button');
+  btn.className = 'num-btn' + (i===0?' active':'');
+  btn.textContent = d.n;
+  btn.id = `nb${i}`;
+  btn.onclick = () => goTo(i);
+  strip.appendChild(btn);
+});
+
+function render() {
+  const d = data[cur];
+  const col = colors[cur];
+  countedItems.clear();
+
+  // Number
+  const numBig = document.getElementById('numBig');
+  numBig.style.animation = 'none';
+  numBig.offsetHeight;
+  numBig.style.animation = 'popIn 0.4s ease';
+  numBig.textContent = d.n;
+  numBig.style.color = col;
+
+  document.getElementById('numWord').innerHTML = `${d.word}<span>number word</span>`;
+  document.getElementById('mainCard').style.borderTop = `6px solid ${col}`;
+
+  // Objects grid
+  const grid = document.getElementById('objectsGrid');
+  grid.innerHTML = '';
+  for (let i = 0; i < d.n; i++) {
+    const span = document.createElement('span');
+    span.className = 'obj';
+    span.textContent = d.emoji;
+    span.style.animationDelay = `${i * 0.05}s`;
+    const idx = i;
+    span.onclick = () => {
+      if (countedItems.has(idx)) {
+        countedItems.delete(idx);
+        span.classList.remove('counted');
+      } else {
+        countedItems.add(idx);
+        span.classList.add('counted');
+      }
+      updateCount();
+      if (countedItems.size === d.n) celebrateAll();
+    };
+    grid.appendChild(span);
+  }
+
+  updateCount();
+
+  // Strip buttons
+  document.querySelectorAll('.num-btn').forEach((b, i) => {
+    b.classList.toggle('active', i === cur);
+    if (i === cur) { b.style.background = col; b.style.borderColor = col; b.style.color = 'white'; }
+    else { b.style.background = ''; b.style.borderColor = ''; b.style.color = ''; }
+  });
+
+  document.getElementById('prevBtn').disabled = cur === 0;
+  document.getElementById('nextBtn').disabled = cur === data.length - 1;
+  document.getElementById('navCount').textContent = `${cur+1} / 20`;
+  document.getElementById('progressFill').style.width = `${((cur+1)/20)*100}%`;
+  document.getElementById('progressLabel').textContent = `${cur+1} of 20`;
+}
+
+function updateCount() {
+  const d = data[cur];
+  const c = countedItems.size;
+  const el = document.getElementById('countDisplay');
+  el.textContent = `Counted: ${c}`;
+  if (c === d.n) { el.style.background = '#c8f7c5'; el.style.color = '#2e7d32'; }
+  else { el.style.background = '#f5f5f5'; el.style.color = '#333'; }
+}
+
+function resetCount() {
+  countedItems.clear();
+  document.querySelectorAll('.obj').forEach(o => o.classList.remove('counted'));
+  updateCount();
+}
+
+function celebrateAll() {
+  document.querySelectorAll('.obj').forEach((o, i) => {
+    setTimeout(() => {
+      o.style.transform = 'scale(1.4) rotate(15deg)';
+      setTimeout(() => o.style.transform = '', 300);
+    }, i * 60);
+  });
+  speakNumber();
+}
+
+function speakNumber() {
+  if (!('speechSynthesis' in window)) return;
+  const d = data[cur];
+  window.speechSynthesis.cancel();
+  const u1 = new SpeechSynthesisUtterance(`${d.n}`);
+  u1.rate = 0.8; u1.pitch = 1.2;
+  const u2 = new SpeechSynthesisUtterance(d.word);
+  u2.rate = 0.85; u2.pitch = 1.1;
+
+  // Count aloud: "1, 2, 3..."
+  const countStr = Array.from({length: d.n}, (_,i) => i+1).join(', ');
+  const u3 = new SpeechSynthesisUtterance(`Let's count! ${countStr}.`);
+  u3.rate = 0.8; u3.pitch = 1.0;
+
+  window.speechSynthesis.speak(u1);
+  window.speechSynthesis.speak(u2);
+  window.speechSynthesis.speak(u3);
+}
+
+function go(dir) {
+  cur = Math.max(0, Math.min(data.length-1, cur+dir));
+  render();
+}
+function goTo(i) { cur=i; render(); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') go(1);
+  if (e.key === 'ArrowLeft')  go(-1);
+});
+
+render();
+</script>
+</body>
+</html>

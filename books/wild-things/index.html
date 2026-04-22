@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Where the Wild Things Are</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:#1a0a2e;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.4);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .topbar a:hover{background:rgba(255,255,255,0.35);}
+  .stage{flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding:20px;}
+  .book{width:780px;max-width:100%;background:white;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,0.6);overflow:hidden;min-height:480px;}
+  .page{display:none;min-height:480px;}
+  .page.active{display:flex;}
+  .pg-full{flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px;}
+  .pg-split{flex-direction:row;}
+  .pg-split .left,.pg-split .right{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 22px;}
+  .story-text{font-size:1.3em;line-height:1.8;color:#333;text-align:center;max-width:500px;}
+  .illus{font-size:5em;margin:14px 0;}
+  .em{color:#7b1fa2;font-weight:bold;}
+
+  .cover{background:linear-gradient(160deg,#1a237e,#283593,#3949ab);}
+  .cover-title{font-size:2.4em;font-weight:bold;color:white;text-shadow:2px 2px 8px rgba(0,0,0,0.4);line-height:1.2;margin:12px 0;}
+  .cover-sub{font-size:1em;color:rgba(255,255,255,0.85);margin-top:8px;}
+  .bg-night{background:linear-gradient(160deg,#0d0d2b,#1a1a4e);}
+  .bg-forest{background:linear-gradient(160deg,#1b5e20,#2e7d32,#388e3c);}
+  .bg-ocean{background:linear-gradient(160deg,#01579b,#0277bd,#039be5);}
+  .bg-wild{background:linear-gradient(160deg,#4a148c,#6a1b9a,#7b1fa2);}
+  .bg-rumpus{background:linear-gradient(160deg,#b71c1c,#c62828,#d32f2f);}
+  .bg-warm{background:linear-gradient(160deg,#e65100,#ef6c00,#f57c00);}
+  .bg-home{background:linear-gradient(160deg,#fce4ec,#f8bbd0,#fff9c4);}
+  .bg-end{background:linear-gradient(135deg,#1a237e,#4a148c);}
+
+  .wild-thing{font-size:4em;display:inline-block;animation:roar 2s ease-in-out infinite;}
+  @keyframes roar{0%,100%{transform:scale(1) rotate(-3deg);}50%{transform:scale(1.1) rotate(3deg);}}
+  .sail{display:inline-block;animation:sail 3s ease-in-out infinite;}
+  @keyframes sail{0%,100%{transform:translateX(-10px);}50%{transform:translateX(10px);}}
+  .crown{display:inline-block;animation:bounce 1.5s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+
+  .nav{display:flex;justify-content:center;align-items:center;gap:20px;padding:18px;}
+  .nav-btn{border:none;border-radius:50px;padding:12px 32px;font-size:1.2em;font-family:inherit;cursor:pointer;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.25);transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+  .read-btn{background:#9C27B0;color:white;border:none;border-radius:50px;padding:12px 24px;font-size:1em;font-family:inherit;cursor:pointer;transition:transform 0.15s;}
+  .read-btn:hover{transform:scale(1.05);}
+  .dots{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:0 20px 14px;}
+  .dot{width:10px;height:10px;border-radius:50%;background:#ccc;cursor:pointer;transition:background 0.3s;}
+  .dot.active{background:#7b1fa2;transform:scale(1.4);}
+  .dot.done{background:#ce93d8;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">👹 Where the Wild Things Are</span>
+  <span id="pageIndicator" style="color:white;font-size:0.95em">Page 1 of 13</span>
+</div>
+<div class="stage"><div class="book">
+
+  <!-- 1. COVER -->
+  <div class="page active pg-full cover">
+    <div style="font-size:5em" class="wild-thing">👹</div>
+    <div class="cover-title">Where the<br>Wild Things Are</div>
+    <div style="font-size:2.5em;margin:10px 0">🌙 🌊 🏝️ 👑</div>
+    <div class="cover-sub">Inspired by Maurice Sendak • A wild adventure!</div>
+  </div>
+
+  <!-- 2. MAX THE MISCHIEF MAKER -->
+  <div class="page pg-split bg-home">
+    <div class="left">
+      <div style="font-size:5em">🐺</div>
+      <div style="font-size:1.2em;font-weight:bold;color:#7b1fa2;margin-top:8px">Max</div>
+    </div>
+    <div class="right">
+      <div class="story-text">
+        The night Max wore his wolf suit,<br>
+        he made all kinds of <strong class="em">mischief!</strong><br><br>
+        He chased the dog! 🐕<br>
+        He hammered nails! 🔨<br>
+        He made a terrible mess! 😈
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. SENT TO BED -->
+  <div class="page pg-full" style="background:linear-gradient(160deg,#fce4ec,#fff)">
+    <div style="font-size:4em">😤</div>
+    <div class="story-text" style="margin-top:16px">
+      His mother called him<br>
+      <strong style="color:#c62828">"WILD THING!"</strong><br><br>
+      And Max said<br>
+      <strong style="color:#7b1fa2">"I'LL EAT YOU UP!"</strong><br><br>
+      So he was sent to bed<br>without his supper. 🍽️
+    </div>
+  </div>
+
+  <!-- 4. FOREST GROWS -->
+  <div class="page pg-full bg-forest">
+    <div class="story-text" style="color:white;margin-bottom:20px">
+      That very night, in Max's room,<br>
+      a forest began to grow...
+    </div>
+    <div style="font-size:4em;margin:10px 0">🌱 🌿 🌳 🌲 🌳</div>
+    <div class="story-text" style="color:rgba(255,255,255,0.9);margin-top:12px">
+      The walls became the world all around!<br>
+      The ceiling became the sky!<br>
+      <em>The room had disappeared...</em>
+    </div>
+  </div>
+
+  <!-- 5. SAILING AWAY -->
+  <div class="page pg-full bg-ocean">
+    <div class="sail" style="font-size:5em">⛵</div>
+    <div class="story-text" style="color:white;margin-top:16px">
+      A private boat waited for Max.<br><br>
+      He sailed away...<br>
+      through night and day 🌙☀️<br>
+      in and out of weeks<br>
+      and almost over a year...
+    </div>
+    <div style="font-size:3em;margin-top:14px">🌊🌊🌊</div>
+  </div>
+
+  <!-- 6. WHERE THE WILD THINGS ARE -->
+  <div class="page pg-full bg-wild">
+    <div style="font-size:3em">👹 🦁 🐊 🦇 👺</div>
+    <div class="story-text" style="color:white;margin:16px 0">
+      He arrived at the place<br>
+      <strong>where the Wild Things are!</strong><br><br>
+      They roared their terrible roars!<br>
+      🦷 They gnashed their terrible teeth!<br>
+      👀 They rolled their terrible eyes!<br>
+      🦶 They showed their terrible claws!
+    </div>
+  </div>
+
+  <!-- 7. MAX IS NOT SCARED -->
+  <div class="page pg-split bg-wild">
+    <div class="left">
+      <div style="font-size:5em" class="crown">🐺</div>
+      <div style="font-size:2em">👑</div>
+    </div>
+    <div class="right">
+      <div class="story-text" style="color:white">
+        But Max looked into their eyes<br>
+        and did not blink!<br><br>
+        <strong>"BE STILL!"</strong> said Max.<br><br>
+        And they were still.<br><br>
+        <strong style="color:gold">Max tamed the Wild Things!</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. KING OF ALL WILD THINGS -->
+  <div class="page pg-full bg-rumpus">
+    <div style="font-size:2em;margin-bottom:8px">👑</div>
+    <div class="story-text" style="color:white;font-size:1.5em;margin-bottom:16px">
+      <strong>"Let the wild rumpus start!"</strong>
+    </div>
+    <div style="font-size:3.5em">
+      👹🕺👺💃🦁🎉
+    </div>
+    <div class="story-text" style="color:rgba(255,255,255,0.9);margin-top:16px">
+      Max became the King<br>
+      of all Wild Things!<br>
+      They danced and roared<br>
+      all through the night!
+    </div>
+  </div>
+
+  <!-- 9. LONELY -->
+  <div class="page pg-full bg-ocean">
+    <div style="font-size:5em;margin-bottom:16px">😔</div>
+    <div class="story-text" style="color:white">
+      But then Max wanted to be<br>
+      where someone loved him most of all.<br><br>
+      From far away he could smell<br>
+      something good to eat...<br><br>
+      <strong style="color:#ffd54f">He wanted to go home. 🏠</strong>
+    </div>
+  </div>
+
+  <!-- 10. WILD THINGS BEGGED -->
+  <div class="page pg-split bg-wild">
+    <div class="left">
+      <div style="font-size:3.5em">👹👺🦁</div>
+      <div class="story-text" style="color:white;font-size:1.1em;margin-top:12px">
+        <em>"Oh please don't go!<br>We'll eat you up<br>we love you so!"</em>
+      </div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em" class="crown">🐺</div>
+      <div class="story-text" style="color:white;margin-top:12px">
+        <strong>"No,"</strong> said Max.<br><br>
+        He stepped into his<br>private boat and<br>waved goodbye. 👋
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. SAILING HOME -->
+  <div class="page pg-full bg-ocean">
+    <div class="sail" style="font-size:5em">⛵</div>
+    <div class="story-text" style="color:white;margin-top:16px">
+      He sailed back over a year<br>
+      and in and out of weeks<br>
+      and through a day...<br><br>
+      🌊 🌙 ☀️ 🌊
+    </div>
+  </div>
+
+  <!-- 12. SUPPER WAITING -->
+  <div class="page pg-full bg-home">
+    <div style="font-size:5em;margin-bottom:16px">🏠</div>
+    <div class="story-text">
+      He arrived back in his own room!<br><br>
+      The forest was gone.<br>
+      His room was his room.<br><br>
+      And his supper was waiting for him...<br>
+      <strong style="color:#e65100;font-size:1.2em">Still hot! 🍽️🥛</strong>
+    </div>
+  </div>
+
+  <!-- 13. THE END -->
+  <div class="page pg-full bg-end">
+    <div style="font-size:6em" class="crown">👑</div>
+    <div style="font-size:3em;font-weight:bold;color:white;text-shadow:2px 2px 6px rgba(0,0,0,0.3);margin:16px 0">The End</div>
+    <div style="font-size:1.1em;color:rgba(255,255,255,0.9);margin-bottom:20px">
+      Home is where the people<br>who love you are! ❤️
+    </div>
+    <a href="../../index.html" style="background:white;color:#4a148c;padding:12px 28px;border-radius:30px;text-decoration:none;font-size:1.1em;font-weight:bold;">🏠 Back to Home</a>
+  </div>
+
+</div></div>
+
+<div class="dots" id="dots"></div>
+<div class="nav">
+  <button class="nav-btn prev" id="prevBtn" onclick="changePage(-1)" disabled>◀ Prev</button>
+  <button class="read-btn" onclick="readPage()">🔊 Read Aloud</button>
+  <button class="nav-btn next" id="nextBtn" onclick="changePage(1)">Next ▶</button>
+</div>
+<script>
+const pages=document.querySelectorAll('.page'),totalPages=pages.length;
+let current=0;
+const dotsEl=document.getElementById('dots');
+pages.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);d.style.cursor='pointer';dotsEl.appendChild(d);});
+function updateUI(){pages.forEach((p,i)=>p.classList.toggle('active',i===current));document.querySelectorAll('.dot').forEach((d,i)=>{d.className='dot'+(i===current?' active':i<current?' done':'');});document.getElementById('prevBtn').disabled=current===0;document.getElementById('nextBtn').disabled=current===totalPages-1;document.getElementById('pageIndicator').textContent=`Page ${current+1} of ${totalPages}`;}
+function changePage(dir){current=Math.max(0,Math.min(totalPages-1,current+dir));updateUI();}
+function goTo(i){current=i;updateUI();}
+const pageTexts=["Where the Wild Things Are! A wild adventure story.","The night Max wore his wolf suit, he made all kinds of mischief! He chased the dog, hammered nails, and made a terrible mess!","His mother called him WILD THING! And Max said I will eat you up! So he was sent to bed without his supper.","That very night, in Max's room, a forest began to grow. The walls became the world all around!","A private boat waited for Max. He sailed away through night and day, in and out of weeks, and almost over a year.","He arrived at the place where the Wild Things are! They roared their terrible roars and gnashed their terrible teeth!","But Max looked into their eyes and did not blink! BE STILL said Max. And they were still. Max tamed the Wild Things!","Let the wild rumpus start! Max became the King of all Wild Things! They danced and roared all through the night!","But then Max wanted to be where someone loved him most of all. He could smell something good to eat. He wanted to go home.","Oh please don't go! We'll eat you up we love you so! But Max said No, and stepped into his private boat.","He sailed back over a year and in and out of weeks and through a day.","He arrived back in his own room! The forest was gone. And his supper was waiting for him... still hot!","The End! Home is where the people who love you are!"];
+function readPage(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(pageTexts[current]);u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')changePage(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')changePage(-1);});
+updateUI();
+</script>
+</body>
+</html>

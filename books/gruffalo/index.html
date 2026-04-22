@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Gruffalo</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:#1b2e1b;min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.4);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .topbar a:hover{background:rgba(255,255,255,0.35);}
+  .stage{flex:1;display:flex;align-items:center;justify-content:center;width:100%;padding:20px;}
+  .book{width:780px;max-width:100%;background:white;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,0.6);overflow:hidden;min-height:480px;}
+  .page{display:none;min-height:480px;}
+  .page.active{display:flex;}
+  .pg-full{flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px;}
+  .pg-split{flex-direction:row;}
+  .pg-split .left,.pg-split .right{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;}
+  .rhyme{font-size:1.25em;line-height:2.1;color:#2d4a1e;font-style:italic;text-align:center;}
+  .rhyme strong{color:#b71c1c;font-style:normal;}
+  .gruffalo-desc{background:#fff8e1;border:3px dashed #ff8f00;border-radius:16px;padding:16px 20px;font-size:1.05em;line-height:1.9;color:#4e342e;text-align:left;margin:10px 0;max-width:340px;}
+  .gruffalo-desc strong{color:#b71c1c;}
+  .speech{background:#e8f5e9;border:3px solid #4caf50;border-radius:16px;padding:12px 18px;font-size:1.1em;color:#1b5e20;margin:8px;max-width:300px;text-align:center;}
+  .speech.dark{background:#fff3e0;border-color:#ff8f00;color:#e65100;}
+
+  .cover{background:linear-gradient(160deg,#1b5e20,#388e3c,#558b2f);}
+  .cover-title{font-size:2.6em;font-weight:bold;color:white;text-shadow:2px 2px 8px rgba(0,0,0,0.4);line-height:1.2;margin:12px 0;}
+  .cover-sub{font-size:1em;color:rgba(255,255,255,0.85);margin-top:8px;}
+  .bg-wood{background:linear-gradient(160deg,#e8f5e9,#f1f8e9);}
+  .bg-dark{background:linear-gradient(160deg,#1a2e0a,#2e4d1a);}
+  .bg-fox{background:linear-gradient(160deg,#fff3e0,#ffe0b2);}
+  .bg-owl{background:linear-gradient(160deg,#e8eaf6,#ede7f6);}
+  .bg-snake{background:linear-gradient(160deg,#e0f2f1,#b2dfdb);}
+  .bg-meet{background:linear-gradient(160deg,#4e342e,#6d4c41);}
+  .bg-scare{background:linear-gradient(160deg,#b71c1c,#c62828);}
+  .bg-end{background:linear-gradient(135deg,#1b5e20,#2e7d32);}
+
+  .mouse-walk{display:inline-block;animation:walk 1s steps(2) infinite;}
+  @keyframes walk{0%{transform:translateX(0) scaleX(1);}50%{transform:translateX(5px) scaleX(1);}100%{transform:translateX(0) scaleX(1);}}
+  .shake{display:inline-block;animation:shake 0.5s ease-in-out infinite;}
+  @keyframes shake{0%,100%{transform:rotate(-5deg);}50%{transform:rotate(5deg);}}
+  .bounce{display:inline-block;animation:bounce 1.5s ease-in-out infinite;}
+  @keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+
+  .nav{display:flex;justify-content:center;align-items:center;gap:20px;padding:18px;}
+  .nav-btn{border:none;border-radius:50px;padding:12px 32px;font-size:1.2em;font-family:inherit;cursor:pointer;color:white;box-shadow:0 4px 12px rgba(0,0,0,0.25);transition:transform 0.15s;}
+  .nav-btn:hover{transform:scale(1.05);}
+  .nav-btn:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+  .nav-btn.prev{background:#FF7043;}
+  .nav-btn.next{background:#4CAF50;}
+  .read-btn{background:#9C27B0;color:white;border:none;border-radius:50px;padding:12px 24px;font-size:1em;font-family:inherit;cursor:pointer;transition:transform 0.15s;}
+  .read-btn:hover{transform:scale(1.05);}
+  .dots{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;padding:0 20px 14px;}
+  .dot{width:10px;height:10px;border-radius:50%;background:#ccc;cursor:pointer;transition:background 0.3s;}
+  .dot.active{background:#2e7d32;transform:scale(1.4);}
+  .dot.done{background:#a5d6a7;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🧌 The Gruffalo</span>
+  <span id="pageIndicator" style="color:white;font-size:0.95em">Page 1 of 14</span>
+</div>
+<div class="stage"><div class="book">
+
+  <!-- 1. COVER -->
+  <div class="page active pg-full cover">
+    <div style="font-size:5em" class="bounce">🧌</div>
+    <div class="cover-title">The Gruffalo</div>
+    <div style="font-size:2em;margin:10px 0">🐭 🦊 🦉 🐍 🧌</div>
+    <div class="cover-sub">Inspired by Julia Donaldson • A clever rhyming tale!</div>
+  </div>
+
+  <!-- 2. MOUSE IN THE WOOD -->
+  <div class="page pg-full bg-wood">
+    <div class="rhyme">
+      A mouse took a walk through the<br>
+      <strong>deep dark wood.</strong><br>
+      A fox saw the mouse<br>and the mouse looked good.
+    </div>
+    <div style="font-size:4em;margin:20px 0">
+      <span class="mouse-walk">🐭</span>
+      <span style="font-size:0.6em">🌲🌳🌲</span>
+    </div>
+  </div>
+
+  <!-- 3. THE FOX -->
+  <div class="page pg-split bg-fox">
+    <div class="left">
+      <div style="font-size:5em">🦊</div>
+      <div class="speech dark">"Where are you going, little mouse?<br>Come and have lunch at my house!"</div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em" class="mouse-walk">🐭</div>
+      <div class="speech">"I'm having lunch with a Gruffalo!"</div>
+      <div class="gruffalo-desc">
+        A <strong>Gruffalo?</strong><br>
+        🦷 Terrible tusks<br>
+        🦶 Terrible claws<br>
+        👁️ Orange eyes<br>
+        🎯 A wart on his nose!
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. FOX RUNS AWAY -->
+  <div class="page pg-full bg-fox">
+    <div class="rhyme">
+      <strong>"The Gruffalo's favourite food<br>is roasted fox!"</strong><br><br>
+      "Oh!" said the fox,<br>
+      and away he ran! 💨
+    </div>
+    <div style="font-size:4em;margin:16px 0">🦊💨 &nbsp; 😏🐭</div>
+    <div class="rhyme" style="font-size:1em;color:#888">
+      <em>"There's no such thing<br>as a Gruffalo!"</em><br>
+      thought the mouse with a smile.
+    </div>
+  </div>
+
+  <!-- 5. THE OWL -->
+  <div class="page pg-split bg-owl">
+    <div class="left">
+      <div style="font-size:5em">🦉</div>
+      <div class="speech dark">"Where are you going, little mouse?<br>Come and have tea at my house!"</div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em" class="mouse-walk">🐭</div>
+      <div class="speech">"I'm having tea with a Gruffalo!"</div>
+      <div class="gruffalo-desc">
+        A <strong>Gruffalo?</strong><br>
+        🪲 Purple prickles on his back<br>
+        🦮 A poisonous wart<br>
+        👁️ Orange eyes<br>
+        🦷 Terrible teeth!
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. OWL FLIES AWAY -->
+  <div class="page pg-full bg-owl">
+    <div class="rhyme">
+      <strong>"The Gruffalo's favourite food<br>is owl ice cream!"</strong><br><br>
+      "Oh!" said the owl,<br>
+      and away he flew! 💨
+    </div>
+    <div style="font-size:4em;margin:16px 0">🦉💨 &nbsp; 😏🐭</div>
+  </div>
+
+  <!-- 7. THE SNAKE -->
+  <div class="page pg-split bg-snake">
+    <div class="left">
+      <div style="font-size:5em">🐍</div>
+      <div class="speech dark">"Where are you going, little mouse?<br>Come for a feast at my logpile house!"</div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em" class="mouse-walk">🐭</div>
+      <div class="speech">"I'm having a feast with a Gruffalo!"</div>
+      <div class="gruffalo-desc">
+        A <strong>Gruffalo?</strong><br>
+        🎯 Knobbly knees<br>
+        👄 Turned-out toes<br>
+        🟠 Orange eyes<br>
+        🪱 Scrambled snake!
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. SNAKE SLITHERS AWAY -->
+  <div class="page pg-full bg-snake">
+    <div class="rhyme">
+      <strong>"The Gruffalo's favourite food<br>is scrambled snake!"</strong><br><br>
+      "Oh!" said the snake,<br>
+      and away he slithered! 💨
+    </div>
+    <div style="font-size:4em;margin:16px 0">🐍💨 &nbsp; 😄🐭</div>
+    <div class="rhyme" style="font-size:1.05em;color:#2d5a27;margin-top:10px">
+      "Silly old fox, owl and snake!"<br>
+      chuckled the mouse.<br>
+      <em>"There's no such thing as a Gruffalo!"</em>
+    </div>
+  </div>
+
+  <!-- 9. BUT WAIT... -->
+  <div class="page pg-full bg-dark">
+    <div class="story-text" style="color:white;font-size:1.4em;margin-bottom:20px">
+      But who is this creature<br>with <strong style="color:#ff8f00">terrible claws</strong><br>and <strong style="color:#ff8f00">terrible tusks</strong><br>and <strong style="color:#ff8f00">terrible jaws</strong>?
+    </div>
+    <div style="font-size:5em" class="shake">🧌</div>
+    <div style="font-size:2.5em;color:#ffd54f;margin-top:16px;font-weight:bold">
+      "Oh help! Oh no!<br>IT IS THE GRUFFALO!"
+    </div>
+  </div>
+
+  <!-- 10. MEET THE GRUFFALO -->
+  <div class="page pg-split bg-meet">
+    <div class="left">
+      <div style="font-size:5em" class="shake">🧌</div>
+      <div class="speech dark" style="border-color:#ff8f00;color:white;background:rgba(255,143,0,0.2)">
+        "My favourite food!"<br>said the Gruffalo.<br>"Roasted mouse on toast!"
+      </div>
+    </div>
+    <div class="right">
+      <div style="font-size:4em">😤🐭</div>
+      <div class="speech" style="border-color:gold;color:#333;background:white">
+        "Roasted me?<br>That's funny!<br><strong>I am the scariest<br>creature in this wood!</strong>"
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. MOUSE LEADS GRUFFALO -->
+  <div class="page pg-full" style="background:linear-gradient(160deg,#2d4a1e,#388e3c)">
+    <div class="rhyme" style="color:white">
+      "Walk behind me!" said the mouse.<br>
+      They walked through the deep dark wood...<br><br>
+      🐍 Snake saw them — and slithered away!<br>
+      🦉 Owl saw them — and flew away!<br>
+      🦊 Fox saw them — and ran away!
+    </div>
+    <div style="font-size:3.5em;margin-top:14px">🐭➡️🧌</div>
+  </div>
+
+  <!-- 12. GRUFFALO IS SCARED -->
+  <div class="page pg-full bg-scare">
+    <div style="font-size:5em" class="shake">🧌😱</div>
+    <div class="rhyme" style="color:white;margin-top:16px">
+      The Gruffalo was <strong style="color:#ffd54f">terrified!</strong><br><br>
+      All the animals ran from<br>
+      the mouse and <em>him!</em><br><br>
+      "You really ARE the scariest<br>creature in this wood!"<br>
+      And away the Gruffalo ran! 💨
+    </div>
+  </div>
+
+  <!-- 13. MOUSE ALONE -->
+  <div class="page pg-full bg-wood">
+    <div style="font-size:5em" class="bounce">🐭</div>
+    <div class="rhyme" style="margin-top:16px">
+      The mouse found a nut<br>
+      and the nut was <strong>good.</strong><br><br>
+      <em>The best nut ever!</em><br>
+      In the deep dark wood. 🌰
+    </div>
+    <div style="font-size:3em;margin-top:14px">🌰 😄 🌲</div>
+  </div>
+
+  <!-- 14. THE END -->
+  <div class="page pg-full bg-end">
+    <div style="font-size:6em" class="bounce">🐭</div>
+    <div style="font-size:3em;font-weight:bold;color:white;text-shadow:2px 2px 6px rgba(0,0,0,0.3);margin:16px 0">The End!</div>
+    <div style="font-size:1.2em;color:rgba(255,255,255,0.9);margin-bottom:20px">
+      Being clever is better than being big! 🧠✨
+    </div>
+    <a href="../../index.html" style="background:white;color:#1b5e20;padding:12px 28px;border-radius:30px;text-decoration:none;font-size:1.1em;font-weight:bold;">🏠 Back to Home</a>
+  </div>
+
+</div></div>
+<div class="dots" id="dots"></div>
+<div class="nav">
+  <button class="nav-btn prev" id="prevBtn" onclick="changePage(-1)" disabled>◀ Prev</button>
+  <button class="read-btn" onclick="readPage()">🔊 Read Aloud</button>
+  <button class="nav-btn next" id="nextBtn" onclick="changePage(1)">Next ▶</button>
+</div>
+<script>
+const pages=document.querySelectorAll('.page'),totalPages=pages.length;let current=0;
+const dotsEl=document.getElementById('dots');
+pages.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.onclick=()=>goTo(i);d.style.cursor='pointer';dotsEl.appendChild(d);});
+function updateUI(){pages.forEach((p,i)=>p.classList.toggle('active',i===current));document.querySelectorAll('.dot').forEach((d,i)=>{d.className='dot'+(i===current?' active':i<current?' done':'');});document.getElementById('prevBtn').disabled=current===0;document.getElementById('nextBtn').disabled=current===totalPages-1;document.getElementById('pageIndicator').textContent=`Page ${current+1} of ${totalPages}`;}
+function changePage(dir){current=Math.max(0,Math.min(totalPages-1,current+dir));updateUI();}
+function goTo(i){current=i;updateUI();}
+const pageTexts=["The Gruffalo! A clever rhyming tale.","A mouse took a walk through the deep dark wood. A fox saw the mouse and the mouse looked good.","Where are you going little mouse? Come have lunch at my house! I am having lunch with a Gruffalo! A Gruffalo? With terrible tusks and terrible claws and orange eyes and a wart on his nose!","The Gruffalo's favourite food is roasted fox! Oh! said the fox, and away he ran!","Where are you going little mouse? Come have tea at my house! I am having tea with a Gruffalo! With purple prickles and terrible teeth!","The Gruffalo's favourite food is owl ice cream! Oh! said the owl, and away he flew!","Where are you going little mouse? Come for a feast at my logpile house! I am having a feast with a Gruffalo! And the Gruffalo's favourite food is scrambled snake!","The Gruffalo's favourite food is scrambled snake! Oh! said the snake, and away he slithered! Silly animals! There is no such thing as a Gruffalo!","But who is this creature with terrible claws and terrible tusks and terrible jaws? Oh help! Oh no! It is the Gruffalo!","My favourite food said the Gruffalo. Roasted mouse on toast! Roasted me? I am the scariest creature in this wood!","Walk behind me said the mouse. The snake slithered away! The owl flew away! The fox ran away!","The Gruffalo was terrified! You really are the scariest creature in the wood! And away the Gruffalo ran!","The mouse found a nut, and the nut was good. The best nut ever, in the deep dark wood.","The End! Being clever is better than being big!"];
+function readPage(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(pageTexts[current]);u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')changePage(1);if(e.key==='ArrowLeft'||e.key==='ArrowUp')changePage(-1);});
+updateUI();
+</script>
+</body>
+</html>

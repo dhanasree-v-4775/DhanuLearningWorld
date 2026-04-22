@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Storytelling</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Comic Sans MS','Chalkboard SE',cursive;background:linear-gradient(135deg,#880e4f,#ad1457,#c2185b);min-height:100vh;display:flex;flex-direction:column;align-items:center;}
+  .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;padding:12px 24px;background:rgba(0,0,0,0.25);color:white;}
+  .topbar a{color:white;text-decoration:none;background:rgba(255,255,255,0.2);padding:6px 14px;border-radius:20px;}
+  .tabs{display:flex;gap:8px;padding:12px 20px;justify-content:center;flex-wrap:wrap;}
+  .tab{padding:9px 20px;border-radius:50px;border:2px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.12);color:white;font-family:inherit;font-size:0.9em;cursor:pointer;transition:all 0.2s;}
+  .tab.active{background:white;color:#880e4f;font-weight:bold;}
+  .tab:hover{background:rgba(255,255,255,0.3);}
+  .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;width:100%;gap:14px;}
+  .card{width:820px;max-width:100%;background:white;border-radius:28px;box-shadow:0 20px 60px rgba(0,0,0,0.35);padding:24px 28px;}
+
+  /* STORY BUILDER */
+  .builder-grid{display:grid;grid-template-columns:260px 1fr;gap:16px;align-items:start;}
+  .panel-title{font-size:0.85em;font-weight:bold;color:#666;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+  .sticker-shelf{display:flex;flex-wrap:wrap;gap:6px;padding:10px;background:#fce4ec;border-radius:14px;max-height:300px;overflow-y:auto;}
+  .sticker{font-size:1.8em;cursor:pointer;transition:transform 0.15s;padding:4px;}
+  .sticker:hover{transform:scale(1.3);}
+
+  /* SCENE CANVAS */
+  .scene-wrap{background:#e3f2fd;border-radius:16px;border:2px solid #f48fb1;overflow:hidden;position:relative;}
+  canvas#storyCanvas{display:block;cursor:crosshair;}
+  .canvas-toolbar{display:flex;gap:8px;padding:8px 10px;background:#fce4ec;border-radius:0 0 14px 14px;flex-wrap:wrap;align-items:center;}
+  .tool-btn{padding:6px 14px;border-radius:20px;border:2px solid #f48fb1;background:white;font-family:inherit;font-size:0.85em;cursor:pointer;color:#880e4f;transition:all 0.2s;}
+  .tool-btn.active{background:#c2185b;color:white;border-color:#c2185b;}
+  .tool-btn:hover{background:#fce4ec;}
+  .color-dot{width:24px;height:24px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:all 0.15s;flex-shrink:0;}
+  .color-dot.active{border-color:#333;transform:scale(1.2);}
+
+  /* SLIDE STRIP */
+  .slide-strip{display:flex;gap:8px;padding:8px;background:#f5f5f5;border-radius:14px;overflow-x:auto;margin-top:10px;}
+  .slide-thumb{width:90px;height:60px;border-radius:10px;border:3px solid #ccc;cursor:pointer;object-fit:cover;flex-shrink:0;transition:all 0.2s;background:#e3f2fd;display:flex;align-items:center;justify-content:center;font-size:1.5em;}
+  .slide-thumb.active{border-color:#c2185b;}
+  .slide-thumb.add-btn{border-style:dashed;color:#aaa;font-size:1.8em;}
+  .slide-thumb.add-btn:hover{border-color:#c2185b;color:#c2185b;}
+
+  /* TEXT AREA */
+  .story-text-input{width:100%;border:2px solid #f48fb1;border-radius:12px;padding:10px 14px;font-family:inherit;font-size:1em;color:#333;resize:none;outline:none;transition:border 0.2s;}
+  .story-text-input:focus{border-color:#c2185b;}
+
+  /* SAMPLE STORIES */
+  .sample-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin:14px 0;}
+  .sample-card{border-radius:18px;padding:16px;cursor:pointer;transition:all 0.2s;border:2px solid transparent;text-align:center;}
+  .sample-card:hover{transform:translateY(-3px);border-color:#c2185b;}
+  .sc-emoji{font-size:2.5em;margin-bottom:6px;}
+  .sc-title{font-size:1em;font-weight:bold;color:#333;}
+  .sc-desc{font-size:0.85em;color:#666;margin-top:4px;}
+
+  /* STORY VIEWER */
+  .story-page{display:none;}
+  .story-page.active{display:block;}
+  .sv-scene{font-size:5em;text-align:center;padding:20px;background:linear-gradient(135deg,#fce4ec,#f8bbd0);border-radius:16px;margin-bottom:14px;min-height:140px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;}
+  .sv-text{font-size:1.15em;color:#333;line-height:1.7;text-align:center;padding:10px 20px;}
+  .sv-text b{color:#c2185b;}
+  .page-dots{display:flex;gap:8px;justify-content:center;margin:10px 0;}
+  .pdot{width:12px;height:12px;border-radius:50%;background:#f48fb1;cursor:pointer;transition:all 0.2s;}
+  .pdot.active{background:#c2185b;transform:scale(1.3);}
+
+  .btn-row{display:flex;gap:10px;justify-content:center;margin-top:14px;}
+  .action-btn{border:none;border-radius:50px;padding:11px 24px;font-size:1em;font-family:inherit;cursor:pointer;color:white;transition:transform 0.15s;}
+  .action-btn:hover{transform:scale(1.05);}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span style="color:white;font-size:1.1em;font-weight:bold">🎨 Digital Storytelling</span>
+  <span style="color:white;font-size:0.9em">ICT</span>
+</div>
+<div class="tabs">
+  <button class="tab active" onclick="setMode('build',this)">🎨 Story Builder</button>
+  <button class="tab" onclick="setMode('read',this)">📖 Read Stories</button>
+  <button class="tab" onclick="setMode('prompts',this)">💡 Story Starters</button>
+</div>
+<div class="main">
+  <div class="card" id="mainCard"></div>
+</div>
+
+<script>
+// Sticker sets
+const stickerSets = {
+  '🐾 Animals':['🐶','🐱','🐰','🦁','🐘','🦋','🐸','🐬','🦅','🐧','🦊','🐺','🦄','🐉','🦕'],
+  '🏡 Places':['🏠','🏰','🌲','🏔️','🌊','🌻','🌈','⭐','🌙','☀️','🌧️','❄️','🏝️','🌋'],
+  '👦 People':['👦','👧','👨','👩','🧙','🧚','🧜','🤴','👸','🦸','🦹','🧑‍🚀','🤖'],
+  '🍎 Things':['🍎','🎀','🎈','🎁','⚽','🎵','📚','🔑','💎','🪄','🏆','🎭','🎨','🚀'],
+  '😊 Feelings':['😊','😢','😮','😄','😱','🤔','😴','🤩','😍','😤','🥳','😇','🤗'],
+};
+
+// Sample read-aloud stories
+const sampleStories = [
+  {
+    title:'🦁 Leo\'s Big Day',
+    color:'#fff3e0', border:'#ff9800',
+    pages:[
+      {scene:['🌅','🌿','🏠'], text:'One sunny morning, <b>Leo the Lion</b> woke up in his cosy home on the savannah.'},
+      {scene:['🦁','🌻','🦋'], text:'He walked outside and saw beautiful yellow flowers and a butterfly dancing in the breeze.'},
+      {scene:['💧','🦁','😊'], text:'Leo was thirsty, so he went to the river for a long cool drink.'},
+      {scene:['🐘','🦒','🦁'], text:'At the river he met his friends — Ellie the Elephant and Gina the Giraffe!'},
+      {scene:['⚽','🎉','🌟'], text:'They played together all afternoon. What a <b>wonderful</b> day!'},
+    ]
+  },
+  {
+    title:'🌱 The Magic Seed',
+    color:'#e8f5e9', border:'#4caf50',
+    pages:[
+      {scene:['🫘','👧','🌍'], text:'Little Mia found a tiny seed on the ground. "What could this be?" she wondered.'},
+      {scene:['🌍','💧','☀️'], text:'She planted it carefully in soft soil, watered it every day and put it by the sunny window.'},
+      {scene:['🌱','😮','✨'], text:'One week later, a tiny green sprout pushed through the soil! Mia gasped in delight.'},
+      {scene:['🌻','🦋','🐝'], text:'Weeks later, a tall sunflower bloomed! Butterflies and bees came to visit.'},
+      {scene:['🌟','👧','🌻'], text:'Mia learned that with <b>patience and care</b>, even a tiny seed can become something magical.'},
+    ]
+  },
+  {
+    title:'🚀 Zara in Space',
+    color:'#e3f2fd', border:'#2196f3',
+    pages:[
+      {scene:['👧','🚀','⭐'], text:'Zara always dreamed of going to space. One night, her rocket was ready!'},
+      {scene:['🚀','🌙','⭐','✨'], text:'She zoomed past the Moon, past sparkling stars, through swirling clouds of stardust.'},
+      {scene:['🪐','😮','🌈'], text:'She found a purple planet with rainbow rings! "I\'ll call it Rainbow World," she said.'},
+      {scene:['👽','😊','🎁'], text:'Friendly aliens gave her a glowing gift and showed her their amazing planet.'},
+      {scene:['🏠','👧','⭐'], text:'Zara flew safely home, full of stories to tell. She knew — <b>the universe is full of wonder!</b>'},
+    ]
+  },
+  {
+    title:'🐢 Slow and Steady',
+    color:'#f3e5f5', border:'#9c27b0',
+    pages:[
+      {scene:['🐢','🌿','☀️'], text:'Tommy the Tortoise loved to walk slowly through the forest, noticing every little thing.'},
+      {scene:['🐰','💨','😄'], text:'One day, Rosie the Rabbit laughed at him. "You\'re SO slow!" she said and zoomed past.'},
+      {scene:['🏆','🎯','🛤️'], text:'They decided to race to the big oak tree at the end of the long path.'},
+      {scene:['😴','🐰','🌸'], text:'Rosie ran so fast she got tired and sat down for a nap under a flower bush.'},
+      {scene:['🐢','🏆','🌟'], text:'Tommy kept going — slowly but steadily — and reached the tree first! <b>Slow and steady wins the race!</b>'},
+    ]
+  },
+];
+
+const storyStarters = [
+  {icon:'🏰', title:'The Enchanted Castle', prompt:'One day, a child found a door hidden behind a waterfall...', hints:['Who lives in the castle?','What magic is inside?','Is there a dragon or a treasure?']},
+  {icon:'🌊', title:'Under the Sea', prompt:'A little fish swam deeper than ever before and discovered...', hints:['What did the fish find?','Did it meet a friendly creature?','Was it scary or exciting?']},
+  {icon:'🌙', title:'The Night Sky', prompt:'When everyone was asleep, the stars came alive and...', hints:['What did the stars do?','Did they tell a story?','What did they grant as a wish?']},
+  {icon:'🤖', title:'My Robot Friend', prompt:'On my birthday I found a small box on my doorstep. Inside was a tiny robot who...', hints:['What can the robot do?','Where did they go together?','What problem did the robot help solve?']},
+  {icon:'🦄', title:'The Lost Unicorn', prompt:'Deep in the Whispering Wood, I heard a soft cry. Following the sound, I found a unicorn who...', hints:['Why was it lost?','How did you help it?','What magical thing happened?']},
+  {icon:'🍄', title:'Tiny World', prompt:'One morning I woke up and I was only as tall as a mushroom! I discovered that...', hints:['What looks different when you\'re tiny?','What creatures did you meet?','How did you become big again?']},
+];
+
+let mode = 'build';
+
+// Builder state
+let slides = [{ stickers:[], text:'Once upon a time...' }];
+let currentSlide = 0;
+let drawMode = 'sticker'; // or 'draw'
+let drawColor = '#c2185b';
+let isDrawing = false;
+let lastX = 0, lastY = 0;
+let activeStickerSet = '🐾 Animals';
+
+// Story viewer
+let viewStory = 0;
+let viewPage = 0;
+
+function setMode(m, tab) {
+  mode = m;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  render();
+}
+
+function render() {
+  if (mode==='build') renderBuild();
+  else if (mode==='read') renderRead();
+  else renderPrompts();
+}
+
+// ========== BUILDER ==========
+function renderBuild() {
+  const stickerSetBtns = Object.keys(stickerSets).map(k =>
+    `<button class="tool-btn ${k===activeStickerSet?'active':''}" onclick="activeStickerSet='${k}';renderBuild()">${k}</button>`
+  ).join('');
+
+  const stickersHTML = stickerSets[activeStickerSet].map(s =>
+    `<span class="sticker" onclick="placeSticker('${s}')" title="Add ${s}">${s}</span>`
+  ).join('');
+
+  const thumbs = slides.map((sl,i) =>
+    `<div class="slide-thumb ${i===currentSlide?'active':''}" onclick="switchSlide(${i})" title="Slide ${i+1}">
+      ${sl.stickers.slice(0,3).map(s=>s.emoji).join('')||'📄'}
+    </div>`
+  ).join('');
+
+  const colors = ['#c2185b','#2196f3','#4caf50','#ff9800','#9c27b0','#000000','#ffffff','#795548'];
+  const colorDots = colors.map(c =>
+    `<span class="color-dot ${c===drawColor?'active':''}" style="background:${c}" onclick="drawColor='${c}';renderBuild()" title="${c}"></span>`
+  ).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#880e4f;margin-bottom:12px">🎨 Build Your Own Story!</div>
+    <div class="builder-grid">
+      <!-- LEFT: sticker palette -->
+      <div>
+        <div class="panel-title">🧩 Sticker Sets</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">${stickerSetBtns}</div>
+        <div class="sticker-shelf">${stickersHTML}</div>
+
+        <div style="margin-top:12px">
+          <div class="panel-title">✏️ Draw Tools</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px">
+            <button class="tool-btn ${drawMode==='sticker'?'active':''}" onclick="drawMode='sticker';renderBuild()">👆 Place</button>
+            <button class="tool-btn ${drawMode==='draw'?'active':''}" onclick="drawMode='draw';renderBuild()">✏️ Draw</button>
+            <button class="tool-btn" onclick="clearCanvas()">🗑️ Clear</button>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">${colorDots}</div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="panel-title">📝 Page Text</div>
+          <textarea class="story-text-input" rows="3" id="slideText" placeholder="Write what happens on this page..."
+            onchange="slides[currentSlide].text=this.value">${slides[currentSlide].text}</textarea>
+        </div>
+      </div>
+
+      <!-- RIGHT: canvas + controls -->
+      <div>
+        <div class="panel-title">🖼️ Slide ${currentSlide+1} of ${slides.length}</div>
+        <div class="scene-wrap">
+          <canvas id="storyCanvas" width="440" height="260"></canvas>
+          <div class="canvas-toolbar">
+            <span style="font-size:0.85em;color:#888">Draw on the canvas or tap stickers →</span>
+          </div>
+        </div>
+
+        <!-- Slide strip -->
+        <div class="slide-strip" id="slideStrip">
+          ${thumbs}
+          <div class="slide-thumb add-btn" onclick="addSlide()" title="Add new slide">+</div>
+        </div>
+
+        <div class="btn-row">
+          <button class="action-btn" style="background:#607D8B" onclick="currentSlide=Math.max(0,currentSlide-1);renderBuild()" ${currentSlide===0?'disabled':''}>◀ Prev</button>
+          <button class="action-btn" style="background:#c2185b" onclick="presentStory()">▶ Present!</button>
+          <button class="action-btn" style="background:#43a047" onclick="currentSlide=Math.min(slides.length-1,currentSlide+1);renderBuild()" ${currentSlide===slides.length-1?'disabled':''}>Next ▶</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Set up canvas
+  const canvas = document.getElementById('storyCanvas');
+  const ctx = canvas.getContext('2d');
+  redrawCanvas(ctx);
+
+  // Draw events
+  canvas.onmousedown = e => {
+    if (drawMode !== 'draw') return;
+    isDrawing = true;
+    const r = canvas.getBoundingClientRect();
+    lastX = e.clientX - r.left; lastY = e.clientY - r.top;
+  };
+  canvas.onmousemove = e => {
+    if (!isDrawing || drawMode !== 'draw') return;
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    ctx.beginPath(); ctx.strokeStyle = drawColor; ctx.lineWidth = 5;
+    ctx.lineCap = 'round'; ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+    slides[currentSlide].drawing = canvas.toDataURL();
+    lastX = x; lastY = y;
+  };
+  canvas.onmouseup = () => { isDrawing = false; };
+  canvas.onmouseleave = () => { isDrawing = false; };
+
+  // Touch support
+  canvas.ontouchstart = e => {
+    e.preventDefault();
+    if (drawMode !== 'draw') return;
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches[0];
+    isDrawing = true;
+    lastX = t.clientX - r.left; lastY = t.clientY - r.top;
+  };
+  canvas.ontouchmove = e => {
+    e.preventDefault();
+    if (!isDrawing || drawMode !== 'draw') return;
+    const r = canvas.getBoundingClientRect();
+    const t = e.touches[0];
+    const x = t.clientX - r.left, y = t.clientY - r.top;
+    ctx.beginPath(); ctx.strokeStyle = drawColor; ctx.lineWidth = 5;
+    ctx.lineCap = 'round'; ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+    slides[currentSlide].drawing = canvas.toDataURL();
+    lastX = x; lastY = y;
+  };
+  canvas.ontouchend = () => { isDrawing = false; };
+}
+
+function redrawCanvas(ctx) {
+  const canvas = ctx.canvas;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Sky background
+  const grad = ctx.createLinearGradient(0,0,0,canvas.height);
+  grad.addColorStop(0,'#e3f2fd'); grad.addColorStop(1,'#f3e5f5');
+  ctx.fillStyle = grad; ctx.fillRect(0,0,canvas.width,canvas.height);
+  // Ground
+  ctx.fillStyle = '#c8e6c9'; ctx.fillRect(0, canvas.height*0.75, canvas.width, canvas.height*0.25);
+
+  // Restore drawing
+  const sl = slides[currentSlide];
+  if (sl.drawing) {
+    const img = new Image();
+    img.onload = () => ctx.drawImage(img, 0, 0);
+    img.src = sl.drawing;
+  }
+  // Draw stickers
+  if (sl.stickers) {
+    sl.stickers.forEach(s => {
+      ctx.font = s.size + 'px serif';
+      ctx.fillText(s.emoji, s.x, s.y);
+    });
+  }
+}
+
+function placeSticker(emoji) {
+  const canvas = document.getElementById('storyCanvas');
+  if (!canvas) return;
+  const sl = slides[currentSlide];
+  if (!sl.stickers) sl.stickers = [];
+  sl.stickers.push({ emoji, x: 80 + Math.random()*280, y: 80 + Math.random()*140, size:48 });
+  const ctx = canvas.getContext('2d');
+  redrawCanvas(ctx);
+  // Update thumb
+  renderBuild();
+}
+
+function clearCanvas() {
+  const sl = slides[currentSlide];
+  sl.stickers = []; sl.drawing = null;
+  const canvas = document.getElementById('storyCanvas');
+  if (canvas) { const ctx = canvas.getContext('2d'); redrawCanvas(ctx); }
+  renderBuild();
+}
+
+function addSlide() {
+  slides.push({ stickers:[], text:'And then...' });
+  currentSlide = slides.length - 1;
+  renderBuild();
+}
+
+function switchSlide(i) {
+  // Save current text
+  const ta = document.getElementById('slideText');
+  if (ta) slides[currentSlide].text = ta.value;
+  currentSlide = i;
+  renderBuild();
+}
+
+function presentStory() {
+  // Save text
+  const ta = document.getElementById('slideText');
+  if (ta) slides[currentSlide].text = ta.value;
+  currentSlide = 0;
+
+  const pagesHTML = slides.map((sl, i) => `
+    <div class="story-page ${i===0?'active':''}" id="mypage${i}">
+      <div class="sv-scene">${(sl.stickers||[]).map(s=>s.emoji).join(' ')||'✨'}</div>
+      <div class="sv-text">${sl.text||''}</div>
+    </div>`).join('');
+
+  const dots = slides.map((_,i) => `<div class="pdot ${i===0?'active':''}" id="pd${i}" onclick="goMyPage(${i})"></div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#880e4f;margin-bottom:12px;text-align:center">📖 Your Story!</div>
+    ${pagesHTML}
+    <div class="page-dots">${dots}</div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#607D8B" onclick="prevMyPage()" id="mpPrev" disabled>◀</button>
+      <button class="action-btn" style="background:#c2185b" onclick="readMyPage()">🔊 Read</button>
+      <button class="action-btn" style="background:#43a047" onclick="nextMyPage()" id="mpNext">▶</button>
+      <button class="action-btn" style="background:#880e4f" onclick="render()">🎨 Edit</button>
+    </div>
+  `;
+}
+
+let myPageIdx = 0;
+function goMyPage(i) {
+  document.querySelectorAll('.story-page').forEach((p,pi)=>p.classList.toggle('active',pi===i));
+  document.querySelectorAll('.pdot').forEach((d,di)=>d.classList.toggle('active',di===i));
+  myPageIdx = i;
+  document.getElementById('mpPrev').disabled = i===0;
+  document.getElementById('mpNext').disabled = i===slides.length-1;
+}
+function prevMyPage(){ goMyPage(Math.max(0,myPageIdx-1)); }
+function nextMyPage(){ goMyPage(Math.min(slides.length-1,myPageIdx+1)); }
+function readMyPage() {
+  const text = slides[myPageIdx]?.text||'';
+  speak(text.replace(/<[^>]+>/g,''));
+}
+
+// ========== READ STORIES ==========
+function renderRead() {
+  const story = sampleStories[viewStory];
+  const page = story.pages[viewPage];
+
+  const storySel = sampleStories.map((s,i) =>
+    `<button style="padding:7px 16px;border-radius:50px;border:2px solid ${i===viewStory?s.border:'#ccc'};background:${i===viewStory?s.border:'white'};color:${i===viewStory?'white':'#333'};font-family:inherit;font-size:0.85em;cursor:pointer;margin:3px" onclick="viewStory=${i};viewPage=0;renderRead()">${s.title}</button>`
+  ).join('');
+
+  const sceneHTML = page.scene.map(e => `<span>${e}</span>`).join('');
+  const dots = story.pages.map((_,i) =>
+    `<div class="pdot ${i===viewPage?'active':''}" onclick="viewPage=${i};renderRead()"></div>`
+  ).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:14px">${storySel}</div>
+    <div style="font-size:1.1em;font-weight:bold;color:#880e4f;text-align:center;margin-bottom:10px">${story.title}</div>
+    <div style="font-size:0.85em;color:#888;text-align:center;margin-bottom:10px">Page ${viewPage+1} of ${story.pages.length}</div>
+
+    <div class="sv-scene" style="background:${story.color};border:2px solid ${story.border}">${sceneHTML}</div>
+    <div class="sv-text" style="font-size:1.2em">${page.text}</div>
+
+    <div class="page-dots">${dots}</div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#607D8B" onclick="viewPage=Math.max(0,viewPage-1);renderRead()" ${viewPage===0?'disabled':''}>◀ Prev</button>
+      <button class="action-btn" style="background:#c2185b" onclick="speak('${page.text.replace(/<[^>]+>/g,'').replace(/'/g,"\\'")}')" >🔊 Read</button>
+      <button class="action-btn" style="background:#43a047" onclick="viewPage=Math.min(${story.pages.length-1},viewPage+1);renderRead()" ${viewPage===story.pages.length-1?'disabled':''}>Next ▶</button>
+    </div>
+  `;
+}
+
+// ========== STORY STARTERS ==========
+function renderPrompts() {
+  const cardsHTML = storyStarters.map((s,i) => `
+    <div class="sample-card" style="background:#fce4ec;border-color:#f48fb1" onclick="showPrompt(${i})">
+      <div class="sc-emoji">${s.icon}</div>
+      <div class="sc-title">${s.title}</div>
+      <div class="sc-desc">${s.prompt.slice(0,50)}...</div>
+    </div>`).join('');
+
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#880e4f;margin-bottom:6px">💡 Story Starters</div>
+    <div style="font-size:0.95em;color:#888;margin-bottom:16px;text-align:center">Choose a starter to get your imagination going! Then go to Story Builder and make your story!</div>
+    <div class="sample-grid">${cardsHTML}</div>
+    <div style="background:#fce4ec;border-radius:14px;padding:12px;font-size:0.9em;color:#880e4f;text-align:center">
+      ✍️ <b>Tips for a great story:</b> Who is the character? Where are they? What happens? How does it end?
+    </div>
+  `;
+}
+
+function showPrompt(i) {
+  const s = storyStarters[i];
+  document.getElementById('mainCard').innerHTML = `
+    <div style="font-size:1.2em;font-weight:bold;color:#880e4f;margin-bottom:14px">${s.icon} ${s.title}</div>
+    <div style="background:linear-gradient(135deg,#fce4ec,#f8bbd0);border-radius:18px;padding:20px;margin-bottom:16px">
+      <div style="font-size:1.2em;color:#333;line-height:1.7;font-style:italic">"${s.prompt}"</div>
+    </div>
+    <div style="font-size:1em;font-weight:bold;color:#880e4f;margin-bottom:10px">🤔 Think about...</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+      ${s.hints.map(h=>`<div style="background:#fff3e0;border-radius:12px;padding:10px 16px;font-size:0.95em;color:#e65100">💭 ${h}</div>`).join('')}
+    </div>
+    <div style="background:#e8f5e9;border-radius:14px;padding:12px;font-size:0.9em;color:#2e7d32;margin-bottom:14px">
+      ✅ Now go to <b>Story Builder</b> and create your story using stickers, drawings and words!
+    </div>
+    <div class="btn-row">
+      <button class="action-btn" style="background:#c2185b" onclick="speak('${s.prompt.replace(/'/g,"\\'")}')" >🔊 Read Starter</button>
+      <button class="action-btn" style="background:#43a047" onclick="mode='build';document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.toggle('active',i===0)});render()">🎨 Go Build!</button>
+      <button class="action-btn" style="background:#607D8B" onclick="renderPrompts()">← Back</button>
+    </div>
+  `;
+}
+
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.rate = 0.85; u.pitch = 1.15;
+  window.speechSynthesis.speak(u);
+}
+
+render();
+</script>
+</body>
+</html>
