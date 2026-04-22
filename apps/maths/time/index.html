@@ -238,6 +238,7 @@ function speakTime(){
   window.speechSynthesis.cancel();
   const t=times[lCur];
   const u=new SpeechSynthesisUtterance(`The time is ${t.word}. ${t.desc}`);
+  u.lang = 'en-US';
   u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);
 }
 
@@ -294,6 +295,7 @@ function readRoutine(){
   window.speechSynthesis.cancel();
   routine.forEach((r,i)=>{
     const u=new SpeechSynthesisUtterance(`At ${r.word}: ${r.act}`);
+  u.lang = 'en-US';
     u.rate=0.85;u.pitch=1.0;
     setTimeout(()=>window.speechSynthesis.speak(u),i*3000);
   });

@@ -232,8 +232,10 @@ function speakCurrent() {
   window.speechSynthesis.cancel();
   const d = sightWords[cur];
   const u1 = new SpeechSynthesisUtterance(d.w);
+  u1.lang = 'en-US';
   u1.rate=0.7; u1.pitch=1.2;
   const u2 = new SpeechSynthesisUtterance(d.sentence);
+  u2.lang = 'en-US';
   u2.rate=0.85; u2.pitch=1.0;
   window.speechSynthesis.speak(u1);
   window.speechSynthesis.speak(u2);

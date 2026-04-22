@@ -418,13 +418,16 @@ function speakNumber() {
   const d = data[cur];
   window.speechSynthesis.cancel();
   const u1 = new SpeechSynthesisUtterance(`${d.n}`);
+  u1.lang = 'en-US';
   u1.rate = 0.8; u1.pitch = 1.2;
   const u2 = new SpeechSynthesisUtterance(d.word);
+  u2.lang = 'en-US';
   u2.rate = 0.85; u2.pitch = 1.1;
 
   // Count aloud: "1, 2, 3..."
   const countStr = Array.from({length: d.n}, (_,i) => i+1).join(', ');
   const u3 = new SpeechSynthesisUtterance(`Let's count! ${countStr}.`);
+  u3.lang = 'en-US';
   u3.rate = 0.8; u3.pitch = 1.0;
 
   window.speechSynthesis.speak(u1);

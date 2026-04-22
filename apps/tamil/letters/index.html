@@ -94,6 +94,9 @@ header p{font-size:.85rem;opacity:.8;margin-top:3px;}
   <p class="ta">தமிழ் எழுத்துக்கள் — Let's learn the Tamil alphabet!</p>
 </header>
 
+<div id="tts-tip" style="display:none;background:#FFF3E0;border-left:4px solid #FF9800;padding:10px 16px;font-size:.82rem;color:#E65100;text-align:center;">
+  💡 <b>Tip:</b> For correct Tamil pronunciation, go to <b>Settings → Accessibility → Spoken Content → Voices → Tamil</b> and download the Tamil voice on your device.
+</div>
 <nav class="mode-nav">
   <button class="mode-btn active" onclick="showMode('vowels',this)">🔴 Vowels <span class="ta">(உயிர்)</span></button>
   <button class="mode-btn" onclick="showMode('consonants',this)">🟠 Consonants <span class="ta">(மெய்)</span></button>
@@ -178,8 +181,8 @@ const vowels=[
   {char:'ஈ',roman:'ii',hint:'நெடில் · long "ii" as in eel',spk:'ஈ, ஈர்',example:'ஈர்',exRoman:'iir',exMeaning:'Wet',emoji:'💧'},
   {char:'உ',roman:'u',hint:'குறில் · short "u" as in put',spk:'உ, உலகம்',example:'உலகம்',exRoman:'ulagam',exMeaning:'World',emoji:'🌍'},
   {char:'ஊ',roman:'uu',hint:'நெடில் · long "uu" as in moon',spk:'ஊ, ஊர்',example:'ஊர்',exRoman:'uur',exMeaning:'Village',emoji:'🏘️'},
-  {char:'எ',roman:'e',hint:'குறில் · short "e" as in egg',spk:'எ, எலி',example:'எலி',exRoman:'eli',exMeaning:'Mouse',emoji:'🐭'},
-  {char:'ஏ',roman:'ae',hint:'நெடில் · long "ae" as in aim',spk:'ஏ, ஏணி',example:'ஏணி',exRoman:'aeni',exMeaning:'Ladder',emoji:'🪜'},
+  {char:'எ',roman:'e',hint:'குறில் · short "e" as in elephant',spk:'எ, எலி',example:'எலி',exRoman:'eli',exMeaning:'Mouse',emoji:'🐭'},
+  {char:'ஏ',roman:'ae',hint:'நெடில் · long "ae" as in hay or eight',spk:'ஏ, ஏணி',example:'ஏணி',exRoman:'aeni',exMeaning:'Ladder',emoji:'🪜'},
   {char:'ஐ',roman:'ai',hint:'ஐகாரம் · "ai" as in eye',spk:'ஐ, ஐந்து',example:'ஐந்து',exRoman:'ainthu',exMeaning:'Five',emoji:'🖐️'},
   {char:'ஒ',roman:'o',hint:'குறில் · short "o" as in odd',spk:'ஒ, ஒட்டகம்',example:'ஒட்டகம்',exRoman:'ottakam',exMeaning:'Camel',emoji:'🐪'},
   {char:'ஓ',roman:'oh',hint:'நெடில் · long "oh" as in open',spk:'ஓ, ஓடம்',example:'ஓடம்',exRoman:'odam',exMeaning:'Boat',emoji:'⛵'},
@@ -210,10 +213,20 @@ const allLetters=[...vowels,...consonants];
 let traceIdx=0;
 
 function speak(text,lang='ta-IN'){
-  window.speechSynthesis&&speechSynthesis.cancel();
+  if(!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  // Check Tamil voice availability
+  const voices=speechSynthesis.getVoices();
+  const hasTamil=voices.some(v=>v.lang.startsWith('ta'));
   const u=new SpeechSynthesisUtterance(text);
-  u.lang=lang;u.rate=0.75;
-  window.speechSynthesis&&speechSynthesis.speak(u);
+  u.lang=hasTamil?lang:'ta-IN';
+  u.rate=0.75;
+  if(!hasTamil&&voices.length>0){
+    // Show one-time tip if Tamil voice not found
+    const tip=document.getElementById('tts-tip');
+    if(tip)tip.style.display='block';
+  }
+  speechSynthesis.speak(u);
 }
 
 function buildGrid(data,id,isC){

@@ -258,6 +258,7 @@ function speakShape(){
   const s=shapes[cur];
   const txt=`${s.name}. ${s.type} shape. Properties: ${s.props.join(', ')}. ${s.desc} ${s.example}`;
   const u=new SpeechSynthesisUtterance(txt);
+  u.lang = 'en-US';
   u.rate=0.85;u.pitch=1.1;
   window.speechSynthesis.speak(u);
 }

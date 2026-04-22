@@ -82,6 +82,9 @@ header p{font-size:.85rem;opacity:.8;margin-top:3px;}
   <p class="hi">हिंदी वर्णमाला — Let's learn the Hindi alphabet!</p>
 </header>
 
+<div id="tts-tip" style="display:none;background:#FFF3E0;border-left:4px solid #FF9800;padding:10px 16px;font-size:.82rem;color:#E65100;text-align:center;">
+  💡 <b>Tip:</b> For correct Hindi pronunciation, go to <b>Settings → Accessibility → Spoken Content → Voices → Hindi</b> and download the Hindi voice on your device.
+</div>
 <nav class="mode-nav">
   <button class="mode-btn active" onclick="showMode('vowels',this)">🔵 Vowels <span class="hi">(स्वर)</span></button>
   <button class="mode-btn" onclick="showMode('consonants',this)">🟠 Consonants <span class="hi">(व्यंजन)</span></button>
@@ -214,10 +217,17 @@ const allLetters=[...vowels,...consonants];
 let traceIdx=0;
 
 function speak(text,lang='hi-IN'){
-  window.speechSynthesis&&speechSynthesis.cancel();
+  if(!window.speechSynthesis)return;
+  speechSynthesis.cancel();
+  const voices=speechSynthesis.getVoices();
+  const hasHindi=voices.some(v=>v.lang.startsWith('hi'));
   const u=new SpeechSynthesisUtterance(text);
-  u.lang=lang;u.rate=0.75;
-  window.speechSynthesis&&speechSynthesis.speak(u);
+  u.lang='hi-IN';u.rate=0.75;
+  if(!hasHindi&&voices.length>0){
+    const tip=document.getElementById('tts-tip');
+    if(tip)tip.style.display='block';
+  }
+  speechSynthesis.speak(u);
 }
 
 function buildGrid(data,id){

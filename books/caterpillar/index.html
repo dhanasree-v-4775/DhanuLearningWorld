@@ -524,6 +524,7 @@
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(pageTexts[current]);
+  u.lang = 'en-US';
       u.rate = 0.85;
       u.pitch = 1.1;
       window.speechSynthesis.speak(u);

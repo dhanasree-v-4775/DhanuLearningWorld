@@ -226,7 +226,8 @@ function newLength(){
     btns.appendChild(btn);
   });
 }
-function speakLen(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();if(!lenA)return;const u=new SpeechSynthesisUtterance(`Which is ${lenType}? ${lenA.name} which is ${lenA.cm} centimetres, or ${lenB.name} which is ${lenB.cm} centimetres?`);u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
+function speakLen(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();if(!lenA)return;const u=new SpeechSynthesisUtterance(`Which is ${lenType}? ${lenA.name} which is ${lenA.cm} centimetres, or ${lenB.name} which is ${lenB.cm} centimetres?`);
+  u.lang = 'en-US';u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
 
 // ── WEIGHT ──
 const weightItems=[
@@ -269,7 +270,8 @@ function newWeight(){
     btns.appendChild(btn);
   });
 }
-function speakWeight(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();if(!wA)return;const u=new SpeechSynthesisUtterance(`Which is ${wType}? ${wA.name} weighing ${wA.kg}, or ${wB.name} weighing ${wB.kg}?`);u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
+function speakWeight(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();if(!wA)return;const u=new SpeechSynthesisUtterance(`Which is ${wType}? ${wA.name} weighing ${wA.kg}, or ${wB.name} weighing ${wB.kg}?`);
+  u.lang = 'en-US';u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
 
 // ── CAPACITY ──
 const capItems=[
@@ -318,7 +320,8 @@ function newCapacity(){
     btns.appendChild(btn);
   });
 }
-function speakCap(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();if(!capA)return;const u=new SpeechSynthesisUtterance(`Which holds ${capType}? ${capA.name} or ${capB.name}?`);u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
+function speakCap(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();if(!capA)return;const u=new SpeechSynthesisUtterance(`Which holds ${capType}? ${capA.name} or ${capB.name}?`);
+  u.lang = 'en-US';u.rate=0.85;u.pitch=1.1;window.speechSynthesis.speak(u);}
 
 function setTab(t,tab){
   document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
