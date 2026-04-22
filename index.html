@@ -22,6 +22,7 @@
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>My Learning World 🌟</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;700;800&family=Noto+Sans+Devanagari:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
    RESET & BASE
@@ -146,6 +147,8 @@ body {
 .nav-pill.science:active,.nav-pill.science:hover{color:#2d9e2d;}
 .nav-pill.ict:active,.nav-pill.ict:hover{color:#6c5ce7;}
 .nav-pill.evs:active,.nav-pill.evs:hover{color:#00b894;}
+.nav-pill.tamil:active,.nav-pill.tamil:hover{color:#E74C3C;}
+.nav-pill.hindi:active,.nav-pill.hindi:hover{color:#FF7043;}
 
 /* ============================================================
    MAIN CONTENT
@@ -269,6 +272,14 @@ body {
 /* EVS */
 .ac-evs .card-icon-wrap    { background:linear-gradient(135deg,#00d2a0,#00695c); }
 .ac-evs .card-badge        { background:#00b894; }
+/* Tamil */
+.sh-tamil  { background:linear-gradient(135deg,#8B1A1A,#C0392B); }
+.ac-tamil .card-icon-wrap  { background:linear-gradient(135deg,#C0392B,#8B1A1A); }
+.ac-tamil .card-badge      { background:#C0392B; }
+/* Hindi */
+.sh-hindi  { background:linear-gradient(135deg,#E64A19,#BF360C); }
+.ac-hindi .card-icon-wrap  { background:linear-gradient(135deg,#FF7043,#BF360C); }
+.ac-hindi .card-badge      { background:#E64A19; }
 
 /* ============================================================
    NEW BADGE ON CARDS (optional decoration)
@@ -367,6 +378,8 @@ body {
       <a class="nav-pill science" href="#science"> 🔬 Science </a>
       <a class="nav-pill ict"     href="#ict">     💻 ICT     </a>
       <a class="nav-pill evs"     href="#evs">     🌍 EVS     </a>
+      <a class="nav-pill tamil"   href="#tamil">   🔤 Tamil   </a>
+      <a class="nav-pill hindi"   href="#hindi">   🔤 Hindi   </a>
     </div>
   </nav>
 
@@ -775,6 +788,76 @@ body {
             <div class="card-title">Healthy Habits</div>
             <div class="card-sub">Stay Fit & Happy</div>
             <span class="card-badge">EVS</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ===== TAMIL ===== -->
+    <section class="section" id="tamil">
+      <div class="section-header sh-tamil">
+        <div class="section-header-inner">
+          <div class="section-icon">🔤</div>
+          <div class="section-text">
+            <div class="section-title">Tamil</div>
+            <div class="section-sub" style="font-family:'Noto Sans Tamil','Tamil Sangam MN',sans-serif;">தமிழ் — Letters, Words &amp; Writing</div>
+          </div>
+          <div class="section-count">2 Apps</div>
+        </div>
+      </div>
+      <div class="card-grid">
+
+        <a class="app-card ac-tamil" href="apps/tamil/letters/index.html" style="animation-delay:0.05s">
+          <div class="card-icon-wrap" style="font-family:'Noto Sans Tamil',sans-serif;">அ</div>
+          <div class="card-body">
+            <div class="card-title">Tamil Letters</div>
+            <div class="card-sub">Vowels, Consonants &amp; Tracing</div>
+            <span class="card-badge">Tamil</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-tamil" href="apps/tamil/words/index.html" style="animation-delay:0.09s">
+          <div class="card-icon-wrap">🖼️</div>
+          <div class="card-body">
+            <div class="card-title">Tamil Words</div>
+            <div class="card-sub">Picture Dictionary &amp; Quiz</div>
+            <span class="card-badge">Tamil</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ===== HINDI ===== -->
+    <section class="section" id="hindi">
+      <div class="section-header sh-hindi">
+        <div class="section-header-inner">
+          <div class="section-icon">🔤</div>
+          <div class="section-text">
+            <div class="section-title">Hindi</div>
+            <div class="section-sub" style="font-family:'Noto Sans Devanagari','Devanagari MT',sans-serif;">हिंदी — Letters, Words &amp; Writing</div>
+          </div>
+          <div class="section-count">2 Apps</div>
+        </div>
+      </div>
+      <div class="card-grid">
+
+        <a class="app-card ac-hindi" href="apps/hindi/letters/index.html" style="animation-delay:0.05s">
+          <div class="card-icon-wrap" style="font-family:'Noto Sans Devanagari',sans-serif;">अ</div>
+          <div class="card-body">
+            <div class="card-title">Hindi Letters</div>
+            <div class="card-sub">Vowels, Consonants &amp; Tracing</div>
+            <span class="card-badge">Hindi</span>
+          </div>
+        </a>
+
+        <a class="app-card ac-hindi" href="apps/hindi/words/index.html" style="animation-delay:0.09s">
+          <div class="card-icon-wrap">🖼️</div>
+          <div class="card-body">
+            <div class="card-title">Hindi Words</div>
+            <div class="card-sub">Picture Dictionary &amp; Quiz</div>
+            <span class="card-badge">Hindi</span>
           </div>
         </a>
 

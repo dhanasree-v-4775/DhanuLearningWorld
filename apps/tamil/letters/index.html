@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head><meta charset="UTF-8">
+<script>
+(function(){
+  var fonts={
+    'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap',
+    'Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap',
+    'Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap',
+    'ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap',
+    'Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'
+  };
+  var chosen=localStorage.getItem('dhanu-font')||'Nunito';
+  if(fonts[chosen]){var l=document.createElement('link');l.rel='stylesheet';l.href=fonts[chosen];document.head.appendChild(l);}
+  document.documentElement.style.setProperty('--app-font',chosen);
+})();
+</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Tamil Letters | தமிழ் எழுத்துக்கள்</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:var(--app-font,'Nunito'),sans-serif;background:linear-gradient(160deg,#4a0000 0%,#8B1A1A 40%,#C0392B 100%);min-height:100vh;color:#333;}
+.ta{font-family:'Noto Sans Tamil','Tamil Sangam MN',sans-serif;}
+
+header{background:rgba(0,0,0,0.35);backdrop-filter:blur(12px);padding:14px 20px 10px;text-align:center;color:#fff;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.1);}
+.back-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.15);color:#fff;border:1.5px solid rgba(255,255,255,0.3);border-radius:50px;padding:6px 14px;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:8px;font-family:var(--app-font,'Nunito'),sans-serif;transition:background .15s;}
+.back-btn:hover{background:rgba(255,255,255,0.25);}
+header h1{font-size:1.6rem;font-weight:800;letter-spacing:-.5px;}
+header p{font-size:.85rem;opacity:.8;margin-top:3px;}
+
+.mode-nav{display:flex;gap:8px;justify-content:center;padding:12px 16px;background:rgba(0,0,0,0.2);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.mode-btn{padding:10px 22px;border:2px solid rgba(255,255,255,0.3);border-radius:50px;font-size:.9rem;font-weight:700;cursor:pointer;background:transparent;color:#fff;transition:all .2s;white-space:nowrap;font-family:var(--app-font,'Nunito'),sans-serif;}
+.mode-btn.active{background:#fff;color:#8B1A1A;border-color:#fff;}
+.mode-btn:active{transform:scale(.95);}
+
+.section{display:none;padding:20px 16px 110px;}
+.section.active{display:block;}
+.sec-title{text-align:center;color:#fff;font-size:1.3rem;font-weight:800;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,.3);}
+.sec-sub{text-align:center;color:rgba(255,255,255,.8);font-size:.85rem;margin-bottom:20px;}
+
+/* ─── Letter Cards ─── */
+.letter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;}
+.letter-card{background:rgba(255,255,255,0.97);border-radius:20px;padding:18px 10px 14px;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 18px rgba(0,0,0,.18);position:relative;overflow:hidden;}
+.letter-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#8B1A1A,#E74C3C,#FF8C42);}
+.letter-card:active{transform:scale(.95);}
+@media(hover:hover){.letter-card:hover{transform:translateY(-5px);box-shadow:0 10px 32px rgba(0,0,0,.25);}}
+.lc-char{font-family:'Noto Sans Tamil','Tamil Sangam MN',sans-serif;font-size:3.6rem;font-weight:800;color:#8B1A1A;line-height:1.15;margin-bottom:4px;}
+.lc-roman{font-size:.72rem;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.lc-emoji{font-size:2rem;margin-bottom:4px;}
+.lc-ta-word{font-family:'Noto Sans Tamil',sans-serif;font-size:.85rem;font-weight:700;color:#333;margin-bottom:2px;}
+.lc-en-word{font-size:.72rem;color:#888;margin-bottom:8px;}
+.lc-grp{display:inline-block;padding:2px 10px;border-radius:50px;font-family:'Noto Sans Tamil',sans-serif;font-size:.65rem;font-weight:700;margin-bottom:6px;}
+.grp-val{background:#FFECEC;color:#C0392B;}
+.grp-mel{background:#E8F5E9;color:#2E7D32;}
+.grp-ida{background:#E3F2FD;color:#1565C0;}
+.hear-btn{background:linear-gradient(135deg,#8B1A1A,#E74C3C);color:#fff;border:none;border-radius:50px;padding:7px 18px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--app-font,'Nunito'),sans-serif;transition:transform .15s;}
+.hear-btn:active{transform:scale(.93);}
+
+/* ─── Write & Trace ─── */
+.trace-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;}
+.ls-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;width:100%;max-width:500px;}
+.ls-btn{aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.25);border-radius:12px;cursor:pointer;font-family:'Noto Sans Tamil',sans-serif;font-size:1.3rem;font-weight:700;color:#fff;transition:all .15s;user-select:none;}
+.ls-btn.sel{background:#fff;color:#8B1A1A;border-color:#fff;transform:scale(1.1);}
+.ls-btn:active{transform:scale(.9);}
+.canvas-box{background:rgba(255,255,255,0.97);border-radius:24px;padding:16px;box-shadow:0 8px 32px rgba(0,0,0,.25);width:100%;max-width:380px;}
+.canvas-hdr{text-align:center;margin-bottom:10px;}
+.trace-char{font-family:'Noto Sans Tamil',sans-serif;font-size:2.8rem;font-weight:800;color:#8B1A1A;}
+.trace-hint{font-size:.82rem;color:#888;margin-top:3px;}
+#traceCanvas{display:block;border-radius:14px;background:#FFFAF8;border:2px dashed #FFCDD2;touch-action:none;cursor:crosshair;width:100%;height:auto;}
+.canvas-ctrls{display:flex;gap:10px;justify-content:center;margin-top:12px;}
+.ctrl-btn{padding:11px 28px;border:none;border-radius:50px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--app-font,'Nunito'),sans-serif;transition:transform .15s;}
+.ctrl-btn:active{transform:scale(.95);}
+.btn-clr{background:#f5f5f5;color:#666;}
+.btn-done{background:linear-gradient(135deg,#8B1A1A,#E74C3C);color:#fff;box-shadow:0 4px 16px rgba(139,26,26,.4);}
+
+/* ─── Celebration ─── */
+.celeb{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:20px;}
+.celeb.show{display:flex;}
+.cel-emo{font-size:5rem;animation:bop .5s ease infinite alternate;}
+.cel-title{color:#fff;font-size:1.9rem;font-weight:800;text-align:center;}
+.cel-sub{color:rgba(255,255,255,.8);font-size:1rem;text-align:center;line-height:1.5;}
+.cel-btn{background:#fff;color:#8B1A1A;border:none;border-radius:50px;padding:14px 36px;font-size:1rem;font-weight:800;cursor:pointer;font-family:var(--app-font,'Nunito'),sans-serif;margin-top:6px;}
+.cel-btn2{background:rgba(255,255,255,.2);color:#fff;border:2px solid rgba(255,255,255,.4);border-radius:50px;padding:12px 28px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:var(--app-font,'Nunito'),sans-serif;}
+@keyframes bop{from{transform:translateY(0) scale(1);}to{transform:translateY(-14px) scale(1.1);}}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../../.." class="back-btn">← Home</a>
+  <h1>🔤 Tamil Letters</h1>
+  <p class="ta">தமிழ் எழுத்துக்கள் — Let's learn the Tamil alphabet!</p>
+</header>
+
+<nav class="mode-nav">
+  <button class="mode-btn active" onclick="showMode('vowels',this)">🔴 Vowels <span class="ta">(உயிர்)</span></button>
+  <button class="mode-btn" onclick="showMode('consonants',this)">🟠 Consonants <span class="ta">(மெய்)</span></button>
+  <button class="mode-btn" onclick="showMode('trace',this)">✏️ Write &amp; Trace</button>
+</nav>
+
+<!-- VOWELS -->
+<section id="vowels-section" class="section active">
+  <div class="sec-title">Vowels — <span class="ta">உயிரெழுத்துக்கள்</span></div>
+  <div class="sec-sub">12 vowels — the "soul" letters of Tamil. Tap a card to hear it! 🔊</div>
+  <div class="letter-grid" id="vowels-grid"></div>
+</section>
+
+<!-- CONSONANTS -->
+<section id="consonants-section" class="section">
+  <div class="sec-title">Consonants — <span class="ta">மெய்யெழுத்துக்கள்</span></div>
+  <div class="sec-sub">18 consonants — the "body" letters of Tamil. Tap to hear! 🔊</div>
+  <div class="letter-grid" id="consonants-grid"></div>
+</section>
+
+<!-- WRITE & TRACE -->
+<section id="trace-section" class="section">
+  <div class="sec-title">✏️ Write &amp; Trace</div>
+  <div class="sec-sub">Choose a letter below, then trace it on the canvas with your finger!</div>
+  <div class="trace-wrap">
+    <div class="ls-grid" id="ls-grid"></div>
+    <div class="canvas-box">
+      <div class="canvas-hdr">
+        <div class="trace-char" id="trace-char">அ</div>
+        <div class="trace-hint" id="trace-hint">a &nbsp;·&nbsp; 👩 Mother (அம்மா)</div>
+      </div>
+      <canvas id="traceCanvas" width="348" height="348"></canvas>
+      <div class="canvas-ctrls">
+        <button class="ctrl-btn btn-clr" onclick="clearCanvas()">🗑️ Clear</button>
+        <button class="ctrl-btn btn-done" onclick="doneTrace()">⭐ Done!</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CELEBRATION -->
+<div class="celeb" id="celeb">
+  <div class="cel-emo">🌟</div>
+  <div class="cel-title">Wonderful!</div>
+  <div class="cel-sub" id="cel-sub">You wrote <b>அ</b> beautifully! Keep going! 🎉</div>
+  <button class="cel-btn" onclick="nextLetter()">Next Letter →</button>
+  <button class="cel-btn2" onclick="hideCeleb()">Practise Again</button>
+</div>
+
+<!-- Font Picker Widget -->
+<div id="font-fab" onclick="document.getElementById('font-panel').classList.toggle('open')" title="Change Font" style="position:fixed;bottom:24px;right:24px;z-index:9999;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(102,126,234,0.5);transition:transform .2s;user-select:none;" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'">Aa</div>
+<div id="font-panel" style="position:fixed;bottom:88px;right:24px;z-index:9998;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px;width:240px;display:none;flex-direction:column;gap:10px;">
+  <div style="font-size:13px;font-weight:700;color:#666;margin-bottom:4px;letter-spacing:.5px;">CHOOSE FONT</div>
+  <button onclick="setFont('Nunito')" data-font="Nunito" style="font-family:'Nunito',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:700;transition:all .15s;">Nunito — Hello World!</button>
+  <button onclick="setFont('Fredoka One')" data-font="Fredoka One" style="font-family:'Fredoka One',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;transition:all .15s;">Fredoka — Hello World!</button>
+  <button onclick="setFont('Patrick Hand')" data-font="Patrick Hand" style="font-family:'Patrick Hand',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;transition:all .15s;">Patrick Hand — Hello!</button>
+  <button onclick="setFont('ABeeZee')" data-font="ABeeZee" style="font-family:'ABeeZee',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;transition:all .15s;">ABeeZee — Hello World!</button>
+  <button onclick="setFont('Poppins')" data-font="Poppins" style="font-family:'Poppins',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:600;transition:all .15s;">Poppins — Hello World!</button>
+</div>
+<style>
+#font-panel.open{display:flex!important;}
+body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,span,div,a,label{font-family:var(--app-font,'Nunito'),sans-serif!important;}
+.ta,.lc-char,.trace-char,.ls-btn,.lc-ta-word,.cel-sub b{font-family:'Noto Sans Tamil','Tamil Sangam MN',sans-serif!important;}
+</style>
+<script>
+(function(){
+  var allFontLinks={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};
+  Object.values(allFontLinks).forEach(function(href){var existing=document.querySelector('link[href="'+href+'"]');if(!existing){var l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l);}});
+  var current=localStorage.getItem('dhanu-font')||'Nunito';
+  document.querySelectorAll('#font-panel button[data-font]').forEach(function(b){if(b.getAttribute('data-font')===current){b.style.borderColor='#667eea';b.style.background='#f0f0ff';b.style.boxShadow='0 0 0 3px rgba(102,126,234,.2)';}});
+})();
+function setFont(name){localStorage.setItem('dhanu-font',name);location.reload();}
+</script>
+
+<script>
+const vowels=[
+  {char:'அ',roman:'a',spk:'அ',example:'அம்மா',exRoman:'amma',exMeaning:'Mother',emoji:'👩'},
+  {char:'ஆ',roman:'aa',spk:'ஆ',example:'ஆடு',exRoman:'aadu',exMeaning:'Goat',emoji:'🐐'},
+  {char:'இ',roman:'i',spk:'இ',example:'இலை',exRoman:'ilai',exMeaning:'Leaf',emoji:'🍃'},
+  {char:'ஈ',roman:'ee',spk:'ஈ',example:'ஈ',exRoman:'ee',exMeaning:'Housefly',emoji:'🪰'},
+  {char:'உ',roman:'u',spk:'உ',example:'உலகம்',exRoman:'ulagam',exMeaning:'World',emoji:'🌍'},
+  {char:'ஊ',roman:'oo',spk:'ஊ',example:'ஊர்',exRoman:'oor',exMeaning:'Village',emoji:'🏘️'},
+  {char:'எ',roman:'e',spk:'எ',example:'எலி',exRoman:'eli',exMeaning:'Mouse',emoji:'🐭'},
+  {char:'ஏ',roman:'ae',spk:'ஏ',example:'ஏணி',exRoman:'aeni',exMeaning:'Ladder',emoji:'🪜'},
+  {char:'ஐ',roman:'ai',spk:'ஐ',example:'ஐந்து',exRoman:'ainthu',exMeaning:'Five',emoji:'🖐️'},
+  {char:'ஒ',roman:'o',spk:'ஒ',example:'ஒட்டகம்',exRoman:'ottakam',exMeaning:'Camel',emoji:'🐪'},
+  {char:'ஓ',roman:'oo',spk:'ஓ',example:'ஓடு',exRoman:'odu',exMeaning:'Shell',emoji:'🐚'},
+  {char:'ஔ',roman:'au',spk:'ஔ',example:'ஔஷதம்',exRoman:'aushadham',exMeaning:'Medicine',emoji:'💊'},
+];
+const consonants=[
+  {char:'க',roman:'k/g',spk:'க',grp:'val',grpL:'வல்லினம்',example:'கடல்',exRoman:'kadal',exMeaning:'Sea',emoji:'🌊'},
+  {char:'ங',roman:'ng',spk:'ங',grp:'mel',grpL:'மெல்லினம்',example:'மங்கை',exRoman:'mangai',exMeaning:'Girl',emoji:'👧'},
+  {char:'ச',roman:'s/j',spk:'ச',grp:'val',grpL:'வல்லினம்',example:'சிங்கம்',exRoman:'singam',exMeaning:'Lion',emoji:'🦁'},
+  {char:'ஞ',roman:'ny',spk:'ஞ',grp:'mel',grpL:'மெல்லினம்',example:'ஞாயிறு',exRoman:'nyaayiru',exMeaning:'Sun',emoji:'☀️'},
+  {char:'ட',roman:'t/d',spk:'ட',grp:'val',grpL:'வல்லினம்',example:'டீ',exRoman:'tee',exMeaning:'Tea',emoji:'🍵'},
+  {char:'ண',roman:'nn',spk:'ண',grp:'mel',grpL:'மெல்லினம்',example:'கண்',exRoman:'kan',exMeaning:'Eye',emoji:'👁️'},
+  {char:'த',roman:'th/d',spk:'த',grp:'val',grpL:'வல்லினம்',example:'தாய்',exRoman:'thaai',exMeaning:'Mother',emoji:'👩'},
+  {char:'ந',roman:'n',spk:'ந',grp:'mel',grpL:'மெல்லினம்',example:'நாடு',exRoman:'naadu',exMeaning:'Country',emoji:'🗺️'},
+  {char:'ப',roman:'p/b',spk:'ப',grp:'val',grpL:'வல்லினம்',example:'பூ',exRoman:'poo',exMeaning:'Flower',emoji:'🌸'},
+  {char:'ம',roman:'m',spk:'ம',grp:'mel',grpL:'மெல்லினம்',example:'மரம்',exRoman:'maram',exMeaning:'Tree',emoji:'🌳'},
+  {char:'ய',roman:'y',spk:'ய',grp:'ida',grpL:'இடையினம்',example:'யானை',exRoman:'yaanai',exMeaning:'Elephant',emoji:'🐘'},
+  {char:'ர',roman:'r',spk:'ர',grp:'ida',grpL:'இடையினம்',example:'ரயில்',exRoman:'rayil',exMeaning:'Train',emoji:'🚂'},
+  {char:'ல',roman:'l',spk:'ல',grp:'ida',grpL:'இடையினம்',example:'லட்டு',exRoman:'laddu',exMeaning:'Sweet',emoji:'🍮'},
+  {char:'வ',roman:'v/w',spk:'வ',grp:'ida',grpL:'இடையினம்',example:'வீடு',exRoman:'veedu',exMeaning:'House',emoji:'🏠'},
+  {char:'ழ',roman:'zh',spk:'ழ',grp:'ida',grpL:'இடையினம்',example:'தமிழ்',exRoman:'tamizh',exMeaning:'Tamil',emoji:'📜'},
+  {char:'ள',roman:'ll',spk:'ள',grp:'ida',grpL:'இடையினம்',example:'விளக்கு',exRoman:'vilakku',exMeaning:'Lamp',emoji:'🪔'},
+  {char:'ற',roman:'rr',spk:'ற',grp:'val',grpL:'வல்லினம்',example:'மழை',exRoman:'mazhai',exMeaning:'Rain',emoji:'🌧️'},
+  {char:'ன',roman:'n',spk:'ன',grp:'mel',grpL:'மெல்லினம்',example:'மனிதன்',exRoman:'manithan',exMeaning:'Human',emoji:'👤'},
+];
+const allLetters=[...vowels,...consonants];
+let traceIdx=0;
+
+function speak(text,lang='ta-IN'){
+  window.speechSynthesis&&speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang;u.rate=0.75;
+  window.speechSynthesis&&speechSynthesis.speak(u);
+}
+
+function buildGrid(data,id,isC){
+  const g=document.getElementById(id);g.innerHTML='';
+  data.forEach(item=>{
+    const c=document.createElement('div');c.className='letter-card';
+    let badge='';
+    if(isC){
+      const cl=item.grp==='val'?'grp-val':item.grp==='mel'?'grp-mel':'grp-ida';
+      badge=`<div class="lc-grp ${cl} ta">${item.grpL}</div>`;
+    }
+    c.innerHTML=`${badge}<div class="lc-char">${item.char}</div><div class="lc-roman">${item.roman}</div><div class="lc-emoji">${item.emoji}</div><div class="lc-ta-word ta">${item.example}</div><div class="lc-en-word">${item.exRoman} · ${item.exMeaning}</div><button class="hear-btn" onclick="event.stopPropagation();speak('${item.spk}')">🔊 Hear</button>`;
+    c.onclick=()=>speak(item.spk);
+    g.appendChild(c);
+  });
+}
+
+function buildLS(){
+  const g=document.getElementById('ls-grid');g.innerHTML='';
+  allLetters.forEach((l,i)=>{
+    const b=document.createElement('div');
+    b.className='ls-btn'+(i===0?' sel':'');
+    b.textContent=l.char;
+    b.onclick=()=>selectLetter(i);
+    g.appendChild(b);
+  });
+}
+
+let drawing=false,lx=0,ly=0;
+const canvas=()=>document.getElementById('traceCanvas');
+const ctx=()=>canvas().getContext('2d');
+
+function drawGuide(char){
+  const c=canvas(),x=c.getContext('2d');
+  x.clearRect(0,0,c.width,c.height);
+  // guide grid
+  x.strokeStyle='rgba(0,0,0,0.04)';x.lineWidth=1;x.setLineDash([5,5]);
+  for(let i=1;i<4;i++){
+    x.beginPath();x.moveTo(c.width/4*i,0);x.lineTo(c.width/4*i,c.height);x.stroke();
+    x.beginPath();x.moveTo(0,c.height/4*i);x.lineTo(c.width,c.height/4*i);x.stroke();
+  }
+  x.setLineDash([]);
+  // centre cross
+  x.strokeStyle='rgba(139,26,26,0.06)';x.lineWidth=2;
+  x.beginPath();x.moveTo(c.width/2,20);x.lineTo(c.width/2,c.height-20);x.stroke();
+  x.beginPath();x.moveTo(20,c.height/2);x.lineTo(c.width-20,c.height/2);x.stroke();
+  // guide letter
+  document.fonts.ready.then(()=>{
+    x.font='bold 200px "Noto Sans Tamil","Tamil Sangam MN",sans-serif';
+    x.fillStyle='rgba(139,26,26,0.09)';
+    x.textAlign='center';x.textBaseline='middle';
+    x.fillText(char,c.width/2,c.height/2);
+  });
+}
+
+function selectLetter(i){
+  traceIdx=i;
+  document.querySelectorAll('.ls-btn').forEach((b,j)=>b.classList.toggle('sel',j===i));
+  const l=allLetters[i];
+  document.getElementById('trace-char').textContent=l.char;
+  document.getElementById('trace-hint').textContent=`${l.roman}  ·  ${l.emoji} ${l.exMeaning} (${l.example})`;
+  drawGuide(l.char);
+  speak(l.spk);
+}
+
+function clearCanvas(){drawGuide(allLetters[traceIdx].char);}
+
+function getP(e){
+  const c=canvas(),r=c.getBoundingClientRect(),sx=c.width/r.width,sy=c.height/r.height;
+  const src=e.touches?e.touches[0]:e;
+  return{x:(src.clientX-r.left)*sx,y:(src.clientY-r.top)*sy};
+}
+function startDraw(e){e.preventDefault&&e.preventDefault();drawing=true;const p=getP(e);lx=p.x;ly=p.y;}
+function moveDraw(e){
+  e.preventDefault&&e.preventDefault();
+  if(!drawing)return;
+  const p=getP(e),x=ctx();
+  x.beginPath();x.strokeStyle='#8B1A1A';x.lineWidth=9;x.lineCap='round';x.lineJoin='round';x.setLineDash([]);
+  x.moveTo(lx,ly);x.lineTo(p.x,p.y);x.stroke();
+  lx=p.x;ly=p.y;
+}
+function endDraw(){drawing=false;}
+
+window.addEventListener('load',()=>{
+  const c=canvas();
+  c.addEventListener('mousedown',startDraw);
+  c.addEventListener('mousemove',moveDraw);
+  c.addEventListener('mouseup',endDraw);
+  c.addEventListener('mouseleave',endDraw);
+  c.addEventListener('touchstart',startDraw,{passive:false});
+  c.addEventListener('touchmove',moveDraw,{passive:false});
+  c.addEventListener('touchend',endDraw);
+});
+
+function doneTrace(){
+  const l=allLetters[traceIdx];
+  document.getElementById('cel-sub').innerHTML=`You traced <span class="ta" style="font-family:'Noto Sans Tamil',sans-serif;font-size:1.8em;color:#FFD700;">${l.char}</span> (${l.roman}) — Brilliant! 🎉`;
+  document.getElementById('celeb').classList.add('show');
+  speak(l.example+' '+l.exMeaning,'ta-IN');
+}
+function hideCeleb(){document.getElementById('celeb').classList.remove('show');}
+function nextLetter(){
+  hideCeleb();
+  selectLetter((traceIdx+1)%allLetters.length);
+  const btns=document.querySelectorAll('.ls-btn');
+  btns[(traceIdx)].scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function showMode(mode,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(mode+'-section').classList.add('active');
+  btn.classList.add('active');
+  if(mode==='trace'){setTimeout(()=>drawGuide(allLetters[traceIdx].char),100);}
+}
+
+buildGrid(vowels,'vowels-grid',false);
+buildGrid(consonants,'consonants-grid',true);
+buildLS();
+setTimeout(()=>drawGuide('அ'),300);
+</script>
+</body>
+</html>

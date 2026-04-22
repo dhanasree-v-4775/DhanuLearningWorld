@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head><meta charset="UTF-8">
+<script>
+(function(){
+  var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};
+  var chosen=localStorage.getItem('dhanu-font')||'Nunito';
+  if(fonts[chosen]){var l=document.createElement('link');l.rel='stylesheet';l.href=fonts[chosen];document.head.appendChild(l);}
+  document.documentElement.style.setProperty('--app-font',chosen);
+})();
+</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Hindi Words | हिंदी शब्द</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:var(--app-font,'Nunito'),sans-serif;background:linear-gradient(160deg,#BF360C 0%,#E64A19 40%,#FF7043 100%);min-height:100vh;color:#333;}
+.hi{font-family:'Noto Sans Devanagari','Devanagari MT',sans-serif;}
+
+header{background:rgba(0,0,0,0.3);backdrop-filter:blur(12px);padding:14px 20px 10px;text-align:center;color:#fff;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.1);}
+.back-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:50px;padding:6px 14px;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:8px;font-family:var(--app-font,'Nunito'),sans-serif;}
+header h1{font-size:1.6rem;font-weight:800;}
+header p{font-size:.85rem;opacity:.8;margin-top:3px;}
+
+.mode-nav{display:flex;gap:8px;justify-content:center;padding:12px 16px;background:rgba(0,0,0,.2);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.mode-btn{padding:10px 22px;border:2px solid rgba(255,255,255,.3);border-radius:50px;font-size:.9rem;font-weight:700;cursor:pointer;background:transparent;color:#fff;transition:all .2s;white-space:nowrap;font-family:var(--app-font,'Nunito'),sans-serif;}
+.mode-btn.active{background:#fff;color:#BF360C;border-color:#fff;}
+.mode-btn:active{transform:scale(.95);}
+
+.section{display:none;padding:20px 16px 110px;}
+.section.active{display:block;}
+.sec-title{text-align:center;color:#fff;font-size:1.3rem;font-weight:800;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,.3);}
+.sec-sub{text-align:center;color:rgba(255,255,255,.8);font-size:.85rem;margin-bottom:20px;}
+
+/* ─── Word Cards ─── */
+.word-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;}
+.word-card{background:rgba(255,255,255,.97);border-radius:22px;padding:0 0 14px;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 20px rgba(0,0,0,.18);overflow:hidden;}
+.word-card:active{transform:scale(.95);}
+@media(hover:hover){.word-card:hover{transform:translateY(-5px);box-shadow:0 10px 32px rgba(0,0,0,.25);}}
+.wc-pic{font-size:4.5rem;line-height:1;padding:18px 10px 12px;background:linear-gradient(135deg,#FBE9E7,#FFCCBC);border-radius:22px 22px 0 0;display:block;}
+.wc-hi{font-family:'Noto Sans Devanagari',sans-serif;font-size:1.15rem;font-weight:800;color:#BF360C;margin:10px 8px 3px;}
+.wc-rom{font-size:.75rem;font-weight:600;color:#888;margin-bottom:4px;}
+.wc-en{font-size:.85rem;font-weight:700;color:#E64A19;padding:4px 10px;background:#FBE9E7;border-radius:50px;display:inline-block;margin-top:4px;}
+
+/* ─── Listen & Find ─── */
+.lf-container{display:flex;flex-direction:column;align-items:center;gap:20px;max-width:500px;margin:0 auto;}
+.lf-prompt{background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);border-radius:24px;padding:20px 30px;text-align:center;color:#fff;width:100%;}
+.lf-score{font-size:1rem;font-weight:700;opacity:.85;}
+.lf-hear{background:#fff;color:#BF360C;border:none;border-radius:50px;padding:16px 40px;font-size:1.1rem;font-weight:800;cursor:pointer;box-shadow:0 4px 18px rgba(0,0,0,.2);font-family:var(--app-font,'Nunito'),sans-serif;transition:transform .15s;}
+.lf-hear:active{transform:scale(.95);}
+.lf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;}
+.lf-opt{background:rgba(255,255,255,.95);border-radius:20px;padding:16px 10px;text-align:center;cursor:pointer;font-size:3.8rem;transition:transform .2s,background .2s;box-shadow:0 3px 14px rgba(0,0,0,.15);border:3px solid transparent;}
+.lf-opt:active{transform:scale(.9);}
+.lf-opt.correct{background:#C8E6C9;border-color:#2E7D32;animation:pulse .4s ease;}
+.lf-opt.wrong{background:#FFCDD2;border-color:#C62828;animation:shake .3s ease;}
+.lf-opt-label{font-family:'Noto Sans Devanagari',sans-serif;font-size:.8rem;font-weight:700;color:#333;display:block;margin-top:6px;}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.08);}}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+
+/* ─── Quiz ─── */
+.quiz-box{max-width:500px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:18px;}
+.quiz-card{background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.3);border-radius:24px;padding:24px;text-align:center;width:100%;}
+.quiz-emoji{font-size:4rem;}
+.quiz-hi{font-family:'Noto Sans Devanagari',sans-serif;font-size:2rem;font-weight:800;color:#fff;margin:10px 0 4px;}
+.quiz-rom{font-size:.9rem;color:rgba(255,255,255,.75);}
+.quiz-q{color:rgba(255,255,255,.9);font-size:1rem;font-weight:700;margin-top:12px;}
+.quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
+.quiz-opt{background:rgba(255,255,255,.95);border:3px solid transparent;border-radius:16px;padding:14px 10px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:var(--app-font,'Nunito'),sans-serif;transition:all .15s;color:#BF360C;}
+.quiz-opt:active{transform:scale(.95);}
+.quiz-opt.correct{background:#C8E6C9;border-color:#2E7D32;color:#1B5E20;}
+.quiz-opt.wrong{background:#FFCDD2;border-color:#C62828;color:#B71C1C;}
+.quiz-score{color:#fff;font-size:1.1rem;font-weight:800;text-align:center;}
+.quiz-next{background:#fff;color:#BF360C;border:none;border-radius:50px;padding:14px 36px;font-size:1rem;font-weight:800;cursor:pointer;font-family:var(--app-font,'Nunito'),sans-serif;box-shadow:0 4px 16px rgba(0,0,0,.2);}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../../.." class="back-btn">← Home</a>
+  <h1>🖼️ Hindi Words</h1>
+  <p class="hi">हिंदी शब्द — Hindi words with pictures!</p>
+</header>
+
+<nav class="mode-nav">
+  <button class="mode-btn active" onclick="showMode('dict',this)">📖 Picture Dictionary</button>
+  <button class="mode-btn" onclick="showMode('listen',this)">👂 Listen &amp; Find</button>
+  <button class="mode-btn" onclick="showMode('quiz',this)">🧠 Quiz</button>
+</nav>
+
+<!-- PICTURE DICTIONARY -->
+<section id="dict-section" class="section active">
+  <div class="sec-title">📖 Picture Dictionary</div>
+  <div class="sec-sub">Tap any word to hear it spoken in Hindi! 🔊</div>
+  <div class="word-grid" id="word-grid"></div>
+</section>
+
+<!-- LISTEN & FIND -->
+<section id="listen-section" class="section">
+  <div class="sec-title">👂 Listen &amp; Find</div>
+  <div class="sec-sub">Hear the Hindi word — tap the right picture!</div>
+  <div class="lf-container">
+    <div class="lf-prompt">
+      <div class="lf-score">⭐ Score: <span id="lf-score">0</span> / <span id="lf-total">0</span></div>
+      <div style="margin:12px 0;font-size:1rem;color:rgba(255,255,255,.8);">Tap 🔊 to hear, then find the picture!</div>
+      <button class="lf-hear" id="lf-hear-btn" onclick="playLFWord()">🔊 Hear Word</button>
+    </div>
+    <div class="lf-grid" id="lf-grid"></div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section id="quiz-section" class="section">
+  <div class="sec-title">🧠 Hindi Word Quiz</div>
+  <div class="sec-sub">See the Hindi word and picture — what does it mean in English?</div>
+  <div class="quiz-box">
+    <div class="quiz-score">⭐ <span id="q-score">0</span> / <span id="q-total">0</span></div>
+    <div class="quiz-card">
+      <div class="quiz-emoji" id="q-emoji">🐘</div>
+      <div class="quiz-hi hi" id="q-hi">हाथी</div>
+      <div class="quiz-rom" id="q-rom">haathi</div>
+      <div class="quiz-q">What does this Hindi word mean?</div>
+    </div>
+    <div class="quiz-opts" id="quiz-opts"></div>
+    <button class="quiz-next" id="q-next" style="display:none" onclick="nextQuiz()">Next Question →</button>
+  </div>
+</section>
+
+<!-- Font Picker Widget -->
+<div id="font-fab" onclick="document.getElementById('font-panel').classList.toggle('open')" title="Change Font" style="position:fixed;bottom:24px;right:24px;z-index:9999;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(102,126,234,0.5);transition:transform .2s;user-select:none;" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'">Aa</div>
+<div id="font-panel" style="position:fixed;bottom:88px;right:24px;z-index:9998;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px;width:240px;display:none;flex-direction:column;gap:10px;">
+  <div style="font-size:13px;font-weight:700;color:#666;margin-bottom:4px;letter-spacing:.5px;">CHOOSE FONT</div>
+  <button onclick="setFont('Nunito')" data-font="Nunito" style="font-family:'Nunito',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:700;transition:all .15s;">Nunito — Hello World!</button>
+  <button onclick="setFont('Fredoka One')" data-font="Fredoka One" style="font-family:'Fredoka One',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;transition:all .15s;">Fredoka — Hello World!</button>
+  <button onclick="setFont('Patrick Hand')" data-font="Patrick Hand" style="font-family:'Patrick Hand',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;transition:all .15s;">Patrick Hand — Hello!</button>
+  <button onclick="setFont('ABeeZee')" data-font="ABeeZee" style="font-family:'ABeeZee',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;transition:all .15s;">ABeeZee — Hello World!</button>
+  <button onclick="setFont('Poppins')" data-font="Poppins" style="font-family:'Poppins',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:600;transition:all .15s;">Poppins — Hello World!</button>
+</div>
+<style>
+#font-panel.open{display:flex!important;}
+body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,span,div,a,label{font-family:var(--app-font,'Nunito'),sans-serif!important;}
+.hi,.wc-hi,.quiz-hi,.lf-opt-label{font-family:'Noto Sans Devanagari','Devanagari MT',sans-serif!important;}
+</style>
+<script>
+(function(){
+  var l={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};
+  Object.values(l).forEach(h=>{if(!document.querySelector('link[href="'+h+'"]')){var e=document.createElement('link');e.rel='stylesheet';e.href=h;document.head.appendChild(e);}});
+  var c=localStorage.getItem('dhanu-font')||'Nunito';
+  document.querySelectorAll('#font-panel button[data-font]').forEach(b=>{if(b.getAttribute('data-font')===c){b.style.borderColor='#667eea';b.style.background='#f0f0ff';}});
+})();
+function setFont(n){localStorage.setItem('dhanu-font',n);location.reload();}
+</script>
+
+<script>
+const words=[
+  {hi:'अम्मा',rom:'Amma',en:'Mother',emoji:'👩',cat:'Family'},
+  {hi:'पापा',rom:'Papa',en:'Father',emoji:'👨',cat:'Family'},
+  {hi:'भाई',rom:'Bhai',en:'Brother',emoji:'👦',cat:'Family'},
+  {hi:'बहन',rom:'Behen',en:'Sister',emoji:'👧',cat:'Family'},
+  {hi:'घर',rom:'Ghar',en:'House',emoji:'🏠',cat:'Places'},
+  {hi:'स्कूल',rom:'School',en:'School',emoji:'🏫',cat:'Places'},
+  {hi:'हाथी',rom:'Haathi',en:'Elephant',emoji:'🐘',cat:'Animals'},
+  {hi:'शेर',rom:'Sher',en:'Lion',emoji:'🦁',cat:'Animals'},
+  {hi:'बंदर',rom:'Bandar',en:'Monkey',emoji:'🐒',cat:'Animals'},
+  {hi:'कुत्ता',rom:'Kutta',en:'Dog',emoji:'🐕',cat:'Animals'},
+  {hi:'बिल्ली',rom:'Billi',en:'Cat',emoji:'🐈',cat:'Animals'},
+  {hi:'मछली',rom:'Machhli',en:'Fish',emoji:'🐟',cat:'Animals'},
+  {hi:'चिड़िया',rom:'Chidiya',en:'Bird',emoji:'🐦',cat:'Animals'},
+  {hi:'गाय',rom:'Gaay',en:'Cow',emoji:'🐄',cat:'Animals'},
+  {hi:'खरगोश',rom:'Khargosh',en:'Rabbit',emoji:'🐇',cat:'Animals'},
+  {hi:'पेड़',rom:'Ped',en:'Tree',emoji:'🌳',cat:'Nature'},
+  {hi:'फूल',rom:'Phool',en:'Flower',emoji:'🌸',cat:'Nature'},
+  {hi:'सूरज',rom:'Sooraj',en:'Sun',emoji:'☀️',cat:'Nature'},
+  {hi:'चाँद',rom:'Chaand',en:'Moon',emoji:'🌙',cat:'Nature'},
+  {hi:'बारिश',rom:'Baarish',en:'Rain',emoji:'🌧️',cat:'Nature'},
+  {hi:'तारा',rom:'Taara',en:'Star',emoji:'⭐',cat:'Nature'},
+  {hi:'आम',rom:'Aam',en:'Mango',emoji:'🥭',cat:'Food'},
+  {hi:'केला',rom:'Kela',en:'Banana',emoji:'🍌',cat:'Food'},
+  {hi:'सेब',rom:'Seb',en:'Apple',emoji:'🍎',cat:'Food'},
+  {hi:'गाजर',rom:'Gajar',en:'Carrot',emoji:'🥕',cat:'Food'},
+  {hi:'दूध',rom:'Doodh',en:'Milk',emoji:'🥛',cat:'Food'},
+  {hi:'पानी',rom:'Paani',en:'Water',emoji:'💧',cat:'Food'},
+  {hi:'रेलगाड़ी',rom:'Relgaadi',en:'Train',emoji:'🚂',cat:'Transport'},
+  {hi:'कार',rom:'Kaar',en:'Car',emoji:'🚗',cat:'Transport'},
+  {hi:'हवाई जहाज',rom:'Hawaai Jahaz',en:'Aeroplane',emoji:'✈️',cat:'Transport'},
+  {hi:'गेंद',rom:'Gend',en:'Ball',emoji:'⚽',cat:'Toys'},
+  {hi:'किताब',rom:'Kitaab',en:'Book',emoji:'📚',cat:'School'},
+  {hi:'पेंसिल',rom:'Pencil',en:'Pencil',emoji:'✏️',cat:'School'},
+  {hi:'आँख',rom:'Aankh',en:'Eye',emoji:'👁️',cat:'Body'},
+  {hi:'हाथ',rom:'Haath',en:'Hand',emoji:'✋',cat:'Body'},
+];
+
+function speak(text,lang='hi-IN'){
+  window.speechSynthesis&&speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang;u.rate=0.75;
+  window.speechSynthesis&&speechSynthesis.speak(u);
+}
+
+function buildDict(){
+  const g=document.getElementById('word-grid');g.innerHTML='';
+  words.forEach(w=>{
+    const c=document.createElement('div');c.className='word-card';
+    c.innerHTML=`<span class="wc-pic">${w.emoji}</span><div class="wc-hi hi">${w.hi}</div><div class="wc-rom">${w.rom}</div><span class="wc-en">${w.en}</span>`;
+    c.onclick=()=>speak(w.hi);
+    g.appendChild(c);
+  });
+}
+
+let lfAnswer=-1,lfScore=0,lfTotal=0;
+function shuffle(a){return a.slice().sort(()=>Math.random()-.5);}
+function newLFRound(){
+  lfAnswer=Math.floor(Math.random()*words.length);
+  let pool=words.map((_,i)=>i).filter(i=>i!==lfAnswer);
+  const opts=shuffle([lfAnswer,...shuffle(pool).slice(0,3)]);
+  const g=document.getElementById('lf-grid');g.innerHTML='';
+  opts.forEach(idx=>{
+    const b=document.createElement('div');b.className='lf-opt';
+    b.innerHTML=`${words[idx].emoji}<span class="lf-opt-label hi">${words[idx].hi}</span>`;
+    b.onclick=()=>checkLF(b,idx);
+    g.appendChild(b);
+  });
+  document.getElementById('lf-hear-btn').textContent='🔊 '+words[lfAnswer].rom;
+}
+function playLFWord(){speak(words[lfAnswer].hi);}
+function checkLF(el,idx){
+  lfTotal++;document.getElementById('lf-total').textContent=lfTotal;
+  if(idx===lfAnswer){
+    el.classList.add('correct');lfScore++;
+    document.getElementById('lf-score').textContent=lfScore;
+    speak(words[lfAnswer].hi+' — '+words[lfAnswer].en,'en-US');
+    setTimeout(newLFRound,1200);
+  } else {
+    el.classList.add('wrong');
+    setTimeout(()=>{el.classList.remove('wrong');playLFWord();},700);
+  }
+}
+
+let qScore=0,qTotal=0,qIdx=-1,qAnswered=false;
+function newQuiz(){
+  qAnswered=false;document.getElementById('q-next').style.display='none';
+  const prev=qIdx;
+  do{qIdx=Math.floor(Math.random()*words.length);}while(qIdx===prev);
+  const w=words[qIdx];
+  document.getElementById('q-emoji').textContent=w.emoji;
+  document.getElementById('q-hi').textContent=w.hi;
+  document.getElementById('q-rom').textContent=w.rom;
+  speak(w.hi);
+  let pool=words.map((_,i)=>i).filter(i=>i!==qIdx);
+  const opts=shuffle([qIdx,...shuffle(pool).slice(0,3)]);
+  const g=document.getElementById('quiz-opts');g.innerHTML='';
+  opts.forEach(i=>{
+    const b=document.createElement('button');b.className='quiz-opt';
+    b.textContent=words[i].en;
+    b.onclick=()=>checkQuiz(b,i);
+    g.appendChild(b);
+  });
+}
+function checkQuiz(el,i){
+  if(qAnswered)return;qAnswered=true;qTotal++;
+  document.getElementById('q-total').textContent=qTotal;
+  if(i===qIdx){
+    el.classList.add('correct');qScore++;
+    document.getElementById('q-score').textContent=qScore;
+  } else {
+    el.classList.add('wrong');
+    document.querySelectorAll('.quiz-opt').forEach(b=>{if(b.textContent===words[qIdx].en)b.classList.add('correct');});
+  }
+  document.getElementById('q-next').style.display='block';
+}
+function nextQuiz(){newQuiz();}
+
+function showMode(mode,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(mode+'-section').classList.add('active');
+  btn.classList.add('active');
+  if(mode==='listen')newLFRound();
+  if(mode==='quiz')newQuiz();
+}
+
+buildDict();
+</script>
+</body>
+</html>

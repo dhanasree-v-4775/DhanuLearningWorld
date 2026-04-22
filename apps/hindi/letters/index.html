@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head><meta charset="UTF-8">
+<script>
+(function(){
+  var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};
+  var chosen=localStorage.getItem('dhanu-font')||'Nunito';
+  if(fonts[chosen]){var l=document.createElement('link');l.rel='stylesheet';l.href=fonts[chosen];document.head.appendChild(l);}
+  document.documentElement.style.setProperty('--app-font',chosen);
+})();
+</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Hindi Letters | हिंदी वर्णमाला</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:var(--app-font,'Nunito'),sans-serif;background:linear-gradient(160deg,#0D1B6E 0%,#1A237E 40%,#283593 100%);min-height:100vh;color:#333;}
+.hi{font-family:'Noto Sans Devanagari','Devanagari MT',sans-serif;}
+
+header{background:rgba(0,0,0,0.35);backdrop-filter:blur(12px);padding:14px 20px 10px;text-align:center;color:#fff;position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,.1);}
+.back-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);border-radius:50px;padding:6px 14px;font-size:.8rem;font-weight:700;cursor:pointer;text-decoration:none;margin-bottom:8px;font-family:var(--app-font,'Nunito'),sans-serif;}
+header h1{font-size:1.6rem;font-weight:800;}
+header p{font-size:.85rem;opacity:.8;margin-top:3px;}
+
+.mode-nav{display:flex;gap:8px;justify-content:center;padding:12px 16px;background:rgba(0,0,0,.2);overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.mode-btn{padding:10px 22px;border:2px solid rgba(255,255,255,.3);border-radius:50px;font-size:.9rem;font-weight:700;cursor:pointer;background:transparent;color:#fff;transition:all .2s;white-space:nowrap;font-family:var(--app-font,'Nunito'),sans-serif;}
+.mode-btn.active{background:#fff;color:#1A237E;border-color:#fff;}
+.mode-btn:active{transform:scale(.95);}
+
+.section{display:none;padding:20px 16px 110px;}
+.section.active{display:block;}
+.sec-title{text-align:center;color:#fff;font-size:1.3rem;font-weight:800;margin-bottom:6px;text-shadow:0 2px 8px rgba(0,0,0,.3);}
+.sec-sub{text-align:center;color:rgba(255,255,255,.8);font-size:.85rem;margin-bottom:20px;}
+
+/* ─── Letter Cards ─── */
+.letter-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;}
+.letter-card{background:rgba(255,255,255,.97);border-radius:20px;padding:18px 10px 14px;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 18px rgba(0,0,0,.18);position:relative;overflow:hidden;}
+.letter-card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#FF9933,#FFFFFF,#138808);}
+.letter-card:active{transform:scale(.95);}
+@media(hover:hover){.letter-card:hover{transform:translateY(-5px);box-shadow:0 10px 32px rgba(0,0,0,.25);}}
+.lc-char{font-family:'Noto Sans Devanagari','Devanagari MT',sans-serif;font-size:3.6rem;font-weight:800;color:#1A237E;line-height:1.2;margin-bottom:4px;}
+.lc-roman{font-size:.72rem;font-weight:700;color:#777;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.lc-emoji{font-size:2rem;margin-bottom:4px;}
+.lc-hi-word{font-family:'Noto Sans Devanagari',sans-serif;font-size:.85rem;font-weight:700;color:#333;margin-bottom:2px;}
+.lc-en-word{font-size:.72rem;color:#888;margin-bottom:8px;}
+.hear-btn{background:linear-gradient(135deg,#1A237E,#3F51B5);color:#fff;border:none;border-radius:50px;padding:7px 18px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--app-font,'Nunito'),sans-serif;transition:transform .15s;}
+.hear-btn:active{transform:scale(.93);}
+
+/* ─── Write & Trace ─── */
+.trace-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;}
+.ls-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;width:100%;max-width:500px;}
+.ls-btn{aspect-ratio:1;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.25);border-radius:12px;cursor:pointer;font-family:'Noto Sans Devanagari',sans-serif;font-size:1.3rem;font-weight:700;color:#fff;transition:all .15s;user-select:none;}
+.ls-btn.sel{background:#fff;color:#1A237E;border-color:#fff;transform:scale(1.1);}
+.ls-btn:active{transform:scale(.9);}
+.canvas-box{background:rgba(255,255,255,.97);border-radius:24px;padding:16px;box-shadow:0 8px 32px rgba(0,0,0,.25);width:100%;max-width:380px;}
+.canvas-hdr{text-align:center;margin-bottom:10px;}
+.trace-char{font-family:'Noto Sans Devanagari',sans-serif;font-size:2.8rem;font-weight:800;color:#1A237E;}
+.trace-hint{font-size:.82rem;color:#888;margin-top:3px;}
+#traceCanvas{display:block;border-radius:14px;background:#F8F9FF;border:2px dashed #C5CAE9;touch-action:none;cursor:crosshair;width:100%;height:auto;}
+.canvas-ctrls{display:flex;gap:10px;justify-content:center;margin-top:12px;}
+.ctrl-btn{padding:11px 28px;border:none;border-radius:50px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--app-font,'Nunito'),sans-serif;transition:transform .15s;}
+.ctrl-btn:active{transform:scale(.95);}
+.btn-clr{background:#f5f5f5;color:#666;}
+.btn-done{background:linear-gradient(135deg,#1A237E,#3F51B5);color:#fff;box-shadow:0 4px 16px rgba(26,35,126,.4);}
+
+/* ─── Celebration ─── */
+.celeb{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:20px;}
+.celeb.show{display:flex;}
+.cel-emo{font-size:5rem;animation:bop .5s ease infinite alternate;}
+.cel-title{color:#fff;font-size:1.9rem;font-weight:800;text-align:center;}
+.cel-sub{color:rgba(255,255,255,.8);font-size:1rem;text-align:center;line-height:1.5;}
+.cel-btn{background:#fff;color:#1A237E;border:none;border-radius:50px;padding:14px 36px;font-size:1rem;font-weight:800;cursor:pointer;font-family:var(--app-font,'Nunito'),sans-serif;margin-top:6px;}
+.cel-btn2{background:rgba(255,255,255,.2);color:#fff;border:2px solid rgba(255,255,255,.4);border-radius:50px;padding:12px 28px;font-size:.9rem;font-weight:700;cursor:pointer;font-family:var(--app-font,'Nunito'),sans-serif;}
+@keyframes bop{from{transform:translateY(0) scale(1);}to{transform:translateY(-14px) scale(1.1);}}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="../../.." class="back-btn">← Home</a>
+  <h1>🔤 Hindi Letters</h1>
+  <p class="hi">हिंदी वर्णमाला — Let's learn the Hindi alphabet!</p>
+</header>
+
+<nav class="mode-nav">
+  <button class="mode-btn active" onclick="showMode('vowels',this)">🔵 Vowels <span class="hi">(स्वर)</span></button>
+  <button class="mode-btn" onclick="showMode('consonants',this)">🟠 Consonants <span class="hi">(व्यंजन)</span></button>
+  <button class="mode-btn" onclick="showMode('trace',this)">✏️ Write &amp; Trace</button>
+</nav>
+
+<!-- VOWELS -->
+<section id="vowels-section" class="section active">
+  <div class="sec-title">Vowels — <span class="hi">स्वर वर्ण</span></div>
+  <div class="sec-sub">13 vowels — the heart of Hindi. Tap a card to hear it! 🔊</div>
+  <div class="letter-grid" id="vowels-grid"></div>
+</section>
+
+<!-- CONSONANTS -->
+<section id="consonants-section" class="section">
+  <div class="sec-title">Consonants — <span class="hi">व्यंजन वर्ण</span></div>
+  <div class="sec-sub">36 consonants — the building blocks of Hindi. Tap to hear! 🔊</div>
+  <div class="letter-grid" id="consonants-grid"></div>
+</section>
+
+<!-- WRITE & TRACE -->
+<section id="trace-section" class="section">
+  <div class="sec-title">✏️ Write &amp; Trace</div>
+  <div class="sec-sub">Choose a letter, then trace it on the canvas with your finger!</div>
+  <div class="trace-wrap">
+    <div class="ls-grid" id="ls-grid"></div>
+    <div class="canvas-box">
+      <div class="canvas-hdr">
+        <div class="trace-char" id="trace-char">अ</div>
+        <div class="trace-hint" id="trace-hint">a · 🍎 Apple (सेब)</div>
+      </div>
+      <canvas id="traceCanvas" width="348" height="348"></canvas>
+      <div class="canvas-ctrls">
+        <button class="ctrl-btn btn-clr" onclick="clearCanvas()">🗑️ Clear</button>
+        <button class="ctrl-btn btn-done" onclick="doneTrace()">⭐ Done!</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CELEBRATION -->
+<div class="celeb" id="celeb">
+  <div class="cel-emo">🌟</div>
+  <div class="cel-title">शाबाश! Bravo!</div>
+  <div class="cel-sub" id="cel-sub">You wrote <b>अ</b> beautifully! 🎉</div>
+  <button class="cel-btn" onclick="nextLetter()">Next Letter →</button>
+  <button class="cel-btn2" onclick="hideCeleb()">Practise Again</button>
+</div>
+
+<!-- Font Picker Widget -->
+<div id="font-fab" onclick="document.getElementById('font-panel').classList.toggle('open')" title="Change Font" style="position:fixed;bottom:24px;right:24px;z-index:9999;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(102,126,234,0.5);transition:transform .2s;user-select:none;" onmouseenter="this.style.transform='scale(1.1)'" onmouseleave="this.style.transform='scale(1)'">Aa</div>
+<div id="font-panel" style="position:fixed;bottom:88px;right:24px;z-index:9998;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px;width:240px;display:none;flex-direction:column;gap:10px;">
+  <div style="font-size:13px;font-weight:700;color:#666;margin-bottom:4px;letter-spacing:.5px;">CHOOSE FONT</div>
+  <button onclick="setFont('Nunito')" data-font="Nunito" style="font-family:'Nunito',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:700;transition:all .15s;">Nunito — Hello World!</button>
+  <button onclick="setFont('Fredoka One')" data-font="Fredoka One" style="font-family:'Fredoka One',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;transition:all .15s;">Fredoka — Hello World!</button>
+  <button onclick="setFont('Patrick Hand')" data-font="Patrick Hand" style="font-family:'Patrick Hand',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;transition:all .15s;">Patrick Hand — Hello!</button>
+  <button onclick="setFont('ABeeZee')" data-font="ABeeZee" style="font-family:'ABeeZee',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;transition:all .15s;">ABeeZee — Hello World!</button>
+  <button onclick="setFont('Poppins')" data-font="Poppins" style="font-family:'Poppins',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:600;transition:all .15s;">Poppins — Hello World!</button>
+</div>
+<style>
+#font-panel.open{display:flex!important;}
+body,button,input,select,textarea,h1,h2,h3,h4,h5,h6,p,span,div,a,label{font-family:var(--app-font,'Nunito'),sans-serif!important;}
+.hi,.lc-char,.trace-char,.ls-btn,.lc-hi-word{font-family:'Noto Sans Devanagari','Devanagari MT',sans-serif!important;}
+</style>
+<script>
+(function(){
+  var l={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};
+  Object.values(l).forEach(h=>{if(!document.querySelector('link[href="'+h+'"]')){var e=document.createElement('link');e.rel='stylesheet';e.href=h;document.head.appendChild(e);}});
+  var c=localStorage.getItem('dhanu-font')||'Nunito';
+  document.querySelectorAll('#font-panel button[data-font]').forEach(b=>{if(b.getAttribute('data-font')===c){b.style.borderColor='#667eea';b.style.background='#f0f0ff';}});
+})();
+function setFont(n){localStorage.setItem('dhanu-font',n);location.reload();}
+</script>
+
+<script>
+const vowels=[
+  {char:'अ',roman:'a',spk:'अ',example:'अनार',exRoman:'anaar',exMeaning:'Pomegranate',emoji:'🍎'},
+  {char:'आ',roman:'aa',spk:'आ',example:'आम',exRoman:'aam',exMeaning:'Mango',emoji:'🥭'},
+  {char:'इ',roman:'i',spk:'इ',example:'इमली',exRoman:'imli',exMeaning:'Tamarind',emoji:'🌿'},
+  {char:'ई',roman:'ee',spk:'ई',example:'ईख',exRoman:'eekh',exMeaning:'Sugarcane',emoji:'🎋'},
+  {char:'उ',roman:'u',spk:'उ',example:'उल्लू',exRoman:'ullu',exMeaning:'Owl',emoji:'🦉'},
+  {char:'ऊ',roman:'oo',spk:'ऊ',example:'ऊँट',exRoman:'oont',exMeaning:'Camel',emoji:'🐪'},
+  {char:'ए',roman:'e',spk:'ए',example:'एड़ी',exRoman:'edee',exMeaning:'Heel',emoji:'🦶'},
+  {char:'ऐ',roman:'ai',spk:'ऐ',example:'ऐनक',exRoman:'ainak',exMeaning:'Glasses',emoji:'👓'},
+  {char:'ओ',roman:'o',spk:'ओ',example:'ओखली',exRoman:'okali',exMeaning:'Mortar',emoji:'🥣'},
+  {char:'औ',roman:'au',spk:'औ',example:'औजार',exRoman:'auzaar',exMeaning:'Tool',emoji:'🔧'},
+  {char:'अं',roman:'am',spk:'अं',example:'अंगूर',exRoman:'angoor',exMeaning:'Grapes',emoji:'🍇'},
+  {char:'अः',roman:'ah',spk:'अः',example:'अः',exRoman:'ah',exMeaning:'Visarga sound',emoji:'🔤'},
+  {char:'ऋ',roman:'ri',spk:'ऋ',example:'ऋषि',exRoman:'rishi',exMeaning:'Sage',emoji:'🧘'},
+];
+const consonants=[
+  {char:'क',roman:'ka',spk:'क',example:'कमल',exRoman:'kamal',exMeaning:'Lotus',emoji:'🪷'},
+  {char:'ख',roman:'kha',spk:'ख',example:'खरगोश',exRoman:'khargosh',exMeaning:'Rabbit',emoji:'🐇'},
+  {char:'ग',roman:'ga',spk:'ग',example:'गाय',exRoman:'gaay',exMeaning:'Cow',emoji:'🐄'},
+  {char:'घ',roman:'gha',spk:'घ',example:'घर',exRoman:'ghar',exMeaning:'House',emoji:'🏠'},
+  {char:'ङ',roman:'nga',spk:'ङ',example:'पंछी',exRoman:'panchhi',exMeaning:'Bird',emoji:'🐦'},
+  {char:'च',roman:'cha',spk:'च',example:'चाँद',exRoman:'chaand',exMeaning:'Moon',emoji:'🌙'},
+  {char:'छ',roman:'chha',spk:'छ',example:'छाता',exRoman:'chhaata',exMeaning:'Umbrella',emoji:'☂️'},
+  {char:'ज',roman:'ja',spk:'ज',example:'जल',exRoman:'jal',exMeaning:'Water',emoji:'💧'},
+  {char:'झ',roman:'jha',spk:'झ',example:'झरना',exRoman:'jharna',exMeaning:'Waterfall',emoji:'🌊'},
+  {char:'ञ',roman:'nya',spk:'ञ',example:'ञान',exRoman:'gyan',exMeaning:'Knowledge',emoji:'📚'},
+  {char:'ट',roman:'ta',spk:'ट',example:'टमाटर',exRoman:'tamatar',exMeaning:'Tomato',emoji:'🍅'},
+  {char:'ठ',roman:'tha',spk:'ठ',example:'ठंड',exRoman:'thand',exMeaning:'Cold',emoji:'🥶'},
+  {char:'ड',roman:'da',spk:'ड',example:'डमरू',exRoman:'damaru',exMeaning:'Drum',emoji:'🥁'},
+  {char:'ढ',roman:'dha',spk:'ढ',example:'ढोल',exRoman:'dhol',exMeaning:'Dhol drum',emoji:'🥁'},
+  {char:'ण',roman:'nna',spk:'ण',example:'गण',exRoman:'gana',exMeaning:'Group',emoji:'👥'},
+  {char:'त',roman:'ta',spk:'त',example:'तारा',exRoman:'taara',exMeaning:'Star',emoji:'⭐'},
+  {char:'थ',roman:'tha',spk:'थ',example:'थैला',exRoman:'thela',exMeaning:'Bag',emoji:'👜'},
+  {char:'द',roman:'da',spk:'द',example:'दिल',exRoman:'dil',exMeaning:'Heart',emoji:'❤️'},
+  {char:'ध',roman:'dha',spk:'ध',example:'धनुष',exRoman:'dhanush',exMeaning:'Bow',emoji:'🏹'},
+  {char:'न',roman:'na',spk:'न',example:'नाव',exRoman:'naav',exMeaning:'Boat',emoji:'⛵'},
+  {char:'प',roman:'pa',spk:'प',example:'पानी',exRoman:'paani',exMeaning:'Water',emoji:'💧'},
+  {char:'फ',roman:'pha',spk:'फ',example:'फूल',exRoman:'phool',exMeaning:'Flower',emoji:'🌸'},
+  {char:'ब',roman:'ba',spk:'ब',example:'बादल',exRoman:'baadal',exMeaning:'Cloud',emoji:'☁️'},
+  {char:'भ',roman:'bha',spk:'भ',example:'भालू',exRoman:'bhaalu',exMeaning:'Bear',emoji:'🐻'},
+  {char:'म',roman:'ma',spk:'म',example:'मछली',exRoman:'machhli',exMeaning:'Fish',emoji:'🐟'},
+  {char:'य',roman:'ya',spk:'य',example:'यात्रा',exRoman:'yaatra',exMeaning:'Journey',emoji:'✈️'},
+  {char:'र',roman:'ra',spk:'र',example:'रेलगाड़ी',exRoman:'relgaadi',exMeaning:'Train',emoji:'🚂'},
+  {char:'ल',roman:'la',spk:'ल',example:'लड़की',exRoman:'ladki',exMeaning:'Girl',emoji:'👧'},
+  {char:'व',roman:'va',spk:'व',example:'वर्षा',exRoman:'varsha',exMeaning:'Rain',emoji:'🌧️'},
+  {char:'श',roman:'sha',spk:'श',example:'शेर',exRoman:'sher',exMeaning:'Lion',emoji:'🦁'},
+  {char:'ष',roman:'sha',spk:'ष',example:'षट्कोण',exRoman:'shatkona',exMeaning:'Hexagon',emoji:'⬡'},
+  {char:'स',roman:'sa',spk:'स',example:'सेब',exRoman:'seb',exMeaning:'Apple',emoji:'🍎'},
+  {char:'ह',roman:'ha',spk:'ह',example:'हाथी',exRoman:'haathi',exMeaning:'Elephant',emoji:'🐘'},
+  {char:'क्ष',roman:'ksha',spk:'क्ष',example:'क्षमा',exRoman:'kshama',exMeaning:'Forgiveness',emoji:'🤝'},
+  {char:'त्र',roman:'tra',spk:'त्र',example:'त्रिशूल',exRoman:'trishool',exMeaning:'Trident',emoji:'🔱'},
+  {char:'ज्ञ',roman:'gya',spk:'ज्ञ',example:'ज्ञान',exRoman:'gyan',exMeaning:'Knowledge',emoji:'📚'},
+];
+const allLetters=[...vowels,...consonants];
+let traceIdx=0;
+
+function speak(text,lang='hi-IN'){
+  window.speechSynthesis&&speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang=lang;u.rate=0.75;
+  window.speechSynthesis&&speechSynthesis.speak(u);
+}
+
+function buildGrid(data,id){
+  const g=document.getElementById(id);g.innerHTML='';
+  data.forEach(item=>{
+    const c=document.createElement('div');c.className='letter-card';
+    c.innerHTML=`<div class="lc-char hi">${item.char}</div><div class="lc-roman">${item.roman}</div><div class="lc-emoji">${item.emoji}</div><div class="lc-hi-word hi">${item.example}</div><div class="lc-en-word">${item.exRoman} · ${item.exMeaning}</div><button class="hear-btn" onclick="event.stopPropagation();speak('${item.spk}')">🔊 Hear</button>`;
+    c.onclick=()=>speak(item.spk);
+    g.appendChild(c);
+  });
+}
+
+function buildLS(){
+  const g=document.getElementById('ls-grid');g.innerHTML='';
+  allLetters.forEach((l,i)=>{
+    const b=document.createElement('div');
+    b.className='ls-btn hi'+(i===0?' sel':'');
+    b.textContent=l.char;
+    b.onclick=()=>selectLetter(i);
+    g.appendChild(b);
+  });
+}
+
+let drawing=false,lx=0,ly=0;
+const canvas=()=>document.getElementById('traceCanvas');
+
+function drawGuide(char){
+  const c=canvas(),x=c.getContext('2d');
+  x.clearRect(0,0,c.width,c.height);
+  x.strokeStyle='rgba(0,0,0,0.04)';x.lineWidth=1;x.setLineDash([5,5]);
+  for(let i=1;i<4;i++){
+    x.beginPath();x.moveTo(c.width/4*i,0);x.lineTo(c.width/4*i,c.height);x.stroke();
+    x.beginPath();x.moveTo(0,c.height/4*i);x.lineTo(c.width,c.height/4*i);x.stroke();
+  }
+  x.setLineDash([]);
+  x.strokeStyle='rgba(26,35,126,0.06)';x.lineWidth=2;
+  x.beginPath();x.moveTo(c.width/2,20);x.lineTo(c.width/2,c.height-20);x.stroke();
+  x.beginPath();x.moveTo(20,c.height/2);x.lineTo(c.width-20,c.height/2);x.stroke();
+  document.fonts.ready.then(()=>{
+    x.font='bold 190px "Noto Sans Devanagari","Devanagari MT",sans-serif';
+    x.fillStyle='rgba(26,35,126,0.09)';
+    x.textAlign='center';x.textBaseline='middle';
+    x.fillText(char,c.width/2,c.height/2+10);
+  });
+}
+
+function selectLetter(i){
+  traceIdx=i;
+  document.querySelectorAll('.ls-btn').forEach((b,j)=>b.classList.toggle('sel',j===i));
+  const l=allLetters[i];
+  document.getElementById('trace-char').textContent=l.char;
+  document.getElementById('trace-hint').textContent=`${l.roman}  ·  ${l.emoji} ${l.exMeaning} (${l.example})`;
+  drawGuide(l.char);
+  speak(l.spk);
+}
+
+function clearCanvas(){drawGuide(allLetters[traceIdx].char);}
+
+function getP(e){
+  const c=canvas(),r=c.getBoundingClientRect(),sx=c.width/r.width,sy=c.height/r.height;
+  const src=e.touches?e.touches[0]:e;
+  return{x:(src.clientX-r.left)*sx,y:(src.clientY-r.top)*sy};
+}
+function startDraw(e){e.preventDefault&&e.preventDefault();drawing=true;const p=getP(e);lx=p.x;ly=p.y;}
+function moveDraw(e){
+  e.preventDefault&&e.preventDefault();
+  if(!drawing)return;
+  const p=getP(e),c=canvas(),x=c.getContext('2d');
+  x.beginPath();x.strokeStyle='#1A237E';x.lineWidth=9;x.lineCap='round';x.lineJoin='round';x.setLineDash([]);
+  x.moveTo(lx,ly);x.lineTo(p.x,p.y);x.stroke();
+  lx=p.x;ly=p.y;
+}
+function endDraw(){drawing=false;}
+
+window.addEventListener('load',()=>{
+  const c=canvas();
+  c.addEventListener('mousedown',startDraw);c.addEventListener('mousemove',moveDraw);c.addEventListener('mouseup',endDraw);c.addEventListener('mouseleave',endDraw);
+  c.addEventListener('touchstart',startDraw,{passive:false});c.addEventListener('touchmove',moveDraw,{passive:false});c.addEventListener('touchend',endDraw);
+});
+
+function doneTrace(){
+  const l=allLetters[traceIdx];
+  document.getElementById('cel-sub').innerHTML=`You traced <span class="hi" style="font-family:'Noto Sans Devanagari',sans-serif;font-size:1.8em;color:#FFD700;">${l.char}</span> (${l.roman}) — शाबाश! 🎉`;
+  document.getElementById('celeb').classList.add('show');
+  speak(l.example+' — '+l.exMeaning,'hi-IN');
+}
+function hideCeleb(){document.getElementById('celeb').classList.remove('show');}
+function nextLetter(){
+  hideCeleb();
+  selectLetter((traceIdx+1)%allLetters.length);
+  document.querySelectorAll('.ls-btn')[traceIdx].scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function showMode(mode,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(mode+'-section').classList.add('active');
+  btn.classList.add('active');
+  if(mode==='trace')setTimeout(()=>drawGuide(allLetters[traceIdx].char),100);
+}
+
+buildGrid(vowels,'vowels-grid');
+buildGrid(consonants,'consonants-grid');
+buildLS();
+setTimeout(()=>drawGuide('अ'),300);
+</script>
+</body>
+</html>
