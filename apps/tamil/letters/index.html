@@ -172,42 +172,43 @@ function setFont(name){localStorage.setItem('dhanu-font',name);location.reload()
 </script>
 
 <script>
-// Romanization & phonetic hints follow standard Tamil Nadu school syllabus
-// Short vowels (குறில்) = 1 beat | Long vowels (நெடில்) = 2 beats
+// Romanization follows Tamil Lexicon (University of Madras / ISO 15919)
+// Short vowels (குறில்) = 1 beat · Long vowels (நெடில்) = 2 beats
 const vowels=[
-  {char:'அ',roman:'a',hint:'குறில் · short "a" as in ago',spk:'அ, அம்மா',example:'அம்மா',exRoman:'ammaa',exMeaning:'Mother',emoji:'👩'},
-  {char:'ஆ',roman:'aa',hint:'நெடில் · long "aa" as in arm',spk:'ஆ, ஆடு',example:'ஆடு',exRoman:'aadu',exMeaning:'Goat',emoji:'🐐'},
-  {char:'இ',roman:'i',hint:'குறில் · short "i" as in ill',spk:'இ, இலை',example:'இலை',exRoman:'ilai',exMeaning:'Leaf',emoji:'🍃'},
-  {char:'ஈ',roman:'ii',hint:'நெடில் · long "ii" as in eel',spk:'ஈ, ஈர்',example:'ஈர்',exRoman:'iir',exMeaning:'Wet',emoji:'💧'},
-  {char:'உ',roman:'u',hint:'குறில் · short "u" as in put',spk:'உ, உலகம்',example:'உலகம்',exRoman:'ulagam',exMeaning:'World',emoji:'🌍'},
-  {char:'ஊ',roman:'uu',hint:'நெடில் · long "uu" as in moon',spk:'ஊ, ஊர்',example:'ஊர்',exRoman:'uur',exMeaning:'Village',emoji:'🏘️'},
-  {char:'எ',roman:'e',hint:'குறில் · short "e" as in elephant',spk:'எ, எலி',example:'எலி',exRoman:'eli',exMeaning:'Mouse',emoji:'🐭'},
-  {char:'ஏ',roman:'ae',hint:'நெடில் · long "ae" as in hay or eight',spk:'ஏ, ஏணி',example:'ஏணி',exRoman:'aeni',exMeaning:'Ladder',emoji:'🪜'},
-  {char:'ஐ',roman:'ai',hint:'ஐகாரம் · "ai" as in eye',spk:'ஐ, ஐந்து',example:'ஐந்து',exRoman:'ainthu',exMeaning:'Five',emoji:'🖐️'},
-  {char:'ஒ',roman:'o',hint:'குறில் · short "o" as in odd',spk:'ஒ, ஒட்டகம்',example:'ஒட்டகம்',exRoman:'ottakam',exMeaning:'Camel',emoji:'🐪'},
-  {char:'ஓ',roman:'oh',hint:'நெடில் · long "oh" as in open',spk:'ஓ, ஓடம்',example:'ஓடம்',exRoman:'odam',exMeaning:'Boat',emoji:'⛵'},
-  {char:'ஔ',roman:'au',hint:'ஔகாரம் · "au" as in owl',spk:'ஔ, ஔஷதம்',example:'ஔஷதம்',exRoman:'aushadham',exMeaning:'Medicine',emoji:'💊'},
+  {char:'அ',roman:'a',hint:'குறில் · short "a" as in \'a\'pple',spk:'அ, அம்மா',example:'அம்மா',exRoman:'ammaa',exMeaning:'Mother',emoji:'👩'},
+  {char:'ஆ',roman:'aa',hint:'நெடில் · long "aa" as in f\'aa\'ther',spk:'ஆ, ஆடு',example:'ஆடு',exRoman:'aadu',exMeaning:'Goat',emoji:'🐐'},
+  {char:'இ',roman:'i',hint:'குறில் · short "i" as in \'i\'nk',spk:'இ, இலை',example:'இலை',exRoman:'ilai',exMeaning:'Leaf',emoji:'🍃'},
+  {char:'ஈ',roman:'ii',hint:'நெடில் · long "ii" as in \'ee\'l',spk:'ஈ, ஈர்',example:'ஈர்',exRoman:'iir',exMeaning:'Wet',emoji:'💧'},
+  {char:'உ',roman:'u',hint:'குறில் · short "u" as in p\'u\'t',spk:'உ, உலகம்',example:'உலகம்',exRoman:'ulagam',exMeaning:'World',emoji:'🌍'},
+  {char:'ஊ',roman:'uu',hint:'நெடில் · long "uu" as in m\'oo\'n',spk:'ஊ, ஊர்',example:'ஊர்',exRoman:'uur',exMeaning:'Village',emoji:'🏘️'},
+  {char:'எ',roman:'ae',hint:'குறில் · short "ae" as in \'e\'lephant',spk:'எ, எலி',example:'எலி',exRoman:'eli',exMeaning:'Mouse',emoji:'🐭'},
+  {char:'ஏ',roman:'aee',hint:'நெடில் · long "aee" as in \'a\'ble',spk:'ஏ, ஏணி',example:'ஏணி',exRoman:'aeni',exMeaning:'Ladder',emoji:'🪜'},
+  {char:'ஐ',roman:'ai',hint:'ஐகாரம் · "ai" as in \'ai\'sle or eye',spk:'ஐ, ஐந்து',example:'ஐந்து',exRoman:'ainthu',exMeaning:'Five',emoji:'🖐️'},
+  {char:'ஒ',roman:'o',hint:'குறில் · short "o" as in \'o\'n',spk:'ஒ, ஒட்டகம்',example:'ஒட்டகம்',exRoman:'ottakam',exMeaning:'Camel',emoji:'🐪'},
+  {char:'ஓ',roman:'oh',hint:'நெடில் · long "oh" as in \'o\'pen',spk:'ஓ, ஓடம்',example:'ஓடம்',exRoman:'odam',exMeaning:'Boat',emoji:'⛵'},
+  {char:'ஔ',roman:'au',hint:'ஔகாரம் · "au" as in \'ou\'t or owl',spk:'ஔ, ஔவை',example:'ஔவை',exRoman:'auvai',exMeaning:'Poetess',emoji:'👵'},
 ];
 // Consonant groups: வல்லினம் (hard) · மெல்லினம் (soft/nasal) · இடையினம் (medium)
+// Tamil Lexicon: ண = retroflex nasal (tongue curled) · ந, ன = dental/alveolar nasal
 const consonants=[
-  {char:'க',roman:'ka',hint:'வல்லினம் · sounds like "ka"',spk:'க, கடல்',grp:'val',grpL:'வல்லினம்',example:'கடல்',exRoman:'kadal',exMeaning:'Sea',emoji:'🌊'},
-  {char:'ங',roman:'nga',hint:'மெல்லினம் · nasal "nga"',spk:'ங, மங்கை',grp:'mel',grpL:'மெல்லினம்',example:'மங்கை',exRoman:'mangai',exMeaning:'Girl',emoji:'👧'},
-  {char:'ச',roman:'cha',hint:'வல்லினம் · sounds like "cha"',spk:'ச, சிங்கம்',grp:'val',grpL:'வல்லினம்',example:'சிங்கம்',exRoman:'singam',exMeaning:'Lion',emoji:'🦁'},
-  {char:'ஞ',roman:'nya',hint:'மெல்லினம் · palatal nasal "nya"',spk:'ஞ, ஞாயிறு',grp:'mel',grpL:'மெல்லினம்',example:'ஞாயிறு',exRoman:'nyaayiru',exMeaning:'Sun',emoji:'☀️'},
-  {char:'ட',roman:'tta',hint:'வல்லினம் · retroflex "tta"',spk:'ட, வண்டு',grp:'val',grpL:'வல்லினம்',example:'வண்டு',exRoman:'vandu',exMeaning:'Beetle',emoji:'🐛'},
-  {char:'ண',roman:'nna',hint:'மெல்லினம் · retroflex nasal "nna"',spk:'ண, கண்',grp:'mel',grpL:'மெல்லினம்',example:'கண்',exRoman:'kan',exMeaning:'Eye',emoji:'👁️'},
-  {char:'த',roman:'tha',hint:'வல்லினம் · dental "tha"',spk:'த, தாய்',grp:'val',grpL:'வல்லினம்',example:'தாய்',exRoman:'thaai',exMeaning:'Mother',emoji:'👩'},
-  {char:'ந',roman:'na',hint:'மெல்லினம் · dental nasal "na"',spk:'ந, நாடு',grp:'mel',grpL:'மெல்லினம்',example:'நாடு',exRoman:'naadu',exMeaning:'Country',emoji:'🗺️'},
-  {char:'ப',roman:'pa',hint:'வல்லினம் · sounds like "pa"',spk:'ப, பூ',grp:'val',grpL:'வல்லினம்',example:'பூ',exRoman:'puu',exMeaning:'Flower',emoji:'🌸'},
-  {char:'ம',roman:'ma',hint:'மெல்லினம் · labial nasal "ma"',spk:'ம, மரம்',grp:'mel',grpL:'மெல்லினம்',example:'மரம்',exRoman:'maram',exMeaning:'Tree',emoji:'🌳'},
-  {char:'ய',roman:'ya',hint:'இடையினம் · sounds like "ya"',spk:'ய, யானை',grp:'ida',grpL:'இடையினம்',example:'யானை',exRoman:'yaanai',exMeaning:'Elephant',emoji:'🐘'},
-  {char:'ர',roman:'ra',hint:'இடையினம் · soft tap "ra"',spk:'ர, ரயில்',grp:'ida',grpL:'இடையினம்',example:'ரயில்',exRoman:'rayil',exMeaning:'Train',emoji:'🚂'},
-  {char:'ல',roman:'la',hint:'இடையினம் · lateral "la"',spk:'ல, லட்டு',grp:'ida',grpL:'இடையினம்',example:'லட்டு',exRoman:'laddu',exMeaning:'Sweet',emoji:'🍮'},
-  {char:'வ',roman:'va',hint:'இடையினம் · sounds like "va"',spk:'வ, வீடு',grp:'ida',grpL:'இடையினம்',example:'வீடு',exRoman:'veedu',exMeaning:'House',emoji:'🏠'},
-  {char:'ழ',roman:'zha',hint:'இடையினம் · unique Tamil "zha" sound',spk:'ழ, தமிழ்',grp:'ida',grpL:'இடையினம்',example:'தமிழ்',exRoman:'tamizh',exMeaning:'Tamil',emoji:'📜'},
-  {char:'ள',roman:'lla',hint:'இடையினம் · retroflex lateral "lla"',spk:'ள, விளக்கு',grp:'ida',grpL:'இடையினம்',example:'விளக்கு',exRoman:'vilakku',exMeaning:'Lamp',emoji:'🪔'},
-  {char:'ற',roman:'rra',hint:'வல்லினம் · hard trill "rra"',spk:'ற, மழை',grp:'val',grpL:'வல்லினம்',example:'மறவன்',exRoman:'maravan',exMeaning:'Warrior',emoji:'⚔️'},
-  {char:'ன',roman:'nna',hint:'மெல்லினம் · alveolar nasal "nna"',spk:'ன, மனிதன்',grp:'mel',grpL:'மெல்லினம்',example:'மனிதன்',exRoman:'manithan',exMeaning:'Human',emoji:'👤'},
+  {char:'க',roman:'ka',hint:'வல்லினம் · "k" as in \'k\'ing',spk:'க, கடல்',grp:'val',grpL:'வல்லினம்',example:'கடல்',exRoman:'kadal',exMeaning:'Sea',emoji:'🌊'},
+  {char:'ங',roman:'nga',hint:'மெல்லினம் · nasal "nga" as in si\'ng\'',spk:'ங, மங்கை',grp:'mel',grpL:'மெல்லினம்',example:'மங்கை',exRoman:'mangai',exMeaning:'Girl',emoji:'👧'},
+  {char:'ச',roman:'cha',hint:'வல்லினம் · "cha" as in \'ch\'air',spk:'ச, சிங்கம்',grp:'val',grpL:'வல்லினம்',example:'சிங்கம்',exRoman:'singam',exMeaning:'Lion',emoji:'🦁'},
+  {char:'ஞ',roman:'nya',hint:'மெல்லினம் · "nya" as in ca\'ny\'on',spk:'ஞ, ஞாயிறு',grp:'mel',grpL:'மெல்லினம்',example:'ஞாயிறு',exRoman:'nyaayiru',exMeaning:'Sun',emoji:'☀️'},
+  {char:'ட',roman:'tta',hint:'வல்லினம் · retroflex — tongue curled back',spk:'ட, வண்டு',grp:'val',grpL:'வல்லினம்',example:'வண்டு',exRoman:'vandu',exMeaning:'Beetle',emoji:'🐛'},
+  {char:'ண',roman:'nna',hint:'மெல்லினம் · retroflex nasal — tongue curled back',spk:'ண, கண்',grp:'mel',grpL:'மெல்லினம்',example:'கண்',exRoman:'kan',exMeaning:'Eye',emoji:'👁️'},
+  {char:'த',roman:'tha',hint:'வல்லினம் · dental — tongue tip touches teeth',spk:'த, தாய்',grp:'val',grpL:'வல்லினம்',example:'தாய்',exRoman:'thaai',exMeaning:'Mother',emoji:'👩'},
+  {char:'ந',roman:'na',hint:'மெல்லினம் · dental nasal — tongue tip touches teeth',spk:'ந, நாடு',grp:'mel',grpL:'மெல்லினம்',example:'நாடு',exRoman:'naadu',exMeaning:'Country',emoji:'🗺️'},
+  {char:'ப',roman:'pa',hint:'வல்லினம் · "p" as in \'p\'ark',spk:'ப, பூ',grp:'val',grpL:'வல்லினம்',example:'பூ',exRoman:'puu',exMeaning:'Flower',emoji:'🌸'},
+  {char:'ம',roman:'ma',hint:'மெல்லினம் · "m" as in \'m\'other',spk:'ம, மரம்',grp:'mel',grpL:'மெல்லினம்',example:'மரம்',exRoman:'maram',exMeaning:'Tree',emoji:'🌳'},
+  {char:'ய',roman:'ya',hint:'இடையினம் · "y" as in \'y\'ard',spk:'ய, யானை',grp:'ida',grpL:'இடையினம்',example:'யானை',exRoman:'yaanai',exMeaning:'Elephant',emoji:'🐘'},
+  {char:'ர',roman:'ra',hint:'இடையினம் · soft tap "r" as in \'r\'un',spk:'ர, ரயில்',grp:'ida',grpL:'இடையினம்',example:'ரயில்',exRoman:'rayil',exMeaning:'Train',emoji:'🚂'},
+  {char:'ல',roman:'la',hint:'இடையினம் · "l" as in \'l\'amp',spk:'ல, லட்டு',grp:'ida',grpL:'இடையினம்',example:'லட்டு',exRoman:'laddu',exMeaning:'Sweet',emoji:'🍮'},
+  {char:'வ',roman:'va',hint:'இடையினம் · "v" as in \'v\'an',spk:'வ, வீடு',grp:'ida',grpL:'இடையினம்',example:'வீடு',exRoman:'veedu',exMeaning:'House',emoji:'🏠'},
+  {char:'ழ',roman:'zha',hint:'இடையினம் · unique to Tamil — no English equivalent!',spk:'ழ, தமிழ்',grp:'ida',grpL:'இடையினம்',example:'தமிழ்',exRoman:'tamizh',exMeaning:'Tamil',emoji:'📜'},
+  {char:'ள',roman:'lla',hint:'இடையினம் · retroflex lateral — tongue curled back',spk:'ள, விளக்கு',grp:'ida',grpL:'இடையினம்',example:'விளக்கு',exRoman:'vilakku',exMeaning:'Lamp',emoji:'🪔'},
+  {char:'ற',roman:'rra',hint:'வல்லினம் · hard trill — tongue vibrates strongly',spk:'ற, மறவன்',grp:'val',grpL:'வல்லினம்',example:'மறவன்',exRoman:'maravan',exMeaning:'Warrior',emoji:'⚔️'},
+  {char:'ன',roman:'na',hint:'மெல்லினம் · alveolar — different from ந (dental)',spk:'ன, மனிதன்',grp:'mel',grpL:'மெல்லினம்',example:'மனிதன்',exRoman:'manithan',exMeaning:'Human',emoji:'👤'},
 ];
 const allLetters=[...vowels,...consonants];
 let traceIdx=0;

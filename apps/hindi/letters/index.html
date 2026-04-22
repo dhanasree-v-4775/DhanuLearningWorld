@@ -43,6 +43,7 @@ header p{font-size:.85rem;opacity:.8;margin-top:3px;}
 .lc-emoji{font-size:2rem;margin-bottom:4px;}
 .lc-hi-word{font-family:'Noto Sans Devanagari',sans-serif;font-size:.85rem;font-weight:700;color:#333;margin-bottom:2px;}
 .lc-en-word{font-size:.72rem;color:#888;margin-bottom:8px;}
+.lc-hint{font-size:.62rem;color:#aaa;margin-bottom:8px;line-height:1.35;padding:0 4px;}
 .hear-btn{background:linear-gradient(135deg,#1A237E,#3F51B5);color:#fff;border:none;border-radius:50px;padding:7px 18px;font-size:.78rem;font-weight:700;cursor:pointer;font-family:var(--app-font,'Nunito'),sans-serif;transition:transform .15s;}
 .hear-btn:active{transform:scale(.93);}
 
@@ -160,58 +161,62 @@ function setFont(n){localStorage.setItem('dhanu-font',n);location.reload();}
 </script>
 
 <script>
+// Romanization follows Oxford Hindi-English Dictionary (IAST standard)
+// Retroflex consonants (ट ठ ड ढ ण ष) = tongue curled BACK
+// Dental consonants  (त थ द ध न स) = tongue tip touches TEETH
 const vowels=[
-  {char:'अ',roman:'a',spk:'अ',example:'अनार',exRoman:'anaar',exMeaning:'Pomegranate',emoji:'🍎'},
-  {char:'आ',roman:'aa',spk:'आ',example:'आम',exRoman:'aam',exMeaning:'Mango',emoji:'🥭'},
-  {char:'इ',roman:'i',spk:'इ',example:'इमली',exRoman:'imli',exMeaning:'Tamarind',emoji:'🌿'},
-  {char:'ई',roman:'ee',spk:'ई',example:'ईख',exRoman:'eekh',exMeaning:'Sugarcane',emoji:'🎋'},
-  {char:'उ',roman:'u',spk:'उ',example:'उल्लू',exRoman:'ullu',exMeaning:'Owl',emoji:'🦉'},
-  {char:'ऊ',roman:'oo',spk:'ऊ',example:'ऊँट',exRoman:'oont',exMeaning:'Camel',emoji:'🐪'},
-  {char:'ए',roman:'e',spk:'ए',example:'एड़ी',exRoman:'edee',exMeaning:'Heel',emoji:'🦶'},
-  {char:'ऐ',roman:'ai',spk:'ऐ',example:'ऐनक',exRoman:'ainak',exMeaning:'Glasses',emoji:'👓'},
-  {char:'ओ',roman:'o',spk:'ओ',example:'ओखली',exRoman:'okali',exMeaning:'Mortar',emoji:'🥣'},
-  {char:'औ',roman:'au',spk:'औ',example:'औजार',exRoman:'auzaar',exMeaning:'Tool',emoji:'🔧'},
-  {char:'अं',roman:'am',spk:'अं',example:'अंगूर',exRoman:'angoor',exMeaning:'Grapes',emoji:'🍇'},
-  {char:'अः',roman:'ah',spk:'अः',example:'अः',exRoman:'ah',exMeaning:'Visarga sound',emoji:'🔤'},
-  {char:'ऋ',roman:'ri',spk:'ऋ',example:'ऋषि',exRoman:'rishi',exMeaning:'Sage',emoji:'🧘'},
+  {char:'अ',roman:'a',hint:'short "a" as in \'a\'go',spk:'अ, अनार',example:'अनार',exRoman:'anaar',exMeaning:'Pomegranate',emoji:'🍎'},
+  {char:'आ',roman:'aa',hint:'long "aa" as in f\'aa\'ther',spk:'आ, आम',example:'आम',exRoman:'aam',exMeaning:'Mango',emoji:'🥭'},
+  {char:'इ',roman:'i',hint:'short "i" as in \'i\'nk',spk:'इ, इमली',example:'इमली',exRoman:'imli',exMeaning:'Tamarind',emoji:'🌿'},
+  {char:'ई',roman:'ii',hint:'long "ii" as in \'ee\'l',spk:'ई, ईख',example:'ईख',exRoman:'eekh',exMeaning:'Sugarcane',emoji:'🎋'},
+  {char:'उ',roman:'u',hint:'short "u" as in p\'u\'t',spk:'उ, उल्लू',example:'उल्लू',exRoman:'ullu',exMeaning:'Owl',emoji:'🦉'},
+  {char:'ऊ',roman:'uu',hint:'long "uu" as in m\'oo\'n',spk:'ऊ, ऊँट',example:'ऊँट',exRoman:'oont',exMeaning:'Camel',emoji:'🐪'},
+  {char:'ए',roman:'e',hint:'long "e" as in h\'e\'y',spk:'ए, एक',example:'एक',exRoman:'ek',exMeaning:'One',emoji:'1️⃣'},
+  {char:'ऐ',roman:'ai',hint:'"ai" as in \'ai\'r',spk:'ऐ, ऐनक',example:'ऐनक',exRoman:'ainak',exMeaning:'Glasses',emoji:'👓'},
+  {char:'ओ',roman:'o',hint:'long "o" as in g\'o\'',spk:'ओ, ओस',example:'ओस',exRoman:'os',exMeaning:'Dew',emoji:'💧'},
+  {char:'औ',roman:'au',hint:'"au" as in \'ou\'t',spk:'औ, औरत',example:'औरत',exRoman:'aurat',exMeaning:'Woman',emoji:'👩'},
+  {char:'अं',roman:'aṃ',hint:'nasal sound — anusvara (like "m" or "n")',spk:'अं, अंगूर',example:'अंगूर',exRoman:'angoor',exMeaning:'Grapes',emoji:'🍇'},
+  {char:'अः',roman:'aḥ',hint:'aspirated breath after vowel — visarga',spk:'अः',example:'अः',exRoman:'aḥ',exMeaning:'Visarga',emoji:'🔤'},
+  {char:'ऋ',roman:'ṛi',hint:'"ri" — vocalic r, as in \'ri\'tual',spk:'ऋ, ऋषि',example:'ऋषि',exRoman:'rishi',exMeaning:'Sage',emoji:'🧘'},
 ];
+// Oxford IAST: underdot (ṭ ḍ ṇ ṣ) = RETROFLEX · no dot (t d n s) = DENTAL
 const consonants=[
-  {char:'क',roman:'ka',spk:'क',example:'कमल',exRoman:'kamal',exMeaning:'Lotus',emoji:'🪷'},
-  {char:'ख',roman:'kha',spk:'ख',example:'खरगोश',exRoman:'khargosh',exMeaning:'Rabbit',emoji:'🐇'},
-  {char:'ग',roman:'ga',spk:'ग',example:'गाय',exRoman:'gaay',exMeaning:'Cow',emoji:'🐄'},
-  {char:'घ',roman:'gha',spk:'घ',example:'घर',exRoman:'ghar',exMeaning:'House',emoji:'🏠'},
-  {char:'ङ',roman:'nga',spk:'ङ',example:'पंछी',exRoman:'panchhi',exMeaning:'Bird',emoji:'🐦'},
-  {char:'च',roman:'cha',spk:'च',example:'चाँद',exRoman:'chaand',exMeaning:'Moon',emoji:'🌙'},
-  {char:'छ',roman:'chha',spk:'छ',example:'छाता',exRoman:'chhaata',exMeaning:'Umbrella',emoji:'☂️'},
-  {char:'ज',roman:'ja',spk:'ज',example:'जल',exRoman:'jal',exMeaning:'Water',emoji:'💧'},
-  {char:'झ',roman:'jha',spk:'झ',example:'झरना',exRoman:'jharna',exMeaning:'Waterfall',emoji:'🌊'},
-  {char:'ञ',roman:'nya',spk:'ञ',example:'ञान',exRoman:'gyan',exMeaning:'Knowledge',emoji:'📚'},
-  {char:'ट',roman:'ta',spk:'ट',example:'टमाटर',exRoman:'tamatar',exMeaning:'Tomato',emoji:'🍅'},
-  {char:'ठ',roman:'tha',spk:'ठ',example:'ठंड',exRoman:'thand',exMeaning:'Cold',emoji:'🥶'},
-  {char:'ड',roman:'da',spk:'ड',example:'डमरू',exRoman:'damaru',exMeaning:'Drum',emoji:'🥁'},
-  {char:'ढ',roman:'dha',spk:'ढ',example:'ढोल',exRoman:'dhol',exMeaning:'Dhol drum',emoji:'🥁'},
-  {char:'ण',roman:'nna',spk:'ण',example:'गण',exRoman:'gana',exMeaning:'Group',emoji:'👥'},
-  {char:'त',roman:'ta',spk:'त',example:'तारा',exRoman:'taara',exMeaning:'Star',emoji:'⭐'},
-  {char:'थ',roman:'tha',spk:'थ',example:'थैला',exRoman:'thela',exMeaning:'Bag',emoji:'👜'},
-  {char:'द',roman:'da',spk:'द',example:'दिल',exRoman:'dil',exMeaning:'Heart',emoji:'❤️'},
-  {char:'ध',roman:'dha',spk:'ध',example:'धनुष',exRoman:'dhanush',exMeaning:'Bow',emoji:'🏹'},
-  {char:'न',roman:'na',spk:'न',example:'नाव',exRoman:'naav',exMeaning:'Boat',emoji:'⛵'},
-  {char:'प',roman:'pa',spk:'प',example:'पानी',exRoman:'paani',exMeaning:'Water',emoji:'💧'},
-  {char:'फ',roman:'pha',spk:'फ',example:'फूल',exRoman:'phool',exMeaning:'Flower',emoji:'🌸'},
-  {char:'ब',roman:'ba',spk:'ब',example:'बादल',exRoman:'baadal',exMeaning:'Cloud',emoji:'☁️'},
-  {char:'भ',roman:'bha',spk:'भ',example:'भालू',exRoman:'bhaalu',exMeaning:'Bear',emoji:'🐻'},
-  {char:'म',roman:'ma',spk:'म',example:'मछली',exRoman:'machhli',exMeaning:'Fish',emoji:'🐟'},
-  {char:'य',roman:'ya',spk:'य',example:'यात्रा',exRoman:'yaatra',exMeaning:'Journey',emoji:'✈️'},
-  {char:'र',roman:'ra',spk:'र',example:'रेलगाड़ी',exRoman:'relgaadi',exMeaning:'Train',emoji:'🚂'},
-  {char:'ल',roman:'la',spk:'ल',example:'लड़की',exRoman:'ladki',exMeaning:'Girl',emoji:'👧'},
-  {char:'व',roman:'va',spk:'व',example:'वर्षा',exRoman:'varsha',exMeaning:'Rain',emoji:'🌧️'},
-  {char:'श',roman:'sha',spk:'श',example:'शेर',exRoman:'sher',exMeaning:'Lion',emoji:'🦁'},
-  {char:'ष',roman:'sha',spk:'ष',example:'षट्कोण',exRoman:'shatkona',exMeaning:'Hexagon',emoji:'⬡'},
-  {char:'स',roman:'sa',spk:'स',example:'सेब',exRoman:'seb',exMeaning:'Apple',emoji:'🍎'},
-  {char:'ह',roman:'ha',spk:'ह',example:'हाथी',exRoman:'haathi',exMeaning:'Elephant',emoji:'🐘'},
-  {char:'क्ष',roman:'ksha',spk:'क्ष',example:'क्षमा',exRoman:'kshama',exMeaning:'Forgiveness',emoji:'🤝'},
-  {char:'त्र',roman:'tra',spk:'त्र',example:'त्रिशूल',exRoman:'trishool',exMeaning:'Trident',emoji:'🔱'},
-  {char:'ज्ञ',roman:'gya',spk:'ज्ञ',example:'ज्ञान',exRoman:'gyan',exMeaning:'Knowledge',emoji:'📚'},
+  {char:'क',roman:'ka',hint:'unaspirated — "k" as in s\'k\'y',spk:'क, कमल',example:'कमल',exRoman:'kamal',exMeaning:'Lotus',emoji:'🪷'},
+  {char:'ख',roman:'kha',hint:'aspirated — "kh" with a puff of air',spk:'ख, खरगोश',example:'खरगोश',exRoman:'khargosh',exMeaning:'Rabbit',emoji:'🐇'},
+  {char:'ग',roman:'ga',hint:'unaspirated — "g" as in \'g\'o',spk:'ग, गाय',example:'गाय',exRoman:'gaay',exMeaning:'Cow',emoji:'🐄'},
+  {char:'घ',roman:'gha',hint:'aspirated — "gh" with a puff of air',spk:'घ, घर',example:'घर',exRoman:'ghar',exMeaning:'House',emoji:'🏠'},
+  {char:'ङ',roman:'ṅa',hint:'nasal — "ng" as in si\'ng\'',spk:'ङ, पंछी',example:'पंछी',exRoman:'panchhi',exMeaning:'Bird',emoji:'🐦'},
+  {char:'च',roman:'cha',hint:'unaspirated — "ch" as in \'ch\'air',spk:'च, चाँद',example:'चाँद',exRoman:'chaand',exMeaning:'Moon',emoji:'🌙'},
+  {char:'छ',roman:'chha',hint:'aspirated — "chh" with a puff of air',spk:'छ, छाता',example:'छाता',exRoman:'chhaata',exMeaning:'Umbrella',emoji:'☂️'},
+  {char:'ज',roman:'ja',hint:'unaspirated — "j" as in \'j\'ar',spk:'ज, जल',example:'जल',exRoman:'jal',exMeaning:'Water',emoji:'💧'},
+  {char:'झ',roman:'jha',hint:'aspirated — "jh" with a puff of air',spk:'झ, झरना',example:'झरना',exRoman:'jharna',exMeaning:'Waterfall',emoji:'🌊'},
+  {char:'ञ',roman:'nya',hint:'palatal nasal — "ny" as in ca\'ny\'on',spk:'ञ, ज्ञान',example:'ज्ञान',exRoman:'gyan',exMeaning:'Knowledge',emoji:'📚'},
+  {char:'ट',roman:'ṭa',hint:'RETROFLEX — tongue curled back · different from त',spk:'ट, टमाटर',example:'टमाटर',exRoman:'ṭamaṭar',exMeaning:'Tomato',emoji:'🍅'},
+  {char:'ठ',roman:'ṭha',hint:'RETROFLEX aspirated — tongue curled back · different from थ',spk:'ठ, ठेला',example:'ठेला',exRoman:'ṭhela',exMeaning:'Cart',emoji:'🛒'},
+  {char:'ड',roman:'ḍa',hint:'RETROFLEX — tongue curled back · different from द',spk:'ड, डमरू',example:'डमरू',exRoman:'ḍamaru',exMeaning:'Drum',emoji:'🥁'},
+  {char:'ढ',roman:'ḍha',hint:'RETROFLEX aspirated — tongue curled back · different from ध',spk:'ढ, ढोल',example:'ढोल',exRoman:'ḍhol',exMeaning:'Dhol',emoji:'🥁'},
+  {char:'ण',roman:'ṇa',hint:'RETROFLEX nasal — tongue curled back · different from न',spk:'ण, बाण',example:'बाण',exRoman:'baaṇ',exMeaning:'Arrow',emoji:'🏹'},
+  {char:'त',roman:'ta',hint:'DENTAL — tongue tip touches teeth · different from ट',spk:'त, तारा',example:'तारा',exRoman:'taara',exMeaning:'Star',emoji:'⭐'},
+  {char:'थ',roman:'tha',hint:'DENTAL aspirated — tongue touches teeth · different from ठ',spk:'थ, थाली',example:'थाली',exRoman:'thaali',exMeaning:'Plate',emoji:'🍽️'},
+  {char:'द',roman:'da',hint:'DENTAL — tongue tip touches teeth · different from ड',spk:'द, दरवाज़ा',example:'दरवाज़ा',exRoman:'darvaaza',exMeaning:'Door',emoji:'🚪'},
+  {char:'ध',roman:'dha',hint:'DENTAL aspirated — tongue touches teeth · different from ढ',spk:'ध, धनुष',example:'धनुष',exRoman:'dhanush',exMeaning:'Bow',emoji:'🏹'},
+  {char:'न',roman:'na',hint:'DENTAL nasal — tongue tip touches teeth · different from ण',spk:'न, नाव',example:'नाव',exRoman:'naav',exMeaning:'Boat',emoji:'⛵'},
+  {char:'प',roman:'pa',hint:'unaspirated — "p" as in s\'p\'ark',spk:'प, पानी',example:'पानी',exRoman:'paani',exMeaning:'Water',emoji:'💧'},
+  {char:'फ',roman:'pha',hint:'aspirated — "ph" with a puff of air',spk:'फ, फूल',example:'फूल',exRoman:'phool',exMeaning:'Flower',emoji:'🌸'},
+  {char:'ब',roman:'ba',hint:'unaspirated — "b" as in \'b\'all',spk:'ब, बादल',example:'बादल',exRoman:'baadal',exMeaning:'Cloud',emoji:'☁️'},
+  {char:'भ',roman:'bha',hint:'aspirated — "bh" with a puff of air',spk:'भ, भालू',example:'भालू',exRoman:'bhaalu',exMeaning:'Bear',emoji:'🐻'},
+  {char:'म',roman:'ma',hint:'nasal — "m" as in \'m\'other',spk:'म, मछली',example:'मछली',exRoman:'machhli',exMeaning:'Fish',emoji:'🐟'},
+  {char:'य',roman:'ya',hint:'"y" as in \'y\'ard',spk:'य, यात्रा',example:'यात्रा',exRoman:'yaatra',exMeaning:'Journey',emoji:'✈️'},
+  {char:'र',roman:'ra',hint:'tap "r" — as in \'r\'un',spk:'र, रेलगाड़ी',example:'रेलगाड़ी',exRoman:'relgaadi',exMeaning:'Train',emoji:'🚂'},
+  {char:'ल',roman:'la',hint:'"l" as in \'l\'amp',spk:'ल, लड़की',example:'लड़की',exRoman:'ladki',exMeaning:'Girl',emoji:'👧'},
+  {char:'व',roman:'va',hint:'"v" or "w" sound',spk:'व, वन',example:'वन',exRoman:'van',exMeaning:'Forest',emoji:'🌳'},
+  {char:'श',roman:'śa',hint:'PALATAL "sh" — as in \'sh\'oe · different from ष',spk:'श, शेर',example:'शेर',exRoman:'śer',exMeaning:'Lion',emoji:'🦁'},
+  {char:'ष',roman:'ṣa',hint:'RETROFLEX "sh" — tongue curled back · different from श',spk:'ष, षट्कोण',example:'षट्कोण',exRoman:'ṣaṭkoṇ',exMeaning:'Hexagon',emoji:'⬡'},
+  {char:'स',roman:'sa',hint:'DENTAL "s" — tongue touches teeth · different from श ष',spk:'स, सेब',example:'सेब',exRoman:'seb',exMeaning:'Apple',emoji:'🍎'},
+  {char:'ह',roman:'ha',hint:'"h" as in \'h\'ouse',spk:'ह, हाथी',example:'हाथी',exRoman:'haathi',exMeaning:'Elephant',emoji:'🐘'},
+  {char:'क्ष',roman:'kṣa',hint:'conjunct — "ksh" as in e\'ksh\'',spk:'क्ष, क्षत्रिय',example:'क्षत्रिय',exRoman:'kṣatriya',exMeaning:'Warrior',emoji:'⚔️'},
+  {char:'त्र',roman:'tra',hint:'conjunct — "tr" as in \'tr\'ee',spk:'त्र, त्रिकोण',example:'त्रिकोण',exRoman:'trikoṇ',exMeaning:'Triangle',emoji:'🔺'},
+  {char:'ज्ञ',roman:'jña',hint:'conjunct — "gya" in modern Hindi',spk:'ज्ञ, ज्ञान',example:'ज्ञान',exRoman:'jñaan',exMeaning:'Knowledge',emoji:'📚'},
 ];
 const allLetters=[...vowels,...consonants];
 let traceIdx=0;
@@ -234,8 +239,10 @@ function buildGrid(data,id){
   const g=document.getElementById(id);g.innerHTML='';
   data.forEach(item=>{
     const c=document.createElement('div');c.className='letter-card';
-    c.innerHTML=`<div class="lc-char hi">${item.char}</div><div class="lc-roman">${item.roman}</div><div class="lc-emoji">${item.emoji}</div><div class="lc-hi-word hi">${item.example}</div><div class="lc-en-word">${item.exRoman} · ${item.exMeaning}</div><button class="hear-btn" onclick="event.stopPropagation();speak('${item.spk}')">🔊 Hear</button>`;
-    c.onclick=()=>speak(item.spk);
+    const spkText=item.spk;
+    c.innerHTML=`<div class="lc-char hi">${item.char}</div><div class="lc-roman">${item.roman}</div><div class="lc-hint">${item.hint||''}</div><div class="lc-emoji">${item.emoji}</div><div class="lc-hi-word hi">${item.example}</div><div class="lc-en-word">${item.exRoman} · ${item.exMeaning}</div><button class="hear-btn">🔊 Hear</button>`;
+    c.querySelector('.hear-btn').onclick=e=>{e.stopPropagation();speak(spkText);};
+    c.onclick=()=>speak(spkText);
     g.appendChild(c);
   });
 }
