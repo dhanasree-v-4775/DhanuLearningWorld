@@ -283,12 +283,23 @@ function clearCanvas() {
   drawGuideLines();
 }
 
+function pickFemaleVoice() {
+  const voices = speechSynthesis.getVoices();
+  const enVoices = voices.filter(v => v.lang.startsWith('en'));
+  const femaleNames = ['Samantha','Google US English','Ava','Allison','Susan','Zira','Karen','Victoria','Moira','Fiona'];
+  for (const name of femaleNames) {
+    const v = enVoices.find(v => v.name.includes(name));
+    if (v) return v;
+  }
+  return enVoices.find(v => v.lang === 'en-US') || enVoices[0] || null;
+}
+
 function speakLetter() {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(curLetter);
-  u.lang = 'en-US';
-  u.rate=0.7; u.pitch=1.2;
+  u.lang = 'en-US'; u.rate=0.7; u.pitch=1.2;
+  const v=pickFemaleVoice(); if(v) u.voice=v;
   window.speechSynthesis.speak(u);
 }
 
@@ -365,7 +376,8 @@ function speakAnswer(){
   if(!('speechSynthesis' in window))return;
   window.speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(sentences[sbCur].answer.replace(/\./g,''));
-  u.rate=0.85;u.pitch=1.1;
+  u.lang='en-US';u.rate=0.85;u.pitch=1.1;
+  const v=pickFemaleVoice();if(v)u.voice=v;
   window.speechSynthesis.speak(u);
 }
 
@@ -397,7 +409,7 @@ function checkCopy(){
 
 function clearCopy(){document.getElementById('copyInput').value='';document.getElementById('copyResult').textContent='';}
 function speakCopy(){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(copySentences[cpCur]);
-  u.lang = 'en-US';u.rate=0.8;u.pitch=1.1;window.speechSynthesis.speak(u);}
+  u.lang='en-US';u.rate=0.8;u.pitch=1.1;const v=pickFemaleVoice();if(v)u.voice=v;window.speechSynthesis.speak(u);}
 function cpGo(dir){cpCur=Math.max(0,Math.min(copySentences.length-1,cpCur+dir));renderCopy();}
 
 // ─── MODE SWITCH ───

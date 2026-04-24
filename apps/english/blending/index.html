@@ -241,12 +241,23 @@ function resetBlend() {
   document.getElementById('wordInfo').textContent='';
 }
 
+function pickFemaleVoice() {
+  const voices = speechSynthesis.getVoices();
+  const enVoices = voices.filter(v => v.lang.startsWith('en'));
+  const femaleNames = ['Samantha','Google US English','Ava','Allison','Susan','Zira','Karen','Victoria','Moira','Fiona'];
+  for (const name of femaleNames) {
+    const v = enVoices.find(v => v.name.includes(name));
+    if (v) return v;
+  }
+  return enVoices.find(v => v.lang === 'en-US') || enVoices[0] || null;
+}
+
 function speakSound(letter) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(letter);
-  u.lang = 'en-US';
-  u.rate = 0.7; u.pitch = 1.2;
+  u.lang = 'en-US'; u.rate = 0.7; u.pitch = 1.2;
+  const v = pickFemaleVoice(); if (v) u.voice = v;
   window.speechSynthesis.speak(u);
 }
 
@@ -254,13 +265,14 @@ function speakWord() {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const d = words[cur];
+  const voice = pickFemaleVoice();
   const letters = d.w.split('').join('... ');
   const u1 = new SpeechSynthesisUtterance(letters);
-  u1.lang = 'en-US';
-  u1.rate = 0.6; u1.pitch = 1.2;
+  u1.lang = 'en-US'; u1.rate = 0.6; u1.pitch = 1.2;
+  if (voice) u1.voice = voice;
   const u2 = new SpeechSynthesisUtterance(d.w);
-  u2.lang = 'en-US';
-  u2.rate = 0.8; u2.pitch = 1.1;
+  u2.lang = 'en-US'; u2.rate = 0.8; u2.pitch = 1.1;
+  if (voice) u2.voice = voice;
   window.speechSynthesis.speak(u1);
   window.speechSynthesis.speak(u2);
 }
