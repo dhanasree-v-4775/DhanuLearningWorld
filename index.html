@@ -107,6 +107,54 @@ body {
 }
 
 /* ============================================================
+   GRADE TAB SWITCHER
+   ============================================================ */
+.grade-tabs {
+  display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+  padding:20px 16px 0;
+}
+.grade-tab {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:14px 32px; border-radius:50px;
+  border:2.5px solid rgba(255,255,255,0.25);
+  background:rgba(255,255,255,0.08);
+  color:rgba(255,255,255,0.75);
+  font-family:inherit; font-size:1.05em; font-weight:bold;
+  cursor:pointer; transition:all 0.25s ease;
+  min-height:52px; white-space:nowrap;
+  -webkit-user-select:none; user-select:none;
+  backdrop-filter:blur(10px);
+}
+.grade-tab:hover {
+  background:rgba(255,255,255,0.15);
+  color:white;
+  border-color:rgba(255,255,255,0.45);
+  transform:translateY(-2px);
+}
+.grade-tab.active {
+  background:linear-gradient(135deg,#f093fb 0%,#f5576c 50%,#fda085 100%);
+  border-color:transparent;
+  color:white;
+  box-shadow:0 8px 28px rgba(240,93,251,0.45);
+  transform:translateY(-2px);
+}
+.grade-tab.active.g1 {
+  background:linear-gradient(135deg,#667eea 0%,#764ba2 50%,#f093fb 100%);
+  box-shadow:0 8px 28px rgba(102,126,234,0.45);
+}
+.grade-tab-desc {
+  display:block; font-size:0.72em; font-weight:600;
+  opacity:0.85; margin-top:1px;
+  letter-spacing:0.3px;
+}
+
+/* ============================================================
+   GRADE CONTENT PANELS
+   ============================================================ */
+.grade-content { display:none; }
+.grade-content.active { display:block; }
+
+/* ============================================================
    STICKY SUBJECT NAV
    ============================================================ */
 .subject-nav {
@@ -224,6 +272,25 @@ body {
     box-shadow:0 16px 40px rgba(0,0,0,0.22);
   }
 }
+
+/* Coming Soon card style */
+.app-card.coming-soon {
+  opacity:0.72;
+  cursor:default;
+  filter:grayscale(0.25);
+}
+.app-card.coming-soon:active { transform:none; box-shadow:0 6px 24px rgba(0,0,0,0.14); }
+@media (hover:hover) {
+  .app-card.coming-soon:hover { transform:none; box-shadow:0 6px 24px rgba(0,0,0,0.14); }
+}
+.badge-coming-soon {
+  display:inline-block; padding:3px 10px;
+  border-radius:20px; font-size:0.7em;
+  font-weight:bold; color:white; margin-top:8px;
+  align-self:flex-start;
+  background:linear-gradient(135deg,#f7971e,#e65c00);
+}
+
 .card-icon-wrap {
   height:110px;
   display:flex; align-items:center; justify-content:center;
@@ -342,6 +409,11 @@ body {
 
 /* Make sure touch targets are big enough */
 .nav-pill, .app-card { min-height:44px; }
+
+/* Grade tabs mobile */
+@media (max-width:480px) {
+  .grade-tab { padding:12px 22px; font-size:0.98em; min-height:52px; }
+}
 </style>
 </head>
 <body>
@@ -358,10 +430,10 @@ body {
 
   <!-- ============ HERO ============ -->
   <header class="hero">
-    <div class="hero-badge">🎓 Grade 1 · IGCSE · Age 5–6</div>
+    <div class="hero-badge" id="hero-badge">🌸 Sr KG · IGCSE · Age 4–5</div>
     <div class="hero-stars">⭐ 🌟 ⭐</div>
     <h1>My <span>Learning</span> World</h1>
-    <p>Books, Games & Fun Activities — all in one place!</p>
+    <p>Books, Games &amp; Fun Activities — all in one place!</p>
     <div class="hero-stats">
       <div class="stat-pill">📚 8 Story Books</div>
       <div class="stat-pill">🎮 26 Learning Apps</div>
@@ -369,552 +441,960 @@ body {
     </div>
   </header>
 
+  <!-- ============ GRADE TAB SWITCHER ============ -->
+  <div class="grade-tabs">
+    <button class="grade-tab active" id="tab-skg" onclick="switchGrade('skg')" aria-pressed="true">
+      🌸 Sr KG
+      <span class="grade-tab-desc">Age 4–5</span>
+    </button>
+    <button class="grade-tab g1" id="tab-g1" onclick="switchGrade('g1')" aria-pressed="false">
+      ⭐ Grade 1
+      <span class="grade-tab-desc">Age 5–6</span>
+    </button>
+  </div>
+
   <!-- ============ STICKY NAV ============ -->
-  <nav class="subject-nav">
-    <div class="subject-nav-inner">
-      <a class="nav-pill books"   href="#books">   📚 Books   </a>
-      <a class="nav-pill english" href="#english"> 🔤 English </a>
-      <a class="nav-pill maths"   href="#maths">   🔢 Maths   </a>
-      <a class="nav-pill science" href="#science"> 🔬 Science </a>
-      <a class="nav-pill ict"     href="#ict">     💻 ICT     </a>
-      <a class="nav-pill evs"     href="#evs">     🌍 EVS     </a>
-      <a class="nav-pill tamil"   href="#tamil">   🔤 Tamil   </a>
-      <a class="nav-pill hindi"   href="#hindi">   🔤 Hindi   </a>
+  <nav class="subject-nav" id="subject-nav">
+    <!-- Updated by JS on tab switch -->
+    <div class="subject-nav-inner" id="nav-inner">
+      <a class="nav-pill english" href="#skg-english"> 🔤 English </a>
+      <a class="nav-pill maths"   href="#skg-maths">   🔢 Maths   </a>
+      <a class="nav-pill science" href="#skg-science"> 🔬 Science </a>
+      <a class="nav-pill evs"     href="#skg-evs">     🌍 EVS     </a>
+      <a class="nav-pill tamil"   href="#skg-tamil">   🔤 Tamil   </a>
+      <a class="nav-pill hindi"   href="#skg-hindi">   🔤 Hindi   </a>
     </div>
   </nav>
 
   <!-- ============ CONTENT ============ -->
   <main class="content">
 
-    <!-- ===== BOOKS ===== -->
-    <section class="section" id="books">
-      <div class="section-header sh-books">
-        <div class="section-header-inner">
-          <div class="section-icon">📚</div>
-          <div class="section-text">
-            <div class="section-title">Story Books</div>
-            <div class="section-sub">Tap to read & listen!</div>
+    <!-- =====================================================
+         SR KG CONTENT
+         ===================================================== -->
+    <div id="skg-content" class="grade-content active">
+
+      <!-- ===== SKG ENGLISH ===== -->
+      <section class="section" id="skg-english">
+        <div class="section-header sh-english">
+          <div class="section-header-inner">
+            <div class="section-icon">🔤</div>
+            <div class="section-text">
+              <div class="section-title">English</div>
+              <div class="section-sub">Alphabet, Phonics &amp; First Words</div>
+            </div>
+            <div class="section-count">5 Topics</div>
           </div>
-          <div class="section-count">8 Books</div>
         </div>
-      </div>
-      <div class="card-grid">
+        <div class="card-grid">
 
-        <a class="app-card ac-book" href="books/caterpillar/index.html" style="animation-delay:0.05s">
-          <div class="card-icon-wrap">🐛</div>
-          <div class="card-body">
-            <div class="card-title">The Very Hungry Caterpillar</div>
-            <div class="card-sub">Eric Carle</div>
-            <span class="card-badge">Picture Book</span>
+          <div class="app-card ac-english coming-soon" style="animation-delay:0.05s">
+            <div class="card-icon-wrap">🔡</div>
+            <div class="card-body">
+              <div class="card-title">Alphabet Fun</div>
+              <div class="card-sub">Recognize A–Z letters</div>
+              <span class="badge-coming-soon">🔜 Coming Soon</span>
+            </div>
           </div>
-        </a>
 
-        <a class="app-card ac-book" href="books/green-eggs/index.html" style="animation-delay:0.09s">
-          <div class="card-icon-wrap">🍳</div>
-          <div class="card-body">
-            <div class="card-title">Green Eggs and Ham</div>
-            <div class="card-sub">Dr. Seuss</div>
-            <span class="card-badge">Early Reader</span>
+          <a class="app-card ac-english" href="apps/english/phonics/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🎵</div>
+            <div class="card-body">
+              <div class="card-title">Phonics Sounds</div>
+              <div class="card-sub">Initial letter sounds a–z</div>
+              <span class="card-badge">English</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-english" href="apps/english/sight-words/index.html" style="animation-delay:0.13s">
+            <div class="card-icon-wrap">👁️</div>
+            <div class="card-body">
+              <div class="card-title">Basic Sight Words</div>
+              <div class="card-sub">the, a, I, is, it, in, on</div>
+              <span class="card-badge">English</span>
+            </div>
+          </a>
+
+          <div class="app-card ac-english coming-soon" style="animation-delay:0.17s">
+            <div class="card-icon-wrap">✏️</div>
+            <div class="card-body">
+              <div class="card-title">Pre-Writing</div>
+              <div class="card-sub">Lines, curves &amp; pencil grip</div>
+              <span class="badge-coming-soon">🔜 Coming Soon</span>
+            </div>
           </div>
-        </a>
 
-        <a class="app-card ac-book" href="books/wild-things/index.html" style="animation-delay:0.13s">
-          <div class="card-icon-wrap">👹</div>
-          <div class="card-body">
-            <div class="card-title">Where the Wild Things Are</div>
-            <div class="card-sub">Maurice Sendak</div>
-            <span class="card-badge">Picture Book</span>
+          <div class="app-card ac-english coming-soon" style="animation-delay:0.21s">
+            <div class="card-icon-wrap">🎤</div>
+            <div class="card-body">
+              <div class="card-title">Rhymes &amp; Songs</div>
+              <div class="card-sub">Nursery rhymes aloud</div>
+              <span class="badge-coming-soon">🔜 Coming Soon</span>
+            </div>
           </div>
-        </a>
 
-        <a class="app-card ac-book" href="books/gruffalo/index.html" style="animation-delay:0.17s">
-          <div class="card-icon-wrap">🧌</div>
-          <div class="card-body">
-            <div class="card-title">The Gruffalo</div>
-            <div class="card-sub">Julia Donaldson</div>
-            <span class="card-badge">Rhyming Story</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-book" href="books/elephant-piggie/index.html" style="animation-delay:0.21s">
-          <div class="card-icon-wrap">🐘</div>
-          <div class="card-body">
-            <div class="card-title">Elephant & Piggie</div>
-            <div class="card-sub">Mo Willems</div>
-            <span class="card-badge">Early Reader</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-book" href="books/frog-toad/index.html" style="animation-delay:0.25s">
-          <div class="card-icon-wrap">🐸</div>
-          <div class="card-body">
-            <div class="card-title">Frog and Toad are Friends</div>
-            <div class="card-sub">Arnold Lobel</div>
-            <span class="card-badge">Chapter Book</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-book" href="books/fathers-dragon/index.html" style="animation-delay:0.29s">
-          <div class="card-icon-wrap">🐉</div>
-          <div class="card-body">
-            <div class="card-title">My Father's Dragon</div>
-            <div class="card-sub">Ruth Stiles Gannett</div>
-            <span class="card-badge">Chapter Book</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-book" href="books/magic-tree/index.html" style="animation-delay:0.33s">
-          <div class="card-icon-wrap">🌳</div>
-          <div class="card-body">
-            <div class="card-title">Magic Tree House</div>
-            <div class="card-sub">Mary Pope Osborne</div>
-            <span class="card-badge">Chapter Book</span>
-          </div>
-        </a>
-
-      </div>
-    </section>
-
-    <!-- ===== ENGLISH ===== -->
-    <section class="section" id="english">
-      <div class="section-header sh-english">
-        <div class="section-header-inner">
-          <div class="section-icon">🔤</div>
-          <div class="section-text">
-            <div class="section-title">English</div>
-            <div class="section-sub">Reading, Writing & Speaking</div>
-          </div>
-          <div class="section-count">8 Apps</div>
         </div>
-      </div>
-      <div class="card-grid">
+      </section>
 
-        <a class="app-card ac-english" href="apps/english/phonics/index.html" style="animation-delay:0.05s">
-          <div class="card-icon-wrap">🔡</div>
-          <div class="card-body">
-            <div class="card-title">Phonics</div>
-            <div class="card-sub">Letter Sounds A–Z</div>
-            <span class="card-badge">English</span>
+      <!-- ===== SKG MATHS ===== -->
+      <section class="section" id="skg-maths">
+        <div class="section-header sh-maths">
+          <div class="section-header-inner">
+            <div class="section-icon">🔢</div>
+            <div class="section-text">
+              <div class="section-title">Maths</div>
+              <div class="section-sub">Count, Shape &amp; Sort</div>
+            </div>
+            <div class="section-count">5 Topics</div>
           </div>
-        </a>
-
-        <a class="app-card ac-english" href="apps/english/blending/index.html" style="animation-delay:0.09s">
-          <div class="card-icon-wrap">🔗</div>
-          <div class="card-body">
-            <div class="card-title">Blending</div>
-            <div class="card-sub">Join Sounds to Read</div>
-            <span class="card-badge">English</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-english" href="apps/english/sight-words/index.html" style="animation-delay:0.13s">
-          <div class="card-icon-wrap">👁️</div>
-          <div class="card-body">
-            <div class="card-title">Sight Words</div>
-            <div class="card-sub">40 Common Words</div>
-            <span class="card-badge">English</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-english" href="apps/english/reading/index.html" style="animation-delay:0.17s">
-          <div class="card-icon-wrap">📖</div>
-          <div class="card-body">
-            <div class="card-title">Reading</div>
-            <div class="card-sub">Short Stories & Quizzes</div>
-            <span class="card-badge">English</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-english" href="apps/english/comprehension/index.html" style="animation-delay:0.21s">
-          <div class="card-icon-wrap">🧠</div>
-          <div class="card-body">
-            <div class="card-title">Comprehension</div>
-            <div class="card-sub">Read & Answer</div>
-            <span class="card-badge">English</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-english" href="apps/english/writing/index.html" style="animation-delay:0.25s">
-          <div class="card-icon-wrap">✏️</div>
-          <div class="card-body">
-            <div class="card-title">Writing</div>
-            <div class="card-sub">Trace, Build & Copy</div>
-            <span class="card-badge">English</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-english" href="apps/english/vocabulary/index.html" style="animation-delay:0.29s">
-          <div class="card-icon-wrap">💬</div>
-          <div class="card-body">
-            <div class="card-title">Vocabulary</div>
-            <div class="card-sub">50 Words & Meanings</div>
-            <span class="card-badge">English</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-english" href="apps/english/speaking/index.html" style="animation-delay:0.33s">
-          <div class="card-icon-wrap">🎤</div>
-          <div class="card-body">
-            <div class="card-title">Speaking & Listening</div>
-            <div class="card-sub">Rhymes & Prompts</div>
-            <span class="card-badge">English</span>
-          </div>
-        </a>
-
-      </div>
-    </section>
-
-    <!-- ===== MATHS ===== -->
-    <section class="section" id="maths">
-      <div class="section-header sh-maths">
-        <div class="section-header-inner">
-          <div class="section-icon">🔢</div>
-          <div class="section-text">
-            <div class="section-title">Maths</div>
-            <div class="section-sub">Numbers, Shapes & More</div>
-          </div>
-          <div class="section-count">8 Apps</div>
         </div>
-      </div>
-      <div class="card-grid">
+        <div class="card-grid">
 
-        <a class="app-card ac-maths" href="apps/maths/counting/index.html" style="animation-delay:0.05s">
-          <div class="card-icon-wrap">🔢</div>
-          <div class="card-body">
-            <div class="card-title">Counting 1–20</div>
-            <div class="card-sub">Count Objects</div>
-            <span class="card-badge">Maths</span>
+          <a class="app-card ac-maths" href="apps/maths/counting/index.html" style="animation-delay:0.05s">
+            <div class="card-icon-wrap">🔢</div>
+            <div class="card-body">
+              <div class="card-title">Numbers 1–10</div>
+              <div class="card-sub">Count, read &amp; write</div>
+              <span class="card-badge">Maths</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-maths" href="apps/maths/shapes/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🔷</div>
+            <div class="card-body">
+              <div class="card-title">Shapes</div>
+              <div class="card-sub">Circle, square, triangle</div>
+              <span class="card-badge">Maths</span>
+            </div>
+          </a>
+
+          <div class="app-card ac-maths coming-soon" style="animation-delay:0.13s">
+            <div class="card-icon-wrap">🎨</div>
+            <div class="card-body">
+              <div class="card-title">Sorting &amp; Matching</div>
+              <div class="card-sub">By colour, size, shape</div>
+              <span class="badge-coming-soon">🔜 Coming Soon</span>
+            </div>
           </div>
-        </a>
 
-        <a class="app-card ac-maths" href="apps/maths/addition/index.html" style="animation-delay:0.09s">
-          <div class="card-icon-wrap">➕</div>
-          <div class="card-body">
-            <div class="card-title">Addition & Subtraction</div>
-            <div class="card-sub">Within 20</div>
-            <span class="card-badge">Maths</span>
+          <a class="app-card ac-maths" href="apps/maths/patterns/index.html" style="animation-delay:0.17s">
+            <div class="card-icon-wrap">🔁</div>
+            <div class="card-body">
+              <div class="card-title">Patterns</div>
+              <div class="card-sub">AB &amp; AAB patterns</div>
+              <span class="card-badge">Maths</span>
+            </div>
+          </a>
+
+          <div class="app-card ac-maths coming-soon" style="animation-delay:0.21s">
+            <div class="card-icon-wrap">⚖️</div>
+            <div class="card-body">
+              <div class="card-title">Comparing</div>
+              <div class="card-sub">Big/small, tall/short</div>
+              <span class="badge-coming-soon">🔜 Coming Soon</span>
+            </div>
           </div>
-        </a>
 
-        <a class="app-card ac-maths" href="apps/maths/shapes/index.html" style="animation-delay:0.13s">
-          <div class="card-icon-wrap">🔷</div>
-          <div class="card-body">
-            <div class="card-title">Shapes</div>
-            <div class="card-sub">2D & 3D Shapes</div>
-            <span class="card-badge">Maths</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-maths" href="apps/maths/patterns/index.html" style="animation-delay:0.17s">
-          <div class="card-icon-wrap">🔁</div>
-          <div class="card-body">
-            <div class="card-title">Patterns</div>
-            <div class="card-sub">What Comes Next?</div>
-            <span class="card-badge">Maths</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-maths" href="apps/maths/time/index.html" style="animation-delay:0.21s">
-          <div class="card-icon-wrap">🕐</div>
-          <div class="card-body">
-            <div class="card-title">Time</div>
-            <div class="card-sub">O'clock & Half Past</div>
-            <span class="card-badge">Maths</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-maths" href="apps/maths/measurement/index.html" style="animation-delay:0.25s">
-          <div class="card-icon-wrap">📏</div>
-          <div class="card-body">
-            <div class="card-title">Measurement</div>
-            <div class="card-sub">Length, Weight & Capacity</div>
-            <span class="card-badge">Maths</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-maths" href="apps/maths/number-bonds/index.html" style="animation-delay:0.29s">
-          <div class="card-icon-wrap">🔗</div>
-          <div class="card-body">
-            <div class="card-title">Number Bonds</div>
-            <div class="card-sub">Make 10 & 20</div>
-            <span class="card-badge">Maths</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-maths" href="apps/maths/data-handling/index.html" style="animation-delay:0.33s">
-          <div class="card-icon-wrap">📊</div>
-          <div class="card-body">
-            <div class="card-title">Data Handling</div>
-            <div class="card-sub">Charts & Graphs</div>
-            <span class="card-badge">Maths</span>
-          </div>
-        </a>
-
-      </div>
-    </section>
-
-    <!-- ===== SCIENCE ===== -->
-    <section class="section" id="science">
-      <div class="section-header sh-science">
-        <div class="section-header-inner">
-          <div class="section-icon">🔬</div>
-          <div class="section-text">
-            <div class="section-title">Science</div>
-            <div class="section-sub">Explore the World Around Us</div>
-          </div>
-          <div class="section-count">4 Apps</div>
         </div>
-      </div>
-      <div class="card-grid">
+      </section>
 
-        <a class="app-card ac-science" href="apps/science/plants/index.html" style="animation-delay:0.05s">
-          <div class="card-icon-wrap">🌱</div>
-          <div class="card-body">
-            <div class="card-title">Parts of a Plant</div>
-            <div class="card-sub">Roots to Flowers</div>
-            <span class="card-badge">Science</span>
+      <!-- ===== SKG SCIENCE ===== -->
+      <section class="section" id="skg-science">
+        <div class="section-header sh-science">
+          <div class="section-header-inner">
+            <div class="section-icon">🔬</div>
+            <div class="section-text">
+              <div class="section-title">Science</div>
+              <div class="section-sub">Body, Animals &amp; Nature</div>
+            </div>
+            <div class="section-count">4 Topics</div>
           </div>
-        </a>
-
-        <a class="app-card ac-science" href="apps/science/animals/index.html" style="animation-delay:0.09s">
-          <div class="card-icon-wrap">🐾</div>
-          <div class="card-body">
-            <div class="card-title">Animals & Habitats</div>
-            <div class="card-sub">Where do they live?</div>
-            <span class="card-badge">Science</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-science" href="apps/science/senses/index.html" style="animation-delay:0.13s">
-          <div class="card-icon-wrap">👃</div>
-          <div class="card-body">
-            <div class="card-title">5 Senses</div>
-            <div class="card-sub">See, Hear, Touch…</div>
-            <span class="card-badge">Science</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-science" href="apps/science/materials/index.html" style="animation-delay:0.17s">
-          <div class="card-icon-wrap">🧱</div>
-          <div class="card-body">
-            <div class="card-title">Materials</div>
-            <div class="card-sub">What's it made of?</div>
-            <span class="card-badge">Science</span>
-          </div>
-        </a>
-
-      </div>
-    </section>
-
-    <!-- ===== ICT ===== -->
-    <section class="section" id="ict">
-      <div class="section-header sh-ict">
-        <div class="section-header-inner">
-          <div class="section-icon">💻</div>
-          <div class="section-text">
-            <div class="section-title">ICT</div>
-            <div class="section-sub">Coding, Logic & Creativity</div>
-          </div>
-          <div class="section-count">3 Apps</div>
         </div>
-      </div>
-      <div class="card-grid">
+        <div class="card-grid">
 
-        <a class="app-card ac-ict" href="apps/ict/sequencing/index.html" style="animation-delay:0.05s">
-          <div class="card-icon-wrap">🎯</div>
-          <div class="card-body">
-            <div class="card-title">Sequencing</div>
-            <div class="card-sub">Order the Steps</div>
-            <span class="card-badge">ICT</span>
+          <div class="app-card ac-science coming-soon" style="animation-delay:0.05s">
+            <div class="card-icon-wrap">🫀</div>
+            <div class="card-body">
+              <div class="card-title">My Body</div>
+              <div class="card-sub">Body parts &amp; senses</div>
+              <span class="badge-coming-soon">🔜 Coming Soon</span>
+            </div>
           </div>
-        </a>
 
-        <a class="app-card ac-ict" href="apps/ict/coding/index.html" style="animation-delay:0.09s">
-          <div class="card-icon-wrap">🤖</div>
-          <div class="card-body">
-            <div class="card-title">Coding Blocks</div>
-            <div class="card-sub">ScratchJr Style</div>
-            <span class="card-badge">ICT</span>
+          <a class="app-card ac-science" href="apps/science/animals/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🐾</div>
+            <div class="card-body">
+              <div class="card-title">Animals Around Me</div>
+              <div class="card-sub">Pets &amp; farm animals</div>
+              <span class="card-badge">Science</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-science" href="apps/science/plants/index.html" style="animation-delay:0.13s">
+            <div class="card-icon-wrap">🌸</div>
+            <div class="card-body">
+              <div class="card-title">Plants</div>
+              <div class="card-sub">Flower, tree, leaf</div>
+              <span class="card-badge">Science</span>
+            </div>
+          </a>
+
+          <div class="app-card ac-science coming-soon" style="animation-delay:0.17s">
+            <div class="card-icon-wrap">🌤️</div>
+            <div class="card-body">
+              <div class="card-title">Weather</div>
+              <div class="card-sub">Sunny, rainy, cloudy, windy</div>
+              <span class="badge-coming-soon">🔜 Coming Soon</span>
+            </div>
           </div>
-        </a>
 
-        <a class="app-card ac-ict" href="apps/ict/storytelling/index.html" style="animation-delay:0.13s">
-          <div class="card-icon-wrap">🎨</div>
-          <div class="card-body">
-            <div class="card-title">Digital Storytelling</div>
-            <div class="card-sub">Create & Present</div>
-            <span class="card-badge">ICT</span>
-          </div>
-        </a>
-
-      </div>
-    </section>
-
-    <!-- ===== EVS ===== -->
-    <section class="section" id="evs">
-      <div class="section-header sh-evs">
-        <div class="section-header-inner">
-          <div class="section-icon">🌍</div>
-          <div class="section-text">
-            <div class="section-title">EVS</div>
-            <div class="section-sub">Environment & Social Studies</div>
-          </div>
-          <div class="section-count">3 Apps</div>
         </div>
-      </div>
-      <div class="card-grid">
+      </section>
 
-        <a class="app-card ac-evs" href="apps/evs/community/index.html" style="animation-delay:0.05s">
-          <div class="card-icon-wrap">👮</div>
-          <div class="card-body">
-            <div class="card-title">Community Helpers</div>
-            <div class="card-sub">People Who Help Us</div>
-            <span class="card-badge">EVS</span>
+      <!-- ===== SKG EVS ===== -->
+      <section class="section" id="skg-evs">
+        <div class="section-header sh-evs">
+          <div class="section-header-inner">
+            <div class="section-icon">🌍</div>
+            <div class="section-text">
+              <div class="section-title">EVS</div>
+              <div class="section-sub">Family, School &amp; Healthy Living</div>
+            </div>
+            <div class="section-count">3 Topics</div>
           </div>
-        </a>
-
-        <a class="app-card ac-evs" href="apps/evs/environment/index.html" style="animation-delay:0.09s">
-          <div class="card-icon-wrap">🌿</div>
-          <div class="card-body">
-            <div class="card-title">My Environment</div>
-            <div class="card-sub">Protect Our Planet</div>
-            <span class="card-badge">EVS</span>
-          </div>
-        </a>
-
-        <a class="app-card ac-evs" href="apps/evs/healthy-habits/index.html" style="animation-delay:0.13s">
-          <div class="card-icon-wrap">💪</div>
-          <div class="card-body">
-            <div class="card-title">Healthy Habits</div>
-            <div class="card-sub">Stay Fit & Happy</div>
-            <span class="card-badge">EVS</span>
-          </div>
-        </a>
-
-      </div>
-    </section>
-
-    <!-- ===== TAMIL ===== -->
-    <section class="section" id="tamil">
-      <div class="section-header sh-tamil">
-        <div class="section-header-inner">
-          <div class="section-icon">🔤</div>
-          <div class="section-text">
-            <div class="section-title">Tamil</div>
-            <div class="section-sub" style="font-family:'Noto Sans Tamil','Tamil Sangam MN',sans-serif;">தமிழ் — Letters, Words &amp; Writing</div>
-          </div>
-          <div class="section-count">2 Apps</div>
         </div>
-      </div>
-      <div class="card-grid">
+        <div class="card-grid">
 
-        <a class="app-card ac-tamil" href="apps/tamil/letters/index.html" style="animation-delay:0.05s">
-          <div class="card-icon-wrap" style="font-family:'Noto Sans Tamil',sans-serif;">அ</div>
-          <div class="card-body">
-            <div class="card-title">Tamil Letters</div>
-            <div class="card-sub">Vowels, Consonants &amp; Tracing</div>
-            <span class="card-badge">Tamil</span>
+          <div class="app-card ac-evs coming-soon" style="animation-delay:0.05s">
+            <div class="card-icon-wrap">👨‍👩‍👧</div>
+            <div class="card-body">
+              <div class="card-title">My Family</div>
+              <div class="card-sub">Family members &amp; roles</div>
+              <span class="badge-coming-soon">🔜 Coming Soon</span>
+            </div>
           </div>
-        </a>
 
-        <a class="app-card ac-tamil" href="apps/tamil/words/index.html" style="animation-delay:0.09s">
-          <div class="card-icon-wrap">🖼️</div>
-          <div class="card-body">
-            <div class="card-title">Tamil Words</div>
-            <div class="card-sub">Picture Dictionary &amp; Quiz</div>
-            <span class="card-badge">Tamil</span>
+          <div class="app-card ac-evs coming-soon" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🏫</div>
+            <div class="card-body">
+              <div class="card-title">My School</div>
+              <div class="card-sub">Classroom, teachers, friends</div>
+              <span class="badge-coming-soon">🔜 Coming Soon</span>
+            </div>
           </div>
-        </a>
 
-      </div>
-    </section>
+          <a class="app-card ac-evs" href="apps/evs/healthy-habits/index.html" style="animation-delay:0.13s">
+            <div class="card-icon-wrap">💪</div>
+            <div class="card-body">
+              <div class="card-title">Healthy Habits</div>
+              <div class="card-sub">Eat, sleep, hygiene</div>
+              <span class="card-badge">EVS</span>
+            </div>
+          </a>
 
-    <!-- ===== HINDI ===== -->
-    <section class="section" id="hindi">
-      <div class="section-header sh-hindi">
-        <div class="section-header-inner">
-          <div class="section-icon">🔤</div>
-          <div class="section-text">
-            <div class="section-title">Hindi</div>
-            <div class="section-sub" style="font-family:'Noto Sans Devanagari','Devanagari MT',sans-serif;">हिंदी — Letters, Words &amp; Writing</div>
-          </div>
-          <div class="section-count">2 Apps</div>
         </div>
-      </div>
-      <div class="card-grid">
+      </section>
 
-        <a class="app-card ac-hindi" href="apps/hindi/letters/index.html" style="animation-delay:0.05s">
-          <div class="card-icon-wrap" style="font-family:'Noto Sans Devanagari',sans-serif;">अ</div>
-          <div class="card-body">
-            <div class="card-title">Hindi Letters</div>
-            <div class="card-sub">Vowels, Consonants &amp; Tracing</div>
-            <span class="card-badge">Hindi</span>
+      <!-- ===== SKG TAMIL ===== -->
+      <section class="section" id="skg-tamil">
+        <div class="section-header sh-tamil">
+          <div class="section-header-inner">
+            <div class="section-icon">🔤</div>
+            <div class="section-text">
+              <div class="section-title">Tamil</div>
+              <div class="section-sub" style="font-family:'Noto Sans Tamil','Tamil Sangam MN',sans-serif;">தமிழ் — Letters &amp; Words</div>
+            </div>
+            <div class="section-count">2 Apps</div>
           </div>
-        </a>
+        </div>
+        <div class="card-grid">
 
-        <a class="app-card ac-hindi" href="apps/hindi/words/index.html" style="animation-delay:0.09s">
-          <div class="card-icon-wrap">🖼️</div>
-          <div class="card-body">
-            <div class="card-title">Hindi Words</div>
-            <div class="card-sub">Picture Dictionary &amp; Quiz</div>
-            <span class="card-badge">Hindi</span>
+          <a class="app-card ac-tamil" href="apps/tamil/letters/index.html" style="animation-delay:0.05s">
+            <div class="card-icon-wrap" style="font-family:'Noto Sans Tamil',sans-serif;">அ</div>
+            <div class="card-body">
+              <div class="card-title">Tamil Letters</div>
+              <div class="card-sub">Vowels, Consonants &amp; Tracing</div>
+              <span class="card-badge">Tamil</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-tamil" href="apps/tamil/words/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🖼️</div>
+            <div class="card-body">
+              <div class="card-title">Tamil Words</div>
+              <div class="card-sub">Picture Dictionary &amp; Quiz</div>
+              <span class="card-badge">Tamil</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ===== SKG HINDI ===== -->
+      <section class="section" id="skg-hindi">
+        <div class="section-header sh-hindi">
+          <div class="section-header-inner">
+            <div class="section-icon">🔤</div>
+            <div class="section-text">
+              <div class="section-title">Hindi</div>
+              <div class="section-sub" style="font-family:'Noto Sans Devanagari','Devanagari MT',sans-serif;">हिंदी — Letters &amp; Words</div>
+            </div>
+            <div class="section-count">2 Apps</div>
           </div>
-        </a>
+        </div>
+        <div class="card-grid">
 
-      </div>
-    </section>
+          <a class="app-card ac-hindi" href="apps/hindi/letters/index.html" style="animation-delay:0.05s">
+            <div class="card-icon-wrap" style="font-family:'Noto Sans Devanagari',sans-serif;">अ</div>
+            <div class="card-body">
+              <div class="card-title">Hindi Letters</div>
+              <div class="card-sub">Vowels, Consonants &amp; Tracing</div>
+              <span class="card-badge">Hindi</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-hindi" href="apps/hindi/words/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🖼️</div>
+            <div class="card-body">
+              <div class="card-title">Hindi Words</div>
+              <div class="card-sub">Picture Dictionary &amp; Quiz</div>
+              <span class="card-badge">Hindi</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+    </div><!-- end skg-content -->
+
+
+    <!-- =====================================================
+         GRADE 1 CONTENT
+         ===================================================== -->
+    <div id="g1-content" class="grade-content">
+
+      <!-- ===== BOOKS ===== -->
+      <section class="section" id="g1-books">
+        <div class="section-header sh-books">
+          <div class="section-header-inner">
+            <div class="section-icon">📚</div>
+            <div class="section-text">
+              <div class="section-title">Story Books</div>
+              <div class="section-sub">Tap to read &amp; listen!</div>
+            </div>
+            <div class="section-count">8 Books</div>
+          </div>
+        </div>
+        <div class="card-grid">
+
+          <a class="app-card ac-book" href="books/caterpillar/index.html" style="animation-delay:0.05s">
+            <div class="card-icon-wrap">🐛</div>
+            <div class="card-body">
+              <div class="card-title">The Very Hungry Caterpillar</div>
+              <div class="card-sub">Eric Carle</div>
+              <span class="card-badge">Picture Book</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-book" href="books/green-eggs/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🍳</div>
+            <div class="card-body">
+              <div class="card-title">Green Eggs and Ham</div>
+              <div class="card-sub">Dr. Seuss</div>
+              <span class="card-badge">Early Reader</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-book" href="books/wild-things/index.html" style="animation-delay:0.13s">
+            <div class="card-icon-wrap">👹</div>
+            <div class="card-body">
+              <div class="card-title">Where the Wild Things Are</div>
+              <div class="card-sub">Maurice Sendak</div>
+              <span class="card-badge">Picture Book</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-book" href="books/gruffalo/index.html" style="animation-delay:0.17s">
+            <div class="card-icon-wrap">🧌</div>
+            <div class="card-body">
+              <div class="card-title">The Gruffalo</div>
+              <div class="card-sub">Julia Donaldson</div>
+              <span class="card-badge">Rhyming Story</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-book" href="books/elephant-piggie/index.html" style="animation-delay:0.21s">
+            <div class="card-icon-wrap">🐘</div>
+            <div class="card-body">
+              <div class="card-title">Elephant &amp; Piggie</div>
+              <div class="card-sub">Mo Willems</div>
+              <span class="card-badge">Early Reader</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-book" href="books/frog-toad/index.html" style="animation-delay:0.25s">
+            <div class="card-icon-wrap">🐸</div>
+            <div class="card-body">
+              <div class="card-title">Frog and Toad are Friends</div>
+              <div class="card-sub">Arnold Lobel</div>
+              <span class="card-badge">Chapter Book</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-book" href="books/fathers-dragon/index.html" style="animation-delay:0.29s">
+            <div class="card-icon-wrap">🐉</div>
+            <div class="card-body">
+              <div class="card-title">My Father's Dragon</div>
+              <div class="card-sub">Ruth Stiles Gannett</div>
+              <span class="card-badge">Chapter Book</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-book" href="books/magic-tree/index.html" style="animation-delay:0.33s">
+            <div class="card-icon-wrap">🌳</div>
+            <div class="card-body">
+              <div class="card-title">Magic Tree House</div>
+              <div class="card-sub">Mary Pope Osborne</div>
+              <span class="card-badge">Chapter Book</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ===== ENGLISH ===== -->
+      <section class="section" id="g1-english">
+        <div class="section-header sh-english">
+          <div class="section-header-inner">
+            <div class="section-icon">🔤</div>
+            <div class="section-text">
+              <div class="section-title">English</div>
+              <div class="section-sub">Reading, Writing &amp; Speaking</div>
+            </div>
+            <div class="section-count">8 Apps</div>
+          </div>
+        </div>
+        <div class="card-grid">
+
+          <a class="app-card ac-english" href="apps/english/phonics/index.html" style="animation-delay:0.05s">
+            <div class="card-icon-wrap">🔡</div>
+            <div class="card-body">
+              <div class="card-title">Phonics</div>
+              <div class="card-sub">Letter Sounds A–Z</div>
+              <span class="card-badge">English</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-english" href="apps/english/blending/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🔗</div>
+            <div class="card-body">
+              <div class="card-title">Blending</div>
+              <div class="card-sub">Join Sounds to Read</div>
+              <span class="card-badge">English</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-english" href="apps/english/sight-words/index.html" style="animation-delay:0.13s">
+            <div class="card-icon-wrap">👁️</div>
+            <div class="card-body">
+              <div class="card-title">Sight Words</div>
+              <div class="card-sub">40 Common Words</div>
+              <span class="card-badge">English</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-english" href="apps/english/reading/index.html" style="animation-delay:0.17s">
+            <div class="card-icon-wrap">📖</div>
+            <div class="card-body">
+              <div class="card-title">Reading</div>
+              <div class="card-sub">Short Stories &amp; Quizzes</div>
+              <span class="card-badge">English</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-english" href="apps/english/comprehension/index.html" style="animation-delay:0.21s">
+            <div class="card-icon-wrap">🧠</div>
+            <div class="card-body">
+              <div class="card-title">Comprehension</div>
+              <div class="card-sub">Read &amp; Answer</div>
+              <span class="card-badge">English</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-english" href="apps/english/writing/index.html" style="animation-delay:0.25s">
+            <div class="card-icon-wrap">✏️</div>
+            <div class="card-body">
+              <div class="card-title">Writing</div>
+              <div class="card-sub">Trace, Build &amp; Copy</div>
+              <span class="card-badge">English</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-english" href="apps/english/vocabulary/index.html" style="animation-delay:0.29s">
+            <div class="card-icon-wrap">💬</div>
+            <div class="card-body">
+              <div class="card-title">Vocabulary</div>
+              <div class="card-sub">50 Words &amp; Meanings</div>
+              <span class="card-badge">English</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-english" href="apps/english/speaking/index.html" style="animation-delay:0.33s">
+            <div class="card-icon-wrap">🎤</div>
+            <div class="card-body">
+              <div class="card-title">Speaking &amp; Listening</div>
+              <div class="card-sub">Rhymes &amp; Prompts</div>
+              <span class="card-badge">English</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ===== MATHS ===== -->
+      <section class="section" id="g1-maths">
+        <div class="section-header sh-maths">
+          <div class="section-header-inner">
+            <div class="section-icon">🔢</div>
+            <div class="section-text">
+              <div class="section-title">Maths</div>
+              <div class="section-sub">Numbers, Shapes &amp; More</div>
+            </div>
+            <div class="section-count">8 Apps</div>
+          </div>
+        </div>
+        <div class="card-grid">
+
+          <a class="app-card ac-maths" href="apps/maths/counting/index.html" style="animation-delay:0.05s">
+            <div class="card-icon-wrap">🔢</div>
+            <div class="card-body">
+              <div class="card-title">Counting 1–20</div>
+              <div class="card-sub">Count Objects</div>
+              <span class="card-badge">Maths</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-maths" href="apps/maths/addition/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">➕</div>
+            <div class="card-body">
+              <div class="card-title">Addition &amp; Subtraction</div>
+              <div class="card-sub">Within 20</div>
+              <span class="card-badge">Maths</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-maths" href="apps/maths/shapes/index.html" style="animation-delay:0.13s">
+            <div class="card-icon-wrap">🔷</div>
+            <div class="card-body">
+              <div class="card-title">Shapes</div>
+              <div class="card-sub">2D &amp; 3D Shapes</div>
+              <span class="card-badge">Maths</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-maths" href="apps/maths/patterns/index.html" style="animation-delay:0.17s">
+            <div class="card-icon-wrap">🔁</div>
+            <div class="card-body">
+              <div class="card-title">Patterns</div>
+              <div class="card-sub">What Comes Next?</div>
+              <span class="card-badge">Maths</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-maths" href="apps/maths/time/index.html" style="animation-delay:0.21s">
+            <div class="card-icon-wrap">🕐</div>
+            <div class="card-body">
+              <div class="card-title">Time</div>
+              <div class="card-sub">O'clock &amp; Half Past</div>
+              <span class="card-badge">Maths</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-maths" href="apps/maths/measurement/index.html" style="animation-delay:0.25s">
+            <div class="card-icon-wrap">📏</div>
+            <div class="card-body">
+              <div class="card-title">Measurement</div>
+              <div class="card-sub">Length, Weight &amp; Capacity</div>
+              <span class="card-badge">Maths</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-maths" href="apps/maths/number-bonds/index.html" style="animation-delay:0.29s">
+            <div class="card-icon-wrap">🔗</div>
+            <div class="card-body">
+              <div class="card-title">Number Bonds</div>
+              <div class="card-sub">Make 10 &amp; 20</div>
+              <span class="card-badge">Maths</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-maths" href="apps/maths/data-handling/index.html" style="animation-delay:0.33s">
+            <div class="card-icon-wrap">📊</div>
+            <div class="card-body">
+              <div class="card-title">Data Handling</div>
+              <div class="card-sub">Charts &amp; Graphs</div>
+              <span class="card-badge">Maths</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ===== SCIENCE ===== -->
+      <section class="section" id="g1-science">
+        <div class="section-header sh-science">
+          <div class="section-header-inner">
+            <div class="section-icon">🔬</div>
+            <div class="section-text">
+              <div class="section-title">Science</div>
+              <div class="section-sub">Explore the World Around Us</div>
+            </div>
+            <div class="section-count">4 Apps</div>
+          </div>
+        </div>
+        <div class="card-grid">
+
+          <a class="app-card ac-science" href="apps/science/plants/index.html" style="animation-delay:0.05s">
+            <div class="card-icon-wrap">🌱</div>
+            <div class="card-body">
+              <div class="card-title">Parts of a Plant</div>
+              <div class="card-sub">Roots to Flowers</div>
+              <span class="card-badge">Science</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-science" href="apps/science/animals/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🐾</div>
+            <div class="card-body">
+              <div class="card-title">Animals &amp; Habitats</div>
+              <div class="card-sub">Where do they live?</div>
+              <span class="card-badge">Science</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-science" href="apps/science/senses/index.html" style="animation-delay:0.13s">
+            <div class="card-icon-wrap">👃</div>
+            <div class="card-body">
+              <div class="card-title">5 Senses</div>
+              <div class="card-sub">See, Hear, Touch…</div>
+              <span class="card-badge">Science</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-science" href="apps/science/materials/index.html" style="animation-delay:0.17s">
+            <div class="card-icon-wrap">🧱</div>
+            <div class="card-body">
+              <div class="card-title">Materials</div>
+              <div class="card-sub">What's it made of?</div>
+              <span class="card-badge">Science</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ===== ICT ===== -->
+      <section class="section" id="g1-ict">
+        <div class="section-header sh-ict">
+          <div class="section-header-inner">
+            <div class="section-icon">💻</div>
+            <div class="section-text">
+              <div class="section-title">ICT</div>
+              <div class="section-sub">Coding, Logic &amp; Creativity</div>
+            </div>
+            <div class="section-count">3 Apps</div>
+          </div>
+        </div>
+        <div class="card-grid">
+
+          <a class="app-card ac-ict" href="apps/ict/sequencing/index.html" style="animation-delay:0.05s">
+            <div class="card-icon-wrap">🎯</div>
+            <div class="card-body">
+              <div class="card-title">Sequencing</div>
+              <div class="card-sub">Order the Steps</div>
+              <span class="card-badge">ICT</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-ict" href="apps/ict/coding/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🤖</div>
+            <div class="card-body">
+              <div class="card-title">Coding Blocks</div>
+              <div class="card-sub">ScratchJr Style</div>
+              <span class="card-badge">ICT</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-ict" href="apps/ict/storytelling/index.html" style="animation-delay:0.13s">
+            <div class="card-icon-wrap">🎨</div>
+            <div class="card-body">
+              <div class="card-title">Digital Storytelling</div>
+              <div class="card-sub">Create &amp; Present</div>
+              <span class="card-badge">ICT</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ===== EVS ===== -->
+      <section class="section" id="g1-evs">
+        <div class="section-header sh-evs">
+          <div class="section-header-inner">
+            <div class="section-icon">🌍</div>
+            <div class="section-text">
+              <div class="section-title">EVS</div>
+              <div class="section-sub">Environment &amp; Social Studies</div>
+            </div>
+            <div class="section-count">3 Apps</div>
+          </div>
+        </div>
+        <div class="card-grid">
+
+          <a class="app-card ac-evs" href="apps/evs/community/index.html" style="animation-delay:0.05s">
+            <div class="card-icon-wrap">👮</div>
+            <div class="card-body">
+              <div class="card-title">Community Helpers</div>
+              <div class="card-sub">People Who Help Us</div>
+              <span class="card-badge">EVS</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-evs" href="apps/evs/environment/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🌿</div>
+            <div class="card-body">
+              <div class="card-title">My Environment</div>
+              <div class="card-sub">Protect Our Planet</div>
+              <span class="card-badge">EVS</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-evs" href="apps/evs/healthy-habits/index.html" style="animation-delay:0.13s">
+            <div class="card-icon-wrap">💪</div>
+            <div class="card-body">
+              <div class="card-title">Healthy Habits</div>
+              <div class="card-sub">Stay Fit &amp; Happy</div>
+              <span class="card-badge">EVS</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ===== TAMIL ===== -->
+      <section class="section" id="g1-tamil">
+        <div class="section-header sh-tamil">
+          <div class="section-header-inner">
+            <div class="section-icon">🔤</div>
+            <div class="section-text">
+              <div class="section-title">Tamil</div>
+              <div class="section-sub" style="font-family:'Noto Sans Tamil','Tamil Sangam MN',sans-serif;">தமிழ் — Letters, Words &amp; Writing</div>
+            </div>
+            <div class="section-count">2 Apps</div>
+          </div>
+        </div>
+        <div class="card-grid">
+
+          <a class="app-card ac-tamil" href="apps/tamil/letters/index.html" style="animation-delay:0.05s">
+            <div class="card-icon-wrap" style="font-family:'Noto Sans Tamil',sans-serif;">அ</div>
+            <div class="card-body">
+              <div class="card-title">Tamil Letters</div>
+              <div class="card-sub">Vowels, Consonants &amp; Tracing</div>
+              <span class="card-badge">Tamil</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-tamil" href="apps/tamil/words/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🖼️</div>
+            <div class="card-body">
+              <div class="card-title">Tamil Words</div>
+              <div class="card-sub">Picture Dictionary &amp; Quiz</div>
+              <span class="card-badge">Tamil</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- ===== HINDI ===== -->
+      <section class="section" id="g1-hindi">
+        <div class="section-header sh-hindi">
+          <div class="section-header-inner">
+            <div class="section-icon">🔤</div>
+            <div class="section-text">
+              <div class="section-title">Hindi</div>
+              <div class="section-sub" style="font-family:'Noto Sans Devanagari','Devanagari MT',sans-serif;">हिंदी — Letters, Words &amp; Writing</div>
+            </div>
+            <div class="section-count">2 Apps</div>
+          </div>
+        </div>
+        <div class="card-grid">
+
+          <a class="app-card ac-hindi" href="apps/hindi/letters/index.html" style="animation-delay:0.05s">
+            <div class="card-icon-wrap" style="font-family:'Noto Sans Devanagari',sans-serif;">अ</div>
+            <div class="card-body">
+              <div class="card-title">Hindi Letters</div>
+              <div class="card-sub">Vowels, Consonants &amp; Tracing</div>
+              <span class="card-badge">Hindi</span>
+            </div>
+          </a>
+
+          <a class="app-card ac-hindi" href="apps/hindi/words/index.html" style="animation-delay:0.09s">
+            <div class="card-icon-wrap">🖼️</div>
+            <div class="card-body">
+              <div class="card-title">Hindi Words</div>
+              <div class="card-sub">Picture Dictionary &amp; Quiz</div>
+              <span class="card-badge">Hindi</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+    </div><!-- end g1-content -->
 
   </main>
 
   <!-- ============ FOOTER ============ -->
   <footer class="footer">
-    Made with <span>❤️</span> for Grade 1 &nbsp;·&nbsp; Keep learning, keep growing! <span>🌟</span>
+    Made with <span>❤️</span> for Dhanu &nbsp;·&nbsp; Keep learning, keep growing! <span>🌟</span>
   </footer>
 
 </div><!-- end app-wrapper -->
 
 <script>
-// Stagger card animations per section when scrolled into view
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const cards = entry.target.querySelectorAll('.app-card');
-      cards.forEach((card, i) => {
-        card.style.animationDelay = (0.04 + i * 0.06) + 's';
-        card.style.animationPlayState = 'running';
-      });
-      observer.unobserve(entry.target);
-    }
+/* ============================================================
+   GRADE TAB SWITCHER
+   ============================================================ */
+var SKG_NAV = [
+  {cls:'english', href:'#skg-english', label:'🔤 English'},
+  {cls:'maths',   href:'#skg-maths',   label:'🔢 Maths'},
+  {cls:'science', href:'#skg-science', label:'🔬 Science'},
+  {cls:'evs',     href:'#skg-evs',     label:'🌍 EVS'},
+  {cls:'tamil',   href:'#skg-tamil',   label:'🔤 Tamil'},
+  {cls:'hindi',   href:'#skg-hindi',   label:'🔤 Hindi'}
+];
+var G1_NAV = [
+  {cls:'books',   href:'#g1-books',   label:'📚 Books'},
+  {cls:'english', href:'#g1-english', label:'🔤 English'},
+  {cls:'maths',   href:'#g1-maths',   label:'🔢 Maths'},
+  {cls:'science', href:'#g1-science', label:'🔬 Science'},
+  {cls:'ict',     href:'#g1-ict',     label:'💻 ICT'},
+  {cls:'evs',     href:'#g1-evs',     label:'🌍 EVS'},
+  {cls:'tamil',   href:'#g1-tamil',   label:'🔤 Tamil'},
+  {cls:'hindi',   href:'#g1-hindi',   label:'🔤 Hindi'}
+];
+
+function buildNav(navDef) {
+  var inner = document.getElementById('nav-inner');
+  inner.innerHTML = '';
+  navDef.forEach(function(item) {
+    var a = document.createElement('a');
+    a.className = 'nav-pill ' + item.cls;
+    a.href = item.href;
+    a.textContent = item.label;
+    inner.appendChild(a);
   });
-}, { threshold: 0.1 });
+  // Re-bind scroll highlighting to new pills
+  bindSectionObserver();
+}
 
-document.querySelectorAll('.section').forEach(section => {
-  // Pause all cards initially
-  section.querySelectorAll('.app-card').forEach(card => {
-    card.style.animationPlayState = 'paused';
+function switchGrade(grade) {
+  var skgContent = document.getElementById('skg-content');
+  var g1Content  = document.getElementById('g1-content');
+  var tabSkg     = document.getElementById('tab-skg');
+  var tabG1      = document.getElementById('tab-g1');
+  var badge      = document.getElementById('hero-badge');
+
+  if (grade === 'skg') {
+    skgContent.classList.add('active');
+    g1Content.classList.remove('active');
+    tabSkg.classList.add('active');
+    tabG1.classList.remove('active');
+    tabSkg.setAttribute('aria-pressed','true');
+    tabG1.setAttribute('aria-pressed','false');
+    badge.textContent = '🌸 Sr KG · IGCSE · Age 4–5';
+    buildNav(SKG_NAV);
+  } else {
+    g1Content.classList.add('active');
+    skgContent.classList.remove('active');
+    tabG1.classList.add('active');
+    tabSkg.classList.remove('active');
+    tabG1.setAttribute('aria-pressed','true');
+    tabSkg.setAttribute('aria-pressed','false');
+    badge.textContent = '⭐ Grade 1 · IGCSE · Age 5–6';
+    buildNav(G1_NAV);
+  }
+
+  // Scroll to top of content, reset card animations
+  window.scrollTo({top:0, behavior:'smooth'});
+  reinitCards();
+}
+
+/* ============================================================
+   CARD SCROLL ENTRANCE ANIMATIONS
+   ============================================================ */
+var cardObserver;
+
+function reinitCards() {
+  if (cardObserver) cardObserver.disconnect();
+  cardObserver = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var cards = entry.target.querySelectorAll('.app-card');
+        cards.forEach(function(card, i) {
+          card.style.animationDelay = (0.04 + i * 0.06) + 's';
+          card.style.animationPlayState = 'running';
+        });
+        cardObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  // Only observe sections in the active grade content
+  var activeContent = document.querySelector('.grade-content.active');
+  if (!activeContent) return;
+  activeContent.querySelectorAll('.section').forEach(function(section) {
+    section.querySelectorAll('.app-card').forEach(function(card) {
+      card.style.animationPlayState = 'paused';
+    });
+    cardObserver.observe(section);
   });
-  observer.observe(section);
-});
+}
 
-// Smooth active state for nav pills on scroll
-const sections = document.querySelectorAll('.section[id]');
-const navPills = document.querySelectorAll('.nav-pill');
+/* ============================================================
+   NAV PILL SCROLL ACTIVE HIGHLIGHT
+   ============================================================ */
+var sectionObserverInst;
 
-const sectionObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      const id = entry.target.getAttribute('id');
-      navPills.forEach(pill => {
-        const href = pill.getAttribute('href').replace('#','');
-        pill.style.background = href === id
-          ? 'rgba(255,255,255,0.25)'
-          : 'rgba(255,255,255,0.08)';
-      });
-    }
+function bindSectionObserver() {
+  if (sectionObserverInst) sectionObserverInst.disconnect();
+  sectionObserverInst = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var id = entry.target.getAttribute('id');
+        document.querySelectorAll('.nav-pill').forEach(function(pill) {
+          var href = pill.getAttribute('href').replace('#','');
+          pill.style.background = href === id
+            ? 'rgba(255,255,255,0.25)'
+            : 'rgba(255,255,255,0.08)';
+        });
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  var activeContent = document.querySelector('.grade-content.active');
+  if (!activeContent) return;
+  activeContent.querySelectorAll('.section[id]').forEach(function(s) {
+    sectionObserverInst.observe(s);
   });
-}, { rootMargin: '-30% 0px -60% 0px' });
+}
 
-sections.forEach(s => sectionObserver.observe(s));
+/* ============================================================
+   INIT ON PAGE LOAD (Sr KG is default)
+   ============================================================ */
+reinitCards();
+bindSectionObserver();
 </script>
 
 <!-- Font Picker Widget -->
