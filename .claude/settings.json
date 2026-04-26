@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__Claude_Preview__preview_console_logs",
+      "mcp__Claude_Preview__preview_screenshot",
+      "mcp__Claude_Preview__preview_snapshot",
+      "mcp__Claude_Preview__preview_resize",
+      "mcp__Claude_Preview__preview_network",
+      "mcp__Claude_Preview__preview_list",
+      "mcp__ccd_session__mark_chapter",
+      "Bash(git log *)",
+      "Bash(git diff --stat *)",
+      "Bash(lsof -i *)",
+      "Bash(lsof -ti *)",
+      "Bash(kill *)"
+    ]
+  }
+}
