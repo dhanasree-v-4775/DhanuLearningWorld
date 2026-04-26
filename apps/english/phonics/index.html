@@ -377,32 +377,20 @@ function go(dir) {
 }
 function goTo(i) { cur=i; render(); }
 
-function pickFemaleVoice() {
-  const voices = speechSynthesis.getVoices();
-  const enVoices = voices.filter(v => v.lang.startsWith('en'));
-  // Prefer well-known female voices by name
-  const femaleNames = ['Samantha','Google US English','Ava','Allison','Susan','Zira','Karen','Victoria','Moira','Fiona'];
-  for (const name of femaleNames) {
-    const v = enVoices.find(v => v.name.includes(name));
-    if (v) return v;
-  }
-  // Fallback: first en-US voice
-  return enVoices.find(v => v.lang === 'en-US') || enVoices[0] || null;
-}
 
 function speakCurrent() {
   if (!('speechSynthesis' in window)) return;
   const d = letters[cur];
   window.speechSynthesis.cancel();
 
-  const voice = pickFemaleVoice();
+
 
   function mkUtterance(text, rate, pitch) {
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US';
     u.rate = rate;
     u.pitch = pitch;
-    if (voice) u.voice = voice;
+
     return u;
   }
 

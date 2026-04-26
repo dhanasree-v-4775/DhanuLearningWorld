@@ -227,28 +227,18 @@ function flipCard() {
   speakCurrent();
 }
 
-function pickFemaleVoice() {
-  const voices = speechSynthesis.getVoices();
-  const enVoices = voices.filter(v => v.lang.startsWith('en'));
-  const femaleNames = ['Samantha','Google US English','Ava','Allison','Susan','Zira','Karen','Victoria','Moira','Fiona'];
-  for (const name of femaleNames) {
-    const v = enVoices.find(v => v.name.includes(name));
-    if (v) return v;
-  }
-  return enVoices.find(v => v.lang === 'en-US') || enVoices[0] || null;
-}
 
 function speakCurrent() {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const d = sightWords[cur];
-  const voice = pickFemaleVoice();
+
   const u1 = new SpeechSynthesisUtterance(d.w);
   u1.lang = 'en-US'; u1.rate=0.7; u1.pitch=1.2;
-  if (voice) u1.voice = voice;
+
   const u2 = new SpeechSynthesisUtterance(d.sentence);
   u2.lang = 'en-US'; u2.rate=0.85; u2.pitch=1.0;
-  if (voice) u2.voice = voice;
+
   window.speechSynthesis.speak(u1);
   window.speechSynthesis.speak(u2);
 }

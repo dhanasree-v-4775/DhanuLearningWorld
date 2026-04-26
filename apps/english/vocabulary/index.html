@@ -255,23 +255,13 @@ function render(){
 
 function go(dir){cur=Math.max(0,Math.min(getWords().length-1,cur+dir));render();}
 
-function pickFemaleVoice() {
-  const voices = speechSynthesis.getVoices();
-  const enVoices = voices.filter(v => v.lang.startsWith('en'));
-  const femaleNames = ['Samantha','Google US English','Ava','Allison','Susan','Zira','Karen','Victoria','Moira','Fiona'];
-  for (const name of femaleNames) {
-    const v = enVoices.find(v => v.name.includes(name));
-    if (v) return v;
-  }
-  return enVoices.find(v => v.lang === 'en-US') || enVoices[0] || null;
-}
 
 function speakWord(){
   if(!('speechSynthesis' in window))return;
   window.speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(getWords()[cur].w);
   u.lang='en-US';u.rate=0.7;u.pitch=1.2;
-  const v=pickFemaleVoice();if(v)u.voice=v;
+
   window.speechSynthesis.speak(u);
 }
 
@@ -280,7 +270,7 @@ function speakExample(){
   window.speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(getWords()[cur].ex);
   u.lang='en-US';u.rate=0.85;u.pitch=1.1;
-  const v=pickFemaleVoice();if(v)u.voice=v;
+
   window.speechSynthesis.speak(u);
 }
 
