@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**DhanuLearningWorld** — a Grade 1 (age 5) IGCSE-aligned interactive learning site for a single child. Static HTML/CSS/JS only; no framework, no build step. Deployed on **Zoho Catalyst (Zoho Slate)** with auto-deploy from the `main` branch on GitHub.
+**DhanuLearningWorld** — an IGCSE-aligned interactive learning site for a single child covering **Sr KG (age 4–5)** and **Grade 1 (age 5–6)**. Static HTML/CSS/JS only; no framework, no build step. Deployed on **Zoho Catalyst (Zoho Slate)** with auto-deploy from the `main` branch on GitHub.
 
 Target device: **Honor Kids Android tablet (HMS — no Google services)**. All UI must work without Google TTS, Google Play, or any Google service.
 
@@ -21,16 +21,30 @@ No build step, no package manager, no compilation. Edit HTML files directly and 
 ## Repository Structure
 
 ```
-index.html              # Home page — links to all subjects
+index.html              # Home page — Sr KG / Grade 1 tab switcher + all subject cards
 tts.js                  # Global voice engine + mobile scroll fix (injected in all pages)
 apps/
-  english/              # phonics, blending, sight-words, vocabulary, reading,
-  │                     #   comprehension, speaking, writing
-  science/              # animals, plants, materials, senses
-  maths/                # counting, addition, number-bonds, shapes, measurement,
-  │                     #   patterns, time, data-handling
-  evs/                  # environment, community, healthy-habits
-  ict/                  # coding, sequencing, storytelling
+  srkg/                 # Sr KG (age 4–5) lessons — 4 levels deep from root
+  │ english/
+  │ │ alphabet/         # Alphabet Fun — A–Z carousel + quiz
+  │ │ pre-writing/      # Pre-Writing — stroke animations + trace guides
+  │ │ rhymes/           # Rhymes & Songs — 6 nursery rhymes, read aloud
+  │ maths/
+  │ │ sorting/          # Sorting & Matching — by colour, size, shape
+  │ │ comparing/        # Comparing — big/small, tall/short, heavy/light, more/less
+  │ science/
+  │ │ my-body/          # My Body — 10 body parts, learn + quiz
+  │ │ weather/          # Weather — learn, dress-up, quiz; CSS animations
+  │ evs/
+  │   my-family/        # My Family — 8 family members + quiz
+  │   my-school/        # My School — things, people + quiz
+  english/              # Grade 1: phonics, blending, sight-words, vocabulary,
+  │                     #   reading, comprehension, speaking, writing
+  science/              # Grade 1: animals, plants, materials, senses
+  maths/                # Grade 1: counting, addition, number-bonds, shapes,
+  │                     #   measurement, patterns, time, data-handling
+  evs/                  # Grade 1: environment, community, healthy-habits
+  ict/                  # Grade 1: coding, sequencing, storytelling
   tamil/                # letters, words  (Tamil native language)
   hindi/                # letters, words  (Hindi native language)
 books/                  # gruffalo, caterpillar, wild-things, magic-tree,
@@ -39,9 +53,13 @@ books/                  # gruffalo, caterpillar, wild-things, magic-tree,
 
 Each leaf is a single `index.html` — fully self-contained with inline CSS and JS.
 
+### Sr KG path convention
+Sr KG apps live at `apps/srkg/<subject>/<lesson>/index.html` (4 levels deep).  
+Home link in every Sr KG page: `href="../../../../index.html"`
+
 ## tts.js — The Global Engine (Critical File)
 
-`tts.js` is injected as `<script src="/tts.js"></script>` before `</body>` in **all 39 HTML files**. It does two things:
+`tts.js` is injected as `<script src="/tts.js"></script>` before `</body>` in **all HTML files** (Grade 1 + Sr KG). It does two things:
 
 1. **Female voice selection** — intercepts `window.speechSynthesis.speak()`, picks the best available female voice (priority: Samantha → Google US English → Microsoft Zira → fallback), applies it to every English utterance. Tamil (`lang="ta-*"`) and Hindi (`lang="hi-*"`) utterances pass through to system TTS unchanged.
 
@@ -103,6 +121,7 @@ Push to `main` → Zoho Catalyst auto-deploys. No CI, no tests, no linting. Depl
 - **No npm, no bundler, no framework** — pure HTML/CSS/JS only
 - **No Google services** — Honor tablet runs HMS; avoid anything requiring Google Play or Google TTS
 - **`/tts.js` absolute path** — always use `/tts.js`, never `./tts.js` or `../tts.js`
-- **IGCSE Grade 1 content** — all English content follows Cambridge Primary English syllabus
+- **IGCSE content** — Sr KG follows Cambridge Early Years; Grade 1 follows Cambridge Primary English syllabus
 - **Tamil & Hindi** — native language support; these pages use system TTS, not the female voice override
 - **No auto-commit** — always ask the user before committing or pushing
+- **Home page tabs** — `index.html` has a Sr KG / Grade 1 pill tab switcher (`switchGrade('skg'|'g1')`). Sr KG content is in `<div id="skg-content">`, Grade 1 in `<div id="g1-content">`

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};var chosen=localStorage.getItem('dhanu-font')||'Nunito';if(fonts[chosen]){var l=document.createElement('link');l.rel='stylesheet';l.href=fonts[chosen];document.head.appendChild(l);}document.documentElement.style.setProperty('--app-font',chosen);})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pre-Writing Skills</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+    background: linear-gradient(135deg, #a855f7, #6d28d9);
+    min-height: 100vh;
+    color: #fff;
+  }
+  .topbar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 20px;
+    background: rgba(0,0,0,0.25);
+    font-size: 18px; font-weight: 700;
+  }
+  .topbar a {
+    color: #fff; text-decoration: none;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 16px; white-space: nowrap;
+  }
+  .topbar span { font-size: 20px; }
+
+  .card {
+    background: #fff;
+    border-radius: 32px;
+    margin: 24px auto;
+    max-width: 500px;
+    padding: 28px 24px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  .stroke-name {
+    font-size: 30px; font-weight: 800; color: #6d28d9;
+    margin-bottom: 6px;
+  }
+  .stroke-num {
+    font-size: 15px; font-weight: 700; color: #a855f7;
+    margin-bottom: 16px; letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .svg-box {
+    background: #fdf4ff;
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 18px;
+    border: 3px solid #e9d5ff;
+  }
+  .svg-box svg { display: block; margin: 0 auto; }
+
+  .guide-box {
+    background: #fff;
+    border-radius: 16px;
+    border: 3px dashed #c084fc;
+    padding: 16px 12px;
+    margin-bottom: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .guide-box svg { display: block; margin: 0 auto; }
+
+  .instruction {
+    font-size: 19px; font-weight: 700; color: #7c3aed;
+    margin-bottom: 20px;
+  }
+
+  .hear-btn {
+    background: linear-gradient(135deg, #a855f7, #6d28d9);
+    color: #fff; border: none;
+    padding: 14px 32px; border-radius: 30px;
+    font-size: 20px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(109,40,217,0.4);
+    min-height: 56px; transition: transform 0.15s;
+  }
+  .hear-btn:active { transform: scale(0.95); }
+
+  .nav-row {
+    display: flex; justify-content: center; align-items: center;
+    gap: 24px; padding: 0 20px 28px;
+    max-width: 500px; margin: 0 auto;
+  }
+  .nav-btn {
+    background: rgba(255,255,255,0.2);
+    border: 3px solid rgba(255,255,255,0.5);
+    color: #fff; border-radius: 50%;
+    width: 64px; height: 64px;
+    font-size: 28px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; font-weight: 800;
+  }
+  .nav-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.35); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .progress-label {
+    font-size: 20px; font-weight: 800;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+
+  .dots-row {
+    display: flex; justify-content: center; gap: 10px;
+    padding-bottom: 24px;
+  }
+  .dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: rgba(255,255,255,0.3); cursor: pointer;
+    transition: background 0.2s;
+  }
+  .dot.active { background: #fff; }
+  .dot.visited { background: rgba(255,255,255,0.6); }
+
+  /* SVG animation keyframes */
+  @keyframes draw { from { stroke-dashoffset: var(--dash); } to { stroke-dashoffset: 0; } }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span>✏️ Pre-Writing Skills</span>
+</div>
+
+<div class="card" id="stroke-card">
+  <div class="stroke-num" id="stroke-num">Stroke 1 of 6</div>
+  <div class="stroke-name" id="stroke-name">Horizontal Lines</div>
+
+  <div class="svg-box" id="svg-box"><!-- animated SVG injected here --></div>
+
+  <div class="guide-box" id="guide-box"><!-- guide SVG injected here --></div>
+
+  <div class="instruction" id="instruction">Trace with your finger! →</div>
+  <button class="hear-btn" onclick="hearStroke()">🔊 Hear it!</button>
+</div>
+
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="goStroke(-1)">◀</button>
+  <span class="progress-label" id="progress-label">1 / 6</span>
+  <button class="nav-btn" id="next-btn" onclick="goStroke(1)">▶</button>
+</div>
+<div class="dots-row" id="dots-row"></div>
+
+<!-- FONT PICKER -->
+<div id="font-fab" onclick="document.getElementById('font-panel').classList.toggle('open')" style="position:fixed;bottom:24px;right:24px;z-index:9999;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(102,126,234,0.5);transition:transform .2s;user-select:none;">Aa</div>
+<div id="font-panel" style="position:fixed;bottom:88px;right:24px;z-index:9998;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px;width:240px;display:none;flex-direction:column;gap:10px;">
+  <div style="font-size:13px;font-weight:700;color:#666;margin-bottom:4px;">CHOOSE FONT</div>
+  <button onclick="setFont('Nunito')" data-font="Nunito" style="font-family:'Nunito',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:700;">Nunito — Hello World!</button>
+  <button onclick="setFont('Fredoka One')" data-font="Fredoka One" style="font-family:'Fredoka One',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">Fredoka — Hello World!</button>
+  <button onclick="setFont('Patrick Hand')" data-font="Patrick Hand" style="font-family:'Patrick Hand',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">Patrick Hand — Hello!</button>
+  <button onclick="setFont('ABeeZee')" data-font="ABeeZee" style="font-family:'ABeeZee',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">ABeeZee — Hello World!</button>
+  <button onclick="setFont('Poppins')" data-font="Poppins" style="font-family:'Poppins',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:600;">Poppins — Hello World!</button>
+</div>
+<style>#font-panel.open{display:flex!important;}body,button,input,select,textarea{font-family:var(--app-font,'Nunito'),sans-serif!important;}</style>
+<script>(function(){var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};Object.values(fonts).forEach(function(href){if(!document.querySelector('link[href="'+href+'"]')){var l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l);}});var current=localStorage.getItem('dhanu-font')||'Nunito';document.querySelectorAll('#font-panel button[data-font]').forEach(function(b){if(b.getAttribute('data-font')===current){b.style.borderColor='#667eea';b.style.background='#f0f0ff';}});})();function setFont(name){localStorage.setItem('dhanu-font',name);location.reload();}</script>
+
+<script>
+var strokes = [
+  {
+    name: 'Horizontal Lines',
+    instruction: 'Draw straight lines from left to right →',
+    speak: 'Horizontal lines. Draw straight lines from left to right. Trace with your finger!',
+    animSVG: function() {
+      return '<svg width="320" height="120" xmlns="http://www.w3.org/2000/svg">'
+        + animLine('M 20 30 L 300 30', '280', '#a855f7', '0s')
+        + animLine('M 20 60 L 300 60', '280', '#6d28d9', '0.8s')
+        + animLine('M 20 90 L 300 90', '280', '#c084fc', '1.6s')
+        + '</svg>';
+    },
+    guideSVG: function() {
+      return '<svg width="320" height="120" xmlns="http://www.w3.org/2000/svg">'
+        + guideLine('M 20 30 L 300 30')
+        + guideLine('M 20 60 L 300 60')
+        + guideLine('M 20 90 L 300 90')
+        + startDot(20,30) + startDot(20,60) + startDot(20,90)
+        + '</svg>';
+    }
+  },
+  {
+    name: 'Vertical Lines',
+    instruction: 'Draw straight lines from top to bottom ↓',
+    speak: 'Vertical lines. Draw straight lines from top to bottom. Trace with your finger!',
+    animSVG: function() {
+      return '<svg width="320" height="140" xmlns="http://www.w3.org/2000/svg">'
+        + animLine('M 80 10 L 80 130', '120', '#a855f7', '0s')
+        + animLine('M 160 10 L 160 130', '120', '#6d28d9', '0.9s')
+        + animLine('M 240 10 L 240 130', '120', '#c084fc', '1.8s')
+        + '</svg>';
+    },
+    guideSVG: function() {
+      return '<svg width="320" height="140" xmlns="http://www.u3.org/2000/svg">'
+        + guideLine('M 80 10 L 80 130')
+        + guideLine('M 160 10 L 160 130')
+        + guideLine('M 240 10 L 240 130')
+        + startDot(80,10) + startDot(160,10) + startDot(240,10)
+        + '</svg>';
+    }
+  },
+  {
+    name: 'Diagonal Lines',
+    instruction: 'Draw slanted lines from top-left to bottom-right ↘',
+    speak: 'Diagonal lines. Draw slanted lines from top-left to bottom-right. Trace with your finger!',
+    animSVG: function() {
+      return '<svg width="320" height="140" xmlns="http://www.w3.org/2000/svg">'
+        + animLine('M 20 10 L 120 130', '148', '#a855f7', '0s')
+        + animLine('M 110 10 L 210 130', '148', '#6d28d9', '0.9s')
+        + animLine('M 200 10 L 300 130', '148', '#c084fc', '1.8s')
+        + '</svg>';
+    },
+    guideSVG: function() {
+      return '<svg width="320" height="140" xmlns="http://www.w3.org/2000/svg">'
+        + guideLine('M 20 10 L 120 130')
+        + guideLine('M 110 10 L 210 130')
+        + guideLine('M 200 10 L 300 130')
+        + startDot(20,10) + startDot(110,10) + startDot(200,10)
+        + '</svg>';
+    }
+  },
+  {
+    name: 'Curved Lines',
+    instruction: 'Draw smooth curvy lines 〜',
+    speak: 'Curved lines. Draw smooth curvy lines. Trace with your finger!',
+    animSVG: function() {
+      return '<svg width="320" height="130" xmlns="http://www.w3.org/2000/svg">'
+        + animPath('M 10 25 Q 80 5 160 25 Q 240 45 310 25', '320', '#a855f7', '0s')
+        + animPath('M 10 65 Q 80 45 160 65 Q 240 85 310 65', '320', '#6d28d9', '1s')
+        + animPath('M 10 105 Q 80 85 160 105 Q 240 125 310 105', '320', '#c084fc', '2s')
+        + '</svg>';
+    },
+    guideSVG: function() {
+      return '<svg width="320" height="130" xmlns="http://www.w3.org/2000/svg">'
+        + guidePath('M 10 25 Q 80 5 160 25 Q 240 45 310 25')
+        + guidePath('M 10 65 Q 80 45 160 65 Q 240 85 310 65')
+        + guidePath('M 10 105 Q 80 85 160 105 Q 240 125 310 105')
+        + startDot(10,25) + startDot(10,65) + startDot(10,105)
+        + '</svg>';
+    }
+  },
+  {
+    name: 'Circles',
+    instruction: 'Draw round circles ○',
+    speak: 'Circles. Draw round circles. Trace with your finger!',
+    animSVG: function() {
+      return '<svg width="320" height="120" xmlns="http://www.w3.org/2000/svg">'
+        + animCircle(56, 60, 42, '#a855f7', '0s')
+        + animCircle(160, 60, 42, '#6d28d9', '1.2s')
+        + animCircle(264, 60, 42, '#c084fc', '2.4s')
+        + '</svg>';
+    },
+    guideSVG: function() {
+      return '<svg width="320" height="120" xmlns="http://www.w3.org/2000/svg">'
+        + guideCircle(56, 60, 42)
+        + guideCircle(160, 60, 42)
+        + guideCircle(264, 60, 42)
+        + startDot(56,18) + startDot(160,18) + startDot(264,18)
+        + '</svg>';
+    }
+  },
+  {
+    name: 'Zigzag Lines',
+    instruction: 'Draw zigzag lines up and down ⚡',
+    speak: 'Zigzag lines. Draw zigzag lines up and down. Trace with your finger!',
+    animSVG: function() {
+      return '<svg width="320" height="130" xmlns="http://www.w3.org/2000/svg">'
+        + animPath('M 10 20 L 55 100 L 100 20 L 145 100 L 190 20 L 235 100 L 280 20 L 310 70', '640', '#a855f7', '0s')
+        + animPath('M 10 50 L 55 120 L 100 50 L 145 120 L 190 50 L 235 120 L 280 50 L 310 95', '640', '#6d28d9', '1.2s')
+        + animPath('M 10 10 L 55 80 L 100 10 L 145 80 L 190 10 L 235 80 L 280 10 L 310 55', '640', '#c084fc', '2.4s')
+        + '</svg>';
+    },
+    guideSVG: function() {
+      return '<svg width="320" height="130" xmlns="http://www.w3.org/2000/svg">'
+        + guidePath('M 10 20 L 55 100 L 100 20 L 145 100 L 190 20 L 235 100 L 280 20 L 310 70')
+        + guidePath('M 10 50 L 55 120 L 100 50 L 145 120 L 190 50 L 235 120 L 280 50 L 310 95')
+        + guidePath('M 10 10 L 55 80 L 100 10 L 145 80 L 190 10 L 235 80 L 280 10 L 310 55')
+        + startDot(10,20) + startDot(10,50) + startDot(10,10)
+        + '</svg>';
+    }
+  }
+];
+
+// SVG helper functions
+function animLine(d, dash, color, delay) {
+  return '<path d="' + d + '" stroke="' + color + '" stroke-width="8" stroke-linecap="round" fill="none"'
+    + ' style="stroke-dasharray:' + dash + ';stroke-dashoffset:' + dash + ';animation:draw 3s linear ' + delay + ' infinite"/>';
+}
+function animPath(d, dash, color, delay) {
+  return '<path d="' + d + '" stroke="' + color + '" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"'
+    + ' style="stroke-dasharray:' + dash + ';stroke-dashoffset:' + dash + ';animation:draw 3.5s linear ' + delay + ' infinite"/>';
+}
+function animCircle(cx, cy, r, color, delay) {
+  var circ = Math.round(2 * Math.PI * r);
+  return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" stroke="' + color + '" stroke-width="8" fill="none"'
+    + ' style="stroke-dasharray:' + circ + ';stroke-dashoffset:' + circ + ';animation:draw 3s linear ' + delay + ' infinite"/>';
+}
+function guideLine(d) {
+  return '<path d="' + d + '" stroke="#d8b4fe" stroke-width="5" stroke-linecap="round" fill="none" stroke-dasharray="12 8"/>';
+}
+function guidePath(d) {
+  return '<path d="' + d + '" stroke="#d8b4fe" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-dasharray="12 8"/>';
+}
+function guideCircle(cx, cy, r) {
+  return '<circle cx="' + cx + '" cy="' + cy + '" r="' + r + '" stroke="#d8b4fe" stroke-width="5" fill="none" stroke-dasharray="12 8"/>';
+}
+function startDot(x, y) {
+  return '<circle cx="' + x + '" cy="' + y + '" r="7" fill="#a855f7"/>';
+}
+
+var idx = 0;
+
+function showStroke() {
+  var s = strokes[idx];
+  document.getElementById('stroke-num').textContent = 'Stroke ' + (idx+1) + ' of 6';
+  document.getElementById('stroke-name').textContent = s.name;
+  document.getElementById('svg-box').innerHTML = s.animSVG();
+  document.getElementById('guide-box').innerHTML = s.guideSVG();
+  document.getElementById('instruction').textContent = s.instruction;
+  document.getElementById('progress-label').textContent = (idx+1) + ' / 6';
+  document.getElementById('prev-btn').disabled = idx === 0;
+  document.getElementById('next-btn').disabled = idx === 5;
+  var dots = document.querySelectorAll('.dot');
+  dots.forEach(function(d, i) {
+    d.className = 'dot' + (i < idx ? ' visited' : '') + (i === idx ? ' active' : '');
+  });
+}
+
+function goStroke(dir) {
+  idx = Math.max(0, Math.min(5, idx + dir));
+  showStroke();
+}
+
+function hearStroke() {
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(strokes[idx].speak);
+  u.lang = 'en-US'; u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
+
+function buildDots() {
+  var row = document.getElementById('dots-row');
+  row.innerHTML = '';
+  for (var i = 0; i < 6; i++) {
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    (function(i2){ d.onclick = function(){ idx = i2; showStroke(); }; })(i);
+    row.appendChild(d);
+  }
+}
+
+buildDots();
+showStroke();
+</script>
+<script src="/tts.js"></script>
+</body>
+</html>

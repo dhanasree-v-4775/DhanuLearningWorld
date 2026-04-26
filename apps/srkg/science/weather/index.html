@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};var chosen=localStorage.getItem('dhanu-font')||'Nunito';if(fonts[chosen]){var l=document.createElement('link');l.rel='stylesheet';l.href=fonts[chosen];document.head.appendChild(l);}document.documentElement.style.setProperty('--app-font',chosen);})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌤️ Weather</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+    background: linear-gradient(135deg, #0096c7, #0077b6);
+    min-height: 100vh;
+    color: #333;
+  }
+  .topbar {
+    background: rgba(0,0,0,0.25);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    backdrop-filter: blur(6px);
+  }
+  .topbar a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 700;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 14px;
+    border-radius: 20px;
+  }
+  .topbar span { color: #fff; font-size: 22px; font-weight: 800; }
+
+  .tabs {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    padding: 18px 16px 10px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    border: 3px solid rgba(255,255,255,0.4);
+    border-radius: 30px;
+    padding: 10px 24px;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+  }
+  .tab-btn.active { background: #fff; color: #0077b6; border-color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+
+  /* === LEARN === */
+  #tab-learn { padding: 16px; }
+  .weather-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 18px;
+    max-width: 920px;
+    margin: 0 auto;
+  }
+  .w-card {
+    border-radius: 26px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+    transition: transform 0.18s;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .w-card:hover, .w-card:active { transform: scale(1.06); }
+
+  /* Weather-specific colours */
+  .w-sunny  { background: linear-gradient(160deg, #fff176, #fbc02d); }
+  .w-rainy  { background: linear-gradient(160deg, #b0bec5, #546e7a); color: #fff; }
+  .w-cloudy { background: linear-gradient(160deg, #cfd8dc, #90a4ae); }
+  .w-windy  { background: linear-gradient(160deg, #b2ebf2, #00acc1); }
+  .w-snowy  { background: linear-gradient(160deg, #e3f2fd, #90caf9); }
+
+  .w-card .w-emoji { font-size: 60px; display: block; margin-bottom: 8px; }
+  .w-card .w-name { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .w-card .w-desc { font-size: 13px; line-height: 1.4; opacity: 0.85; }
+  .hear-btn-w {
+    margin-top: 12px;
+    background: rgba(0,0,0,0.18);
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 7px 16px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+  }
+  .w-sunny .hear-btn-w { background: rgba(0,0,0,0.15); color: #5d4037; }
+  .w-cloudy .hear-btn-w { color: #263238; }
+  .w-snowy .hear-btn-w { color: #0d47a1; }
+
+  /* CSS Animations */
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes fallRain { 0% { transform: translateY(-10px); opacity: 0; } 80% { opacity: 1; } 100% { transform: translateY(60px); opacity: 0; } }
+  @keyframes floatCloud { 0%,100% { transform: translateX(0); } 50% { transform: translateX(12px); } }
+  @keyframes blowWind { 0%,100% { transform: translateX(0) scaleX(1); opacity: 0.6; } 50% { transform: translateX(18px) scaleX(1.15); opacity: 1; } }
+  @keyframes fallSnow { 0% { transform: translateY(-5px) rotate(0deg); opacity: 0; } 80% { opacity: 1; } 100% { transform: translateY(55px) rotate(180deg); opacity: 0; } }
+
+  .anim-sun { display: inline-block; animation: spin 6s linear infinite; font-size: 60px; }
+  .rain-drops { position: relative; height: 60px; }
+  .rain-drop { position: absolute; font-size: 18px; animation: fallRain 1.2s infinite; }
+  .cloud-float { display: inline-block; animation: floatCloud 3s ease-in-out infinite; font-size: 60px; }
+  .wind-lines { font-size: 60px; display: inline-block; animation: blowWind 1.8s ease-in-out infinite; }
+  .snow-flakes { position: relative; height: 60px; }
+  .snow-flake { position: absolute; font-size: 18px; animation: fallSnow 1.8s infinite; }
+
+  /* === DRESS UP === */
+  #tab-dress { display: none; padding: 20px 16px; }
+  .dress-box {
+    background: #fff;
+    border-radius: 28px;
+    padding: 28px 22px;
+    max-width: 540px;
+    margin: 0 auto;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.14);
+  }
+  .dress-weather-show { font-size: 70px; margin-bottom: 8px; }
+  .dress-weather-name { font-size: 26px; font-weight: 800; color: #0077b6; margin-bottom: 4px; }
+  .dress-prompt { font-size: 18px; color: #555; margin-bottom: 20px; }
+  .clothes-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .cloth-btn {
+    background: #e3f2fd;
+    border: 3px solid #90caf9;
+    border-radius: 20px;
+    padding: 18px 10px;
+    font-size: 22px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.18s;
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+    color: #333;
+  }
+  .cloth-btn:hover { transform: scale(1.06); }
+  .cloth-btn.selected { background: #bbdefb; border-color: #1976d2; }
+  .cloth-btn.right { background: #c8f7c5; border-color: #4caf50; }
+  .cloth-btn.wrong { background: #ffdde0; border-color: #f44336; }
+  .dress-check-btn {
+    background: linear-gradient(135deg, #0096c7, #0077b6);
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    padding: 14px 32px;
+    font-size: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+    margin-bottom: 12px;
+  }
+  .dress-feedback { font-size: 20px; font-weight: 800; min-height: 28px; margin-bottom: 10px; }
+  .dress-next-btn {
+    background: #0077b6;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 24px;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+    display: none;
+  }
+
+  /* === QUIZ === */
+  #tab-quiz { display: none; padding: 20px 16px; }
+  .quiz-box {
+    background: #fff;
+    border-radius: 28px;
+    padding: 28px 22px;
+    max-width: 540px;
+    margin: 0 auto;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.14);
+  }
+  .qprog { font-size: 16px; color: #aaa; font-weight: 700; margin-bottom: 6px; }
+  .qbar { background: #e3f2fd; border-radius: 20px; height: 12px; margin-bottom: 18px; overflow: hidden; }
+  .qfill { background: linear-gradient(90deg, #0096c7, #0077b6); height: 100%; border-radius: 20px; transition: width 0.4s; }
+  .q-emoji-big { font-size: 72px; margin-bottom: 10px; display: block; }
+  .q-text { font-size: 22px; font-weight: 800; color: #333; margin-bottom: 22px; line-height: 1.35; }
+  .q-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .q-opt {
+    background: #e3f2fd;
+    border: 3px solid #90caf9;
+    border-radius: 18px;
+    padding: 16px 8px;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+    color: #333;
+  }
+  .q-opt:hover { transform: scale(1.05); }
+  .q-opt.correct { background: #c8f7c5; border-color: #4caf50; }
+  .q-opt.wrong { background: #ffdde0; border-color: #f44336; }
+  .q-fb { margin-top: 16px; font-size: 20px; font-weight: 800; min-height: 28px; }
+  .q-fb.good { color: #4caf50; }
+  .q-fb.bad { color: #f44336; }
+  .q-next { margin-top: 16px; background: linear-gradient(135deg,#0096c7,#0077b6); color: #fff; border: none; border-radius: 22px; padding: 12px 30px; font-size: 18px; font-weight: 800; cursor: pointer; display: none; font-family: var(--app-font,'Nunito'),sans-serif; }
+  .result-box { text-align: center; }
+  .res-emoji { font-size: 72px; }
+  .res-title { font-size: 28px; font-weight: 800; color: #0077b6; margin: 10px 0; }
+  .res-score { font-size: 20px; color: #555; margin-bottom: 18px; }
+  .restart { background: linear-gradient(135deg,#0096c7,#0077b6); color: #fff; border: none; border-radius: 22px; padding: 12px 30px; font-size: 18px; font-weight: 800; cursor: pointer; font-family: var(--app-font,'Nunito'),sans-serif; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span>🌤️ Weather</span>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('learn')">📖 Learn</button>
+  <button class="tab-btn" onclick="showTab('dress')">👗 Dress Up</button>
+  <button class="tab-btn" onclick="showTab('quiz')">🧠 Quiz</button>
+</div>
+
+<!-- LEARN TAB -->
+<div id="tab-learn">
+  <div class="weather-grid">
+
+    <div class="w-card w-sunny" onclick="speak('Sunny! Bright and warm! Great for playing outside!')">
+      <span class="w-emoji"><span class="anim-sun">☀️</span></span>
+      <div class="w-name">Sunny</div>
+      <div class="w-desc">Bright and warm! Great for playing outside!</div>
+      <button class="hear-btn-w" onclick="event.stopPropagation();speak('Sunny! Bright and warm! Great for playing outside!')">🔊 Hear</button>
+    </div>
+
+    <div class="w-card w-rainy" onclick="speak('Rainy! Water falls from clouds. Great for plants!')">
+      <span class="w-emoji">
+        <div class="rain-drops">
+          <span class="rain-drop" style="left:20%;animation-delay:0s">💧</span>
+          <span class="rain-drop" style="left:45%;animation-delay:0.4s">💧</span>
+          <span class="rain-drop" style="left:70%;animation-delay:0.8s">💧</span>
+          <span style="font-size:36px;position:absolute;top:0;left:50%;transform:translateX(-50%)">🌧️</span>
+        </div>
+      </span>
+      <div class="w-name" style="color:#fff">Rainy</div>
+      <div class="w-desc">Water falls from clouds. Great for plants!</div>
+      <button class="hear-btn-w" onclick="event.stopPropagation();speak('Rainy! Water falls from clouds. Great for plants!')">🔊 Hear</button>
+    </div>
+
+    <div class="w-card w-cloudy" onclick="speak('Cloudy! Clouds cover the sky. Not too hot, not too cold!')">
+      <span class="w-emoji"><span class="cloud-float">☁️</span></span>
+      <div class="w-name">Cloudy</div>
+      <div class="w-desc">Clouds cover the sky. Not too hot, not too cold!</div>
+      <button class="hear-btn-w" onclick="event.stopPropagation();speak('Cloudy! Clouds cover the sky. Not too hot, not too cold!')">🔊 Hear</button>
+    </div>
+
+    <div class="w-card w-windy" onclick="speak('Windy! Air moves fast! Kites fly high on windy days!')">
+      <span class="w-emoji"><span class="wind-lines">💨</span></span>
+      <div class="w-name">Windy</div>
+      <div class="w-desc">Air moves fast! Kites fly high on windy days!</div>
+      <button class="hear-btn-w" onclick="event.stopPropagation();speak('Windy! Air moves fast! Kites fly high on windy days!')">🔊 Hear</button>
+    </div>
+
+    <div class="w-card w-snowy" onclick="speak('Snowy! Cold water becomes snow! You can build a snowman!')">
+      <span class="w-emoji">
+        <div class="snow-flakes">
+          <span class="snow-flake" style="left:15%;animation-delay:0s">❄️</span>
+          <span class="snow-flake" style="left:50%;animation-delay:0.6s">❄️</span>
+          <span class="snow-flake" style="left:80%;animation-delay:1.1s">❄️</span>
+          <span style="font-size:36px;position:absolute;top:0;left:50%;transform:translateX(-50%)">🌨️</span>
+        </div>
+      </span>
+      <div class="w-name" style="color:#0d47a1">Snowy</div>
+      <div class="w-desc">Cold water becomes snow! You can build a snowman!</div>
+      <button class="hear-btn-w" onclick="event.stopPropagation();speak('Snowy! Cold water becomes snow! You can build a snowman!')">🔊 Hear</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- DRESS UP TAB -->
+<div id="tab-dress">
+  <div class="dress-box">
+    <div class="dress-weather-show" id="dress-emoji">☀️</div>
+    <div class="dress-weather-name" id="dress-name">Sunny</div>
+    <div class="dress-prompt">What should you wear today? Tap all the right clothes!</div>
+    <div class="clothes-grid" id="clothes-grid"></div>
+    <button class="dress-check-btn" onclick="checkDress()">✅ Check!</button>
+    <div class="dress-feedback" id="dress-fb"></div>
+    <button class="dress-next-btn" id="dress-next" onclick="nextDress()">Next Weather ➡️</button>
+  </div>
+</div>
+
+<!-- QUIZ TAB -->
+<div id="tab-quiz">
+  <div class="quiz-box" id="quiz-box">
+    <div class="qprog" id="qprog">Question 1 of 10</div>
+    <div class="qbar"><div class="qfill" id="qfill" style="width:0%"></div></div>
+    <span class="q-emoji-big" id="q-emoji"></span>
+    <div class="q-text" id="q-text"></div>
+    <div class="q-opts" id="q-opts"></div>
+    <div class="q-fb" id="q-fb"></div>
+    <button class="q-next" id="q-next" onclick="nextQ()">Next ➡️</button>
+  </div>
+</div>
+
+<script>
+var weathers = [
+  { name:'Sunny', emoji:'☀️', desc:'Bright and warm! Great for playing outside!',
+    correct:['🕶️ Sunglasses','👒 Hat'], wrong:['🧥 Heavy coat','☂️ Umbrella'] },
+  { name:'Rainy', emoji:'🌧️', desc:'Water falls from clouds. Great for plants!',
+    correct:['☂️ Umbrella','🥾 Boots','🧥 Raincoat'], wrong:['🩴 Flip-flops'] },
+  { name:'Windy', emoji:'💨', desc:'Air moves fast! Kites fly high on windy days!',
+    correct:['🧥 Jacket','🧣 Scarf','👒 Hat'], wrong:['🩱 Swimsuit'] },
+  { name:'Snowy', emoji:'❄️', desc:'Cold water becomes snow! You can build a snowman!',
+    correct:['🧤 Gloves','🧣 Scarf','🥾 Boots'], wrong:['🩴 Flip-flops'] },
+  { name:'Cloudy', emoji:'☁️', desc:'Clouds cover the sky. Not too hot, not too cold!',
+    correct:['🧥 Light jacket','👟 Trainers','☂️ Umbrella'], wrong:['🩱 Swimsuit'] }
+];
+
+var dressIdx = 0, dressChecked = false;
+function loadDress() {
+  var w = weathers[dressIdx];
+  document.getElementById('dress-emoji').textContent = w.emoji;
+  document.getElementById('dress-name').textContent = w.name;
+  document.getElementById('dress-fb').textContent = '';
+  document.getElementById('dress-next').style.display = 'none';
+  dressChecked = false;
+  var allClothes = w.correct.concat(w.wrong).sort(function() { return Math.random()-0.5; });
+  var grid = document.getElementById('clothes-grid');
+  grid.innerHTML = '';
+  allClothes.forEach(function(c) {
+    var btn = document.createElement('button');
+    btn.className = 'cloth-btn';
+    btn.textContent = c;
+    btn.onclick = function() {
+      if (!dressChecked) btn.classList.toggle('selected');
+    };
+    grid.appendChild(btn);
+  });
+  speak('It is ' + w.name + '! What should you wear today?');
+}
+function checkDress() {
+  if (dressChecked) return;
+  dressChecked = true;
+  var w = weathers[dressIdx];
+  var btns = document.querySelectorAll('.cloth-btn');
+  var allRight = true;
+  btns.forEach(function(btn) {
+    var txt = btn.textContent;
+    var isCorrect = w.correct.indexOf(txt) >= 0;
+    var isSelected = btn.classList.contains('selected');
+    if (isCorrect) { btn.classList.add('right'); if (!isSelected) allRight = false; }
+    else if (isSelected) { btn.classList.add('wrong'); allRight = false; }
+  });
+  var fb = document.getElementById('dress-fb');
+  if (allRight) {
+    fb.textContent = '⭐ Perfect dressing!';
+    fb.style.color = '#4caf50';
+    speak('Perfect dressing!');
+  } else {
+    fb.textContent = '❌ Check the green ones — those are correct!';
+    fb.style.color = '#f44336';
+    speak('Check the green ones. Those are the correct clothes!');
+  }
+  document.getElementById('dress-next').style.display = 'block';
+}
+function nextDress() { dressIdx = (dressIdx + 1) % weathers.length; loadDress(); }
+
+var quizQs = [
+  { emoji:'☀️', q:'What weather is this?', answer:'Sunny', opts:['Sunny','Rainy','Snowy','Windy'] },
+  { emoji:'🌧️', q:'What weather is this?', answer:'Rainy', opts:['Cloudy','Rainy','Windy','Snowy'] },
+  { emoji:'❄️', q:'What weather is this?', answer:'Snowy', opts:['Rainy','Windy','Snowy','Sunny'] },
+  { emoji:'💨', q:'Which weather is best for flying a kite?', answer:'Windy', opts:['Sunny','Rainy','Windy','Snowy'] },
+  { emoji:'🌧️', q:'What do plants love most?', answer:'Rainy', opts:['Sunny','Windy','Cloudy','Rainy'] },
+  { emoji:'☂️', q:'What do you use on a rainy day?', answer:'Umbrella', opts:['Kite','Umbrella','Sunglasses','Gloves'] },
+  { emoji:'☀️', q:'Which weather is bright and warm?', answer:'Sunny', opts:['Snowy','Cloudy','Sunny','Rainy'] },
+  { emoji:'❄️', q:'What can you build in snowy weather?', answer:'Snowman', opts:['Kite','Sandcastle','Snowman','Boat'] },
+  { emoji:'☁️', q:'What weather is this?', answer:'Cloudy', opts:['Sunny','Cloudy','Rainy','Windy'] },
+  { emoji:'🧤', q:'When do you wear gloves and scarf?', answer:'Snowy', opts:['Sunny','Rainy','Cloudy','Snowy'] }
+];
+
+var qIdx=0, qScore=0, qAnswered=false;
+
+function startQuiz() {
+  qIdx=0; qScore=0; qAnswered=false;
+  showQ();
+}
+function showQ() {
+  var q = quizQs[qIdx];
+  document.getElementById('qprog').textContent = 'Question '+(qIdx+1)+' of '+quizQs.length;
+  document.getElementById('qfill').style.width = (qIdx/quizQs.length*100)+'%';
+  document.getElementById('q-emoji').textContent = q.emoji;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('q-fb').textContent = '';
+  document.getElementById('q-fb').className = 'q-fb';
+  document.getElementById('q-next').style.display = 'none';
+  qAnswered = false;
+  var optsEl = document.getElementById('q-opts');
+  optsEl.innerHTML = '';
+  q.opts.forEach(function(opt) {
+    var btn = document.createElement('button');
+    btn.className = 'q-opt';
+    btn.textContent = opt;
+    btn.onclick = function() { checkQ(opt, btn); };
+    optsEl.appendChild(btn);
+  });
+  speak(q.q);
+}
+function checkQ(chosen, btn) {
+  if (qAnswered) return;
+  qAnswered = true;
+  var correct = quizQs[qIdx].answer;
+  var fb = document.getElementById('q-fb');
+  if (chosen === correct) {
+    qScore++;
+    btn.classList.add('correct');
+    fb.textContent = '⭐ Correct!';
+    fb.className = 'q-fb good';
+    speak('Correct! Well done!');
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.q-opt').forEach(function(b) {
+      if (b.textContent === correct) b.classList.add('correct');
+    });
+    fb.textContent = '❌ The answer is ' + correct + '!';
+    fb.className = 'q-fb bad';
+    speak('The answer is ' + correct);
+  }
+  document.getElementById('q-next').style.display = 'block';
+}
+function nextQ() {
+  qIdx++;
+  if (qIdx >= quizQs.length) showResult();
+  else showQ();
+}
+function showResult() {
+  var stars = qScore>=9?'🌟🌟🌟':qScore>=7?'⭐⭐⭐':qScore>=5?'⭐⭐':'⭐';
+  var msg = qScore>=9?'Amazing weather expert!':qScore>=7?'Great job! Well done!':qScore>=5?'Good try! Keep learning!':'Keep practising!';
+  document.getElementById('quiz-box').innerHTML = '<div class="result-box"><div class="res-emoji">'+stars+'</div><div class="res-title">You got '+qScore+' out of '+quizQs.length+'!</div><div class="res-score">'+msg+'</div><button class="restart" onclick="startQuiz()">🔄 Try Again</button></div>';
+  speak(msg + '. You got ' + qScore + ' out of ' + quizQs.length);
+}
+
+function showTab(tab) {
+  ['learn','dress','quiz'].forEach(function(t) {
+    document.getElementById('tab-'+t).style.display = t===tab ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach(function(b, i) {
+    b.classList.toggle('active', ['learn','dress','quiz'][i]===tab);
+  });
+  if (tab === 'dress') loadDress();
+  if (tab === 'quiz') startQuiz();
+}
+
+function speak(text) {
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
+</script>
+
+<div id="font-fab" onclick="document.getElementById('font-panel').classList.toggle('open')" style="position:fixed;bottom:24px;right:24px;z-index:9999;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(102,126,234,0.5);transition:transform .2s;user-select:none;">Aa</div>
+<div id="font-panel" style="position:fixed;bottom:88px;right:24px;z-index:9998;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px;width:240px;display:none;flex-direction:column;gap:10px;">
+  <div style="font-size:13px;font-weight:700;color:#666;margin-bottom:4px;">CHOOSE FONT</div>
+  <button onclick="setFont('Nunito')" data-font="Nunito" style="font-family:'Nunito',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:700;">Nunito — Hello World!</button>
+  <button onclick="setFont('Fredoka One')" data-font="Fredoka One" style="font-family:'Fredoka One',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">Fredoka — Hello World!</button>
+  <button onclick="setFont('Patrick Hand')" data-font="Patrick Hand" style="font-family:'Patrick Hand',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">Patrick Hand — Hello!</button>
+  <button onclick="setFont('ABeeZee')" data-font="ABeeZee" style="font-family:'ABeeZee',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">ABeeZee — Hello World!</button>
+  <button onclick="setFont('Poppins')" data-font="Poppins" style="font-family:'Poppins',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:600;">Poppins — Hello World!</button>
+</div>
+<style>#font-panel.open{display:flex!important;}body,button,input,select,textarea{font-family:var(--app-font,'Nunito'),sans-serif!important;}</style>
+<script>(function(){var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};Object.values(fonts).forEach(function(href){if(!document.querySelector('link[href="'+href+'"]')){var l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l);}});var current=localStorage.getItem('dhanu-font')||'Nunito';document.querySelectorAll('#font-panel button[data-font]').forEach(function(b){if(b.getAttribute('data-font')===current){b.style.borderColor='#667eea';b.style.background='#f0f0ff';}});})();function setFont(name){localStorage.setItem('dhanu-font',name);location.reload();}</script>
+<script src="/tts.js"></script>
+</body>
+</html>

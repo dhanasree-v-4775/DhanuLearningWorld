@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};var chosen=localStorage.getItem('dhanu-font')||'Nunito';if(fonts[chosen]){var l=document.createElement('link');l.rel='stylesheet';l.href=fonts[chosen];document.head.appendChild(l);}document.documentElement.style.setProperty('--app-font',chosen);})();</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Comparing</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+    background: linear-gradient(135deg, #00b894, #00695c);
+    min-height: 100vh;
+  }
+  .topbar {
+    background: rgba(0,0,0,0.22);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .topbar a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .topbar span {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 10px 6px;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    background: rgba(255,255,255,0.22);
+    border: 3px solid rgba(255,255,255,0.45);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    padding: 8px 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .tab-btn.active {
+    background: #fff;
+    color: #00695c;
+    border-color: #fff;
+    transform: scale(1.05);
+  }
+
+  /* Game area */
+  .game-area {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 14px;
+  }
+
+  /* Score bar */
+  .score-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255,255,255,0.2);
+    border-radius: 16px;
+    padding: 10px 20px;
+    margin-bottom: 14px;
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  /* Question card */
+  .question-card {
+    background: #fff;
+    border-radius: 28px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    text-align: center;
+  }
+  .question-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #00695c;
+    margin-bottom: 18px;
+  }
+
+  /* Choices row */
+  .choices {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  .choice-btn {
+    flex: 1;
+    min-width: 120px;
+    max-width: 280px;
+    background: linear-gradient(135deg, #e0f7fa, #b2dfdb);
+    border: 4px solid #80cbc4;
+    border-radius: 22px;
+    padding: 16px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .choice-btn:hover, .choice-btn:active {
+    transform: scale(1.05);
+    border-color: #00897b;
+  }
+  .choice-emoji {
+    line-height: 1;
+    display: block;
+  }
+  .choice-label {
+    font-size: 16px;
+    font-weight: 800;
+    color: #333;
+  }
+  /* More & Less groups */
+  .emoji-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 2px;
+    font-size: 28px;
+    line-height: 1.2;
+    max-width: 160px;
+  }
+  .count-badge {
+    font-size: 22px;
+    font-weight: 900;
+    color: #00695c;
+    background: #e0f7fa;
+    border-radius: 50px;
+    padding: 2px 14px;
+    margin-top: 4px;
+    display: inline-block;
+  }
+  .choice-btn.flash-correct {
+    background: linear-gradient(135deg, #a5d6a7, #66bb6a);
+    border-color: #2e7d32;
+    animation: popCorrect 0.5s ease;
+  }
+  .choice-btn.flash-wrong {
+    background: linear-gradient(135deg, #ffcdd2, #ef9a9a);
+    border-color: #c62828;
+    animation: shakeWrong 0.5s ease;
+  }
+  @keyframes popCorrect {
+    0%   { transform: scale(1.0); }
+    40%  { transform: scale(1.18); }
+    100% { transform: scale(1.0); }
+  }
+  @keyframes shakeWrong {
+    0%   { transform: translateX(0); }
+    20%  { transform: translateX(-10px); }
+    40%  { transform: translateX(10px); }
+    60%  { transform: translateX(-8px); }
+    80%  { transform: translateX(8px); }
+    100% { transform: translateX(0); }
+  }
+  .vs-badge {
+    font-size: 28px;
+    font-weight: 900;
+    color: #00695c;
+    align-self: center;
+    padding: 0 4px;
+  }
+
+  /* Feedback message */
+  .feedback-msg {
+    min-height: 42px;
+    font-size: 20px;
+    font-weight: 800;
+    color: #333;
+    margin-top: 14px;
+    text-align: center;
+  }
+
+  /* Score screen */
+  .score-screen {
+    display: none;
+    background: #fff;
+    border-radius: 28px;
+    padding: 36px 24px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  }
+  .score-screen.show { display: block; }
+  .score-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #00695c;
+    margin-bottom: 10px;
+  }
+  .score-stars {
+    font-size: 54px;
+    margin: 10px 0;
+    letter-spacing: 6px;
+  }
+  .score-detail {
+    font-size: 22px;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  .play-again-btn {
+    background: linear-gradient(135deg, #00b894, #00695c);
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    font-weight: 800;
+    padding: 14px 40px;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,105,92,0.4);
+    transition: transform 0.15s;
+  }
+  .play-again-btn:hover { transform: scale(1.05); }
+
+  @media (max-width: 500px) {
+    .tab-btn { font-size: 12px; padding: 7px 12px; }
+    .choice-btn { min-width: 100px; padding: 12px 8px; }
+    .question-title { font-size: 18px; }
+    .emoji-group { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span>⚖️ Comparing</span>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab(0)">🐘 Big & Small</button>
+  <button class="tab-btn" onclick="switchTab(1)">🦒 Tall & Short</button>
+  <button class="tab-btn" onclick="switchTab(2)">🪨 Heavy & Light</button>
+  <button class="tab-btn" onclick="switchTab(3)">🐍 Long & Short</button>
+  <button class="tab-btn" onclick="switchTab(4)">🍎 More & Less</button>
+</div>
+
+<div class="game-area">
+  <div class="score-bar">
+    <span id="progress-text">Question 1 / 8</span>
+    <span id="score-text">⭐ Score: 0</span>
+  </div>
+
+  <div class="question-card" id="question-card">
+    <div class="question-title" id="question-title">Which is BIGGER?</div>
+    <div class="choices" id="choices-container"></div>
+    <div class="feedback-msg" id="feedback-msg"></div>
+  </div>
+
+  <div class="score-screen" id="score-screen">
+    <div class="score-title" id="result-title">Fantastic!</div>
+    <div class="score-stars" id="result-stars">⭐⭐⭐</div>
+    <div class="score-detail" id="result-detail">You got 8 out of 8!</div>
+    <button class="play-again-btn" onclick="playAgain()">Play Again! 🎉</button>
+  </div>
+</div>
+
+<!-- Font Picker Widget -->
+<div id="font-fab" onclick="document.getElementById('font-panel').classList.toggle('open')" style="position:fixed;bottom:24px;right:24px;z-index:9999;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(102,126,234,0.5);transition:transform .2s;user-select:none;">Aa</div>
+<div id="font-panel" style="position:fixed;bottom:88px;right:24px;z-index:9998;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px;width:240px;display:none;flex-direction:column;gap:10px;">
+  <div style="font-size:13px;font-weight:700;color:#666;margin-bottom:4px;">CHOOSE FONT</div>
+  <button onclick="setFont('Nunito')" data-font="Nunito" style="font-family:'Nunito',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:700;">Nunito — Hello World!</button>
+  <button onclick="setFont('Fredoka One')" data-font="Fredoka One" style="font-family:'Fredoka One',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">Fredoka — Hello World!</button>
+  <button onclick="setFont('Patrick Hand')" data-font="Patrick Hand" style="font-family:'Patrick Hand',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">Patrick Hand — Hello!</button>
+  <button onclick="setFont('ABeeZee')" data-font="ABeeZee" style="font-family:'ABeeZee',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">ABeeZee — Hello World!</button>
+  <button onclick="setFont('Poppins')" data-font="Poppins" style="font-family:'Poppins',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:600;">Poppins — Hello World!</button>
+</div>
+<style>#font-panel.open{display:flex!important;}body,button,input,select,textarea{font-family:var(--app-font,'Nunito'),sans-serif!important;}</style>
+<script>(function(){var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};Object.values(fonts).forEach(function(href){if(!document.querySelector('link[href="'+href+'"]')){var l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l);}});var current=localStorage.getItem('dhanu-font')||'Nunito';document.querySelectorAll('#font-panel button[data-font]').forEach(function(b){if(b.getAttribute('data-font')===current){b.style.borderColor='#667eea';b.style.background='#f0f0ff';}});})();function setFont(name){localStorage.setItem('dhanu-font',name);location.reload();}</script>
+
+<script>
+// ===== DATA =====
+// Each category has: question, pairs (a, b, answer = 0 or 1 → which option is "more/bigger/etc")
+// answer: 0 = first option wins, 1 = second option wins
+var CATEGORIES = [
+  // 0: Big & Small
+  {
+    question: 'Which is BIGGER? 🐘',
+    keyword: 'bigger',
+    pairs: [
+      { a: { emoji:'🐘', label:'Elephant', size:110 }, b: { emoji:'🐭', label:'Mouse', size:55 },    answer:0, say:'The elephant is bigger!' },
+      { a: { emoji:'🌳', label:'Tree',     size:110 }, b: { emoji:'🌱', label:'Seedling', size:55 },  answer:0, say:'The tree is bigger!' },
+      { a: { emoji:'🚗', label:'Car',      size:100 }, b: { emoji:'🛵', label:'Scooter', size:60 },   answer:0, say:'The car is bigger!' },
+      { a: { emoji:'🐋', label:'Whale',    size:110 }, b: { emoji:'🐟', label:'Fish', size:55 },      answer:0, say:'The whale is bigger!' },
+      { a: { emoji:'🏠', label:'House',    size:100 }, b: { emoji:'⛺', label:'Tent', size:60 },      answer:0, say:'The house is bigger!' },
+      { a: { emoji:'🦁', label:'Lion',     size:100 }, b: { emoji:'🐱', label:'Cat', size:60 },       answer:0, say:'The lion is bigger!' },
+      { a: { emoji:'🎃', label:'Pumpkin',  size:100 }, b: { emoji:'🍇', label:'Grapes', size:60 },    answer:0, say:'The pumpkin is bigger!' },
+      { a: { emoji:'🌏', label:'Earth',    size:110 }, b: { emoji:'🌕', label:'Moon', size:60 },      answer:0, say:'The Earth is bigger!' }
+    ]
+  },
+  // 1: Tall & Short
+  {
+    question: 'Which is TALLER? 🦒',
+    keyword: 'taller',
+    pairs: [
+      { a: { emoji:'🦒', label:'Giraffe',    size:110 }, b: { emoji:'🐸', label:'Frog', size:55 },      answer:0, say:'The giraffe is taller!' },
+      { a: { emoji:'🌴', label:'Palm Tree',  size:110 }, b: { emoji:'🌷', label:'Flower', size:55 },    answer:0, say:'The palm tree is taller!' },
+      { a: { emoji:'🏔️', label:'Mountain',  size:110 }, b: { emoji:'⛰️', label:'Hill', size:65 },     answer:0, say:'The mountain is taller!' },
+      { a: { emoji:'👨', label:'Adult',      size:100 }, b: { emoji:'🧒', label:'Child', size:65 },     answer:0, say:'The adult is taller!' },
+      { a: { emoji:'🗼', label:'Tower',      size:110 }, b: { emoji:'🏠', label:'House', size:65 },     answer:0, say:'The tower is taller!' },
+      { a: { emoji:'🦏', label:'Rhino',      size:100 }, b: { emoji:'🐇', label:'Rabbit', size:60 },    answer:0, say:'The rhino is taller!' },
+      { a: { emoji:'🌵', label:'Cactus',     size:110 }, b: { emoji:'🍀', label:'Clover', size:55 },    answer:0, say:'The cactus is taller!' },
+      { a: { emoji:'🧑‍🚀', label:'Astronaut', size:100 }, b: { emoji:'🐢', label:'Turtle', size:55 }, answer:0, say:'The astronaut is taller!' }
+    ]
+  },
+  // 2: Heavy & Light
+  {
+    question: 'Which is HEAVIER? 🪨',
+    keyword: 'heavier',
+    pairs: [
+      { a: { emoji:'🪨', label:'Rock',        size:100 }, b: { emoji:'🪶', label:'Feather', size:70 },    answer:0, say:'The rock is heavier!' },
+      { a: { emoji:'🐘', label:'Elephant',    size:110 }, b: { emoji:'🐦', label:'Bird', size:55 },       answer:0, say:'The elephant is heavier!' },
+      { a: { emoji:'🚂', label:'Train',       size:110 }, b: { emoji:'🚲', label:'Bicycle', size:60 },    answer:0, say:'The train is heavier!' },
+      { a: { emoji:'📚', label:'Books',       size:100 }, b: { emoji:'📄', label:'Paper', size:65 },      answer:0, say:'The books are heavier!' },
+      { a: { emoji:'🏋️', label:'Weights',    size:100 }, b: { emoji:'🎈', label:'Balloon', size:60 },    answer:0, say:'The weights are heavier!' },
+      { a: { emoji:'🪵', label:'Wood',        size:100 }, b: { emoji:'🍃', label:'Leaf', size:60 },       answer:0, say:'The wood is heavier!' },
+      { a: { emoji:'🐊', label:'Crocodile',   size:110 }, b: { emoji:'🦋', label:'Butterfly', size:55 }, answer:0, say:'The crocodile is heavier!' },
+      { a: { emoji:'🍉', label:'Watermelon',  size:110 }, b: { emoji:'🍓', label:'Strawberry', size:55 }, answer:0, say:'The watermelon is heavier!' }
+    ]
+  },
+  // 3: Long & Short
+  {
+    question: 'Which is LONGER? 🐍',
+    keyword: 'longer',
+    pairs: [
+      { a: { emoji:'🐍', label:'Snake',      size:110 }, b: { emoji:'🪱', label:'Worm', size:60 },       answer:0, say:'The snake is longer!' },
+      { a: { emoji:'✏️', label:'Long Pencil',size:110 }, b: { emoji:'🖊️', label:'Short Pen', size:60 }, answer:0, say:'The pencil is longer!' },
+      { a: { emoji:'🚂', label:'Train',      size:110 }, b: { emoji:'🚗', label:'Car', size:60 },        answer:0, say:'The train is longer!' },
+      { a: { emoji:'📏', label:'Ruler',      size:110 }, b: { emoji:'🖊️', label:'Pen', size:65 },       answer:0, say:'The ruler is longer!' },
+      { a: { emoji:'🌿', label:'Vine',       size:110 }, b: { emoji:'🌿', label:'Twig', size:58 },       answer:0, say:'The vine is longer!' },
+      { a: { emoji:'🦒', label:'Giraffe Neck',size:110}, b: { emoji:'🐸', label:'Frog Legs', size:55 },  answer:0, say:'The giraffe neck is longer!' },
+      { a: { emoji:'🛣️', label:'Road',      size:110 }, b: { emoji:'🛤️', label:'Path', size:65 },      answer:0, say:'The road is longer!' },
+      { a: { emoji:'🐊', label:'Crocodile',  size:110 }, b: { emoji:'🦎', label:'Lizard', size:60 },    answer:0, say:'The crocodile is longer!' }
+    ]
+  },
+  // 4: More & Less
+  {
+    question: 'Which group has MORE? 🍎',
+    keyword: 'more',
+    pairs: [
+      { a: { emoji:'🍎', count:5, label:'5 apples' },   b: { emoji:'🍎', count:2, label:'2 apples' },   answer:0, say:'Five is more than two!' },
+      { a: { emoji:'⭐', count:3, label:'3 stars' },    b: { emoji:'⭐', count:6, label:'6 stars' },    answer:1, say:'Six is more than three!' },
+      { a: { emoji:'🐟', count:7, label:'7 fish' },     b: { emoji:'🐟', count:3, label:'3 fish' },     answer:0, say:'Seven is more than three!' },
+      { a: { emoji:'🌸', count:2, label:'2 flowers' },  b: { emoji:'🌸', count:8, label:'8 flowers' },  answer:1, say:'Eight is more than two!' },
+      { a: { emoji:'🎈', count:4, label:'4 balloons' }, b: { emoji:'🎈', count:9, label:'9 balloons' }, answer:1, say:'Nine is more than four!' },
+      { a: { emoji:'🍪', count:6, label:'6 cookies' },  b: { emoji:'🍪', count:4, label:'4 cookies' },  answer:0, say:'Six is more than four!' },
+      { a: { emoji:'🌟', count:10, label:'10 stars' },  b: { emoji:'🌟', count:5, label:'5 stars' },    answer:0, say:'Ten is more than five!' },
+      { a: { emoji:'🐞', count:3, label:'3 bugs' },     b: { emoji:'🐞', count:7, label:'7 bugs' },     answer:1, say:'Seven is more than three!' }
+    ]
+  }
+];
+
+// ===== STATE =====
+var currentCatIdx = 0;
+var currentQ = 0;
+var score = 0;
+var busy = false;
+var queue = [];
+var totalQ = 8;
+
+function shuffleArr(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+  }
+  return a;
+}
+
+function switchTab(idx) {
+  currentCatIdx = idx;
+  document.querySelectorAll('.tab-btn').forEach(function(b, i) {
+    b.classList.toggle('active', i === idx);
+  });
+  startGame();
+}
+
+function startGame() {
+  var cat = CATEGORIES[currentCatIdx];
+  queue = shuffleArr(cat.pairs);
+  currentQ = 0;
+  score = 0;
+  busy = false;
+  document.getElementById('score-screen').classList.remove('show');
+  document.getElementById('question-card').style.display = '';
+  renderQuestion();
+  updateScoreBar();
+}
+
+function renderQuestion() {
+  var cat = CATEGORIES[currentCatIdx];
+  var pair = queue[currentQ];
+  document.getElementById('question-title').textContent = cat.question;
+  document.getElementById('feedback-msg').textContent = '';
+
+  var isMoreLess = (currentCatIdx === 4);
+  var html = '';
+
+  if (isMoreLess) {
+    // Side A
+    html += renderMoreBtn(0, pair.a);
+    html += '<div class="vs-badge">OR</div>';
+    // Side B
+    html += renderMoreBtn(1, pair.b);
+  } else {
+    // Standard emoji pair
+    html += renderEmojiBtn(0, pair.a);
+    html += '<div class="vs-badge">OR</div>';
+    html += renderEmojiBtn(1, pair.b);
+  }
+
+  document.getElementById('choices-container').innerHTML = html;
+}
+
+function renderEmojiBtn(idx, option) {
+  return '<button class="choice-btn" id="choice-' + idx + '" onclick="checkAnswer(' + idx + ')">' +
+    '<span class="choice-emoji" style="font-size:' + option.size + 'px;">' + option.emoji + '</span>' +
+    '<span class="choice-label">' + option.label + '</span>' +
+    '</button>';
+}
+
+function renderMoreBtn(idx, option) {
+  var emojis = '';
+  for (var i = 0; i < option.count; i++) {
+    emojis += '<span>' + option.emoji + '</span>';
+  }
+  return '<button class="choice-btn" id="choice-' + idx + '" onclick="checkAnswer(' + idx + ')">' +
+    '<div class="emoji-group">' + emojis + '</div>' +
+    '<span class="count-badge">' + option.count + '</span>' +
+    '<span class="choice-label">' + option.label + '</span>' +
+    '</button>';
+}
+
+function updateScoreBar() {
+  document.getElementById('progress-text').textContent = 'Question ' + (currentQ + 1) + ' / ' + totalQ;
+  document.getElementById('score-text').textContent = '⭐ Score: ' + score;
+}
+
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
+
+function checkAnswer(selectedIdx) {
+  if (busy) return;
+  var pair = queue[currentQ];
+  var correct = (selectedIdx === pair.answer);
+  busy = true;
+
+  var btnA = document.getElementById('choice-0');
+  var btnB = document.getElementById('choice-1');
+  var chosen = selectedIdx === 0 ? btnA : btnB;
+  var other  = selectedIdx === 0 ? btnB : btnA;
+
+  if (correct) {
+    chosen.classList.add('flash-correct');
+    score++;
+    document.getElementById('feedback-msg').innerHTML = '✅ ' + pair.say;
+    speak(pair.say);
+  } else {
+    chosen.classList.add('flash-wrong');
+    // highlight the correct one
+    (pair.answer === 0 ? btnA : btnB).classList.add('flash-correct');
+    document.getElementById('feedback-msg').innerHTML = '❌ ' + pair.say;
+    speak('Oops! ' + pair.say);
+  }
+
+  updateScoreBar();
+
+  setTimeout(function() {
+    currentQ++;
+    if (currentQ >= totalQ) {
+      showScore();
+    } else {
+      renderQuestion();
+      busy = false;
+      updateScoreBar();
+    }
+  }, correct ? 1000 : 1400);
+}
+
+function showScore() {
+  document.getElementById('question-card').style.display = 'none';
+  var screen = document.getElementById('score-screen');
+  screen.classList.add('show');
+
+  var stars = score >= 7 ? '⭐⭐⭐' : score >= 5 ? '⭐⭐' : '⭐';
+  var title = score >= 7 ? 'You are a comparing champion! 🏆' :
+               score >= 5 ? 'Well done! Great comparing! 👏' :
+               'Good try! Let\'s practise more! 💪';
+
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-stars').textContent = stars;
+  document.getElementById('result-detail').textContent = 'You got ' + score + ' out of ' + totalQ + '!';
+
+  if (score >= 7) speak('You are a comparing champion!');
+  else if (score >= 5) speak('Well done! Great comparing!');
+  else speak('Good try! Let us practise more!');
+}
+
+function playAgain() {
+  startGame();
+}
+
+// Init
+startGame();
+</script>
+
+<script src="/tts.js"></script>
+</body>
+</html>

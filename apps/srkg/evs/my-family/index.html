@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};var chosen=localStorage.getItem('dhanu-font')||'Nunito';if(fonts[chosen]){var l=document.createElement('link');l.rel='stylesheet';l.href=fonts[chosen];document.head.appendChild(l);}document.documentElement.style.setProperty('--app-font',chosen);})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>👨‍👩‍👧 My Family</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+    background: linear-gradient(135deg, #ff7043, #bf360c);
+    min-height: 100vh;
+    color: #333;
+  }
+  .topbar {
+    background: rgba(0,0,0,0.25);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    backdrop-filter: blur(6px);
+  }
+  .topbar a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 700;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 14px;
+    border-radius: 20px;
+  }
+  .topbar span { color: #fff; font-size: 22px; font-weight: 800; }
+
+  .mode-tabs {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    padding: 20px 16px 10px;
+  }
+  .mode-tab {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+    border: 3px solid rgba(255,255,255,0.4);
+    border-radius: 30px;
+    padding: 12px 28px;
+    font-size: 19px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+  }
+  .mode-tab.active { background: #fff; color: #bf360c; border-color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.18); }
+
+  /* === MEET MODE === */
+  #meet-mode { padding: 16px; }
+  .family-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 18px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .fam-card {
+    background: #fff;
+    border-radius: 26px;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 6px 22px rgba(0,0,0,0.13);
+    transition: transform 0.18s, box-shadow 0.18s;
+    user-select: none;
+  }
+  .fam-card:hover, .fam-card:active { transform: scale(1.06); box-shadow: 0 12px 30px rgba(0,0,0,0.2); }
+  .fam-card .fam-emoji { font-size: 64px; display: block; margin-bottom: 10px; }
+  .fam-card .fam-name { font-size: 22px; font-weight: 800; color: #bf360c; margin-bottom: 6px; }
+  .fam-card .fam-desc { font-size: 13px; color: #666; line-height: 1.4; }
+  .hear-fam {
+    margin-top: 12px;
+    background: linear-gradient(135deg, #ff7043, #bf360c);
+    color: #fff;
+    border: none;
+    border-radius: 18px;
+    padding: 8px 18px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+    transition: transform 0.15s;
+  }
+  .hear-fam:hover { transform: scale(1.08); }
+
+  /* Overlay */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .overlay.show { display: flex; }
+  .ov-card {
+    background: #fff;
+    border-radius: 32px;
+    padding: 40px 30px;
+    text-align: center;
+    max-width: 380px;
+    width: 100%;
+    animation: popIn 0.25s cubic-bezier(.26,1.5,.6,1);
+  }
+  @keyframes popIn { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .ov-emoji { font-size: 100px; display: block; margin-bottom: 10px; }
+  .ov-name { font-size: 36px; font-weight: 800; color: #bf360c; margin-bottom: 10px; }
+  .ov-desc { font-size: 18px; color: #555; line-height: 1.5; margin-bottom: 22px; }
+  .ov-close { background: #ff7043; color: #fff; border: none; border-radius: 20px; padding: 12px 28px; font-size: 18px; font-weight: 800; cursor: pointer; font-family: var(--app-font,'Nunito'),sans-serif; }
+
+  /* === QUIZ MODE === */
+  #quiz-mode { display: none; padding: 20px 16px; }
+  .quiz-box {
+    background: #fff;
+    border-radius: 28px;
+    padding: 30px 24px;
+    max-width: 560px;
+    margin: 0 auto;
+    text-align: center;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.14);
+  }
+  .q-prog { font-size: 16px; color: #aaa; font-weight: 700; margin-bottom: 6px; }
+  .q-bar { background: #fce4ec; border-radius: 20px; height: 12px; margin-bottom: 18px; overflow: hidden; }
+  .q-fill { background: linear-gradient(90deg, #ff7043, #bf360c); height: 100%; border-radius: 20px; transition: width 0.4s; }
+  .q-question { font-size: 22px; font-weight: 800; color: #333; margin-bottom: 24px; line-height: 1.35; }
+  .q-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .q-opt {
+    background: #fff3e0;
+    border: 3px solid #ffccbc;
+    border-radius: 20px;
+    padding: 20px 10px;
+    font-size: 28px;
+    cursor: pointer;
+    transition: all 0.18s;
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+    color: #333;
+  }
+  .q-opt:hover { transform: scale(1.06); }
+  .q-opt.correct { background: #c8f7c5; border-color: #4caf50; }
+  .q-opt.wrong { background: #ffdde0; border-color: #f44336; }
+  .q-fb { margin-top: 16px; font-size: 22px; font-weight: 800; min-height: 30px; }
+  .q-fb.good { color: #4caf50; }
+  .q-fb.bad { color: #f44336; }
+  .q-next { margin-top: 16px; background: linear-gradient(135deg,#ff7043,#bf360c); color: #fff; border: none; border-radius: 22px; padding: 13px 32px; font-size: 19px; font-weight: 800; cursor: pointer; display: none; font-family: var(--app-font,'Nunito'),sans-serif; }
+  .result-box { text-align: center; }
+  .res-emoji { font-size: 72px; }
+  .res-title { font-size: 28px; font-weight: 800; color: #bf360c; margin: 10px 0; }
+  .res-score { font-size: 20px; color: #555; margin-bottom: 18px; }
+  .restart-btn { background: linear-gradient(135deg,#ff7043,#bf360c); color: #fff; border: none; border-radius: 22px; padding: 13px 32px; font-size: 19px; font-weight: 800; cursor: pointer; font-family: var(--app-font,'Nunito'),sans-serif; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span>👨‍👩‍👧 My Family</span>
+</div>
+
+<div class="mode-tabs">
+  <button class="mode-tab active" onclick="showMode('meet')">👨‍👩‍👧 Meet My Family</button>
+  <button class="mode-tab" onclick="showMode('quiz')">🧠 Family Quiz</button>
+</div>
+
+<!-- MEET MODE -->
+<div id="meet-mode">
+  <div class="family-grid" id="family-grid"></div>
+</div>
+
+<!-- QUIZ MODE -->
+<div id="quiz-mode">
+  <div class="quiz-box" id="quiz-box">
+    <div class="q-prog" id="q-prog">Question 1 of 8</div>
+    <div class="q-bar"><div class="q-fill" id="q-fill" style="width:0%"></div></div>
+    <div class="q-question" id="q-question"></div>
+    <div class="q-opts" id="q-opts"></div>
+    <div class="q-fb" id="q-fb"></div>
+    <button class="q-next" id="q-next" onclick="nextQ()">Next ➡️</button>
+  </div>
+</div>
+
+<!-- Overlay -->
+<div class="overlay" id="overlay" onclick="closeOv(event)">
+  <div class="ov-card" id="ov-card">
+    <span class="ov-emoji" id="ov-emoji"></span>
+    <div class="ov-name" id="ov-name"></div>
+    <div class="ov-desc" id="ov-desc"></div>
+    <button class="ov-close" onclick="closeOvBtn()">Close ✕</button>
+  </div>
+</div>
+
+<script>
+var family = [
+  { name: 'Mummy',   emoji: '👩',   desc: 'Mummy loves and takes care of you. She gives the best hugs!' },
+  { name: 'Daddy',   emoji: '👨',   desc: 'Daddy keeps your family safe and strong. He loves to play with you!' },
+  { name: 'Brother', emoji: '👦',   desc: 'Your brother is your best friend at home. You grow up together!' },
+  { name: 'Sister',  emoji: '👧',   desc: 'Your sister shares everything with you. She\'s always there for you!' },
+  { name: 'Grandma', emoji: '👵',   desc: 'Grandma tells wonderful stories and makes yummy food!' },
+  { name: 'Grandpa', emoji: '👴',   desc: 'Grandpa is very wise and loves to take you on walks!' },
+  { name: 'Uncle',   emoji: '🧔',   desc: 'Uncle is Mummy or Daddy\'s brother. He loves to make you laugh!' },
+  { name: 'Aunt',    emoji: '👩‍🦱', desc: 'Aunt is Mummy or Daddy\'s sister. She brings lovely gifts!' }
+];
+
+var quizQs = [
+  { q: 'Who gives the best hugs?', answer: 'Mummy', opts: ['Mummy', 'Daddy', 'Grandpa', 'Uncle'] },
+  { q: 'Who keeps your family safe and strong?', answer: 'Daddy', opts: ['Grandma', 'Daddy', 'Brother', 'Aunt'] },
+  { q: 'Who tells wonderful stories and makes yummy food?', answer: 'Grandma', opts: ['Aunt', 'Mummy', 'Grandma', 'Sister'] },
+  { q: 'Who is your best friend at home?', answer: 'Brother', opts: ['Uncle', 'Grandpa', 'Brother', 'Daddy'] },
+  { q: 'Who is very wise and loves to take you on walks?', answer: 'Grandpa', opts: ['Grandpa', 'Daddy', 'Uncle', 'Brother'] },
+  { q: 'Who loves to make you laugh?', answer: 'Uncle', opts: ['Grandma', 'Mummy', 'Uncle', 'Sister'] },
+  { q: 'Who shares everything with you?', answer: 'Sister', opts: ['Aunt', 'Grandpa', 'Daddy', 'Sister'] },
+  { q: 'Who brings lovely gifts?', answer: 'Aunt', opts: ['Aunt', 'Grandma', 'Brother', 'Mummy'] }
+];
+
+var qIdx = 0, qScore = 0, qAnswered = false;
+
+function buildGrid() {
+  var grid = document.getElementById('family-grid');
+  grid.innerHTML = '';
+  family.forEach(function(m, i) {
+    var card = document.createElement('div');
+    card.className = 'fam-card';
+    card.innerHTML =
+      '<span class="fam-emoji">' + m.emoji + '</span>' +
+      '<div class="fam-name">' + m.name + '</div>' +
+      '<div class="fam-desc">' + m.desc + '</div>' +
+      '<button class="hear-fam" onclick="event.stopPropagation();speak(\'' + m.name + '. ' + m.desc.replace(/'/g,"\\'") + '\')">🔊 Hear</button>';
+    card.addEventListener('click', function() { openOv(i); });
+    grid.appendChild(card);
+  });
+}
+
+function openOv(i) {
+  var m = family[i];
+  document.getElementById('ov-emoji').textContent = m.emoji;
+  document.getElementById('ov-name').textContent = m.name;
+  document.getElementById('ov-desc').textContent = m.desc;
+  document.getElementById('overlay').classList.add('show');
+  speak(m.name + '. ' + m.desc);
+}
+function closeOv(e) { if (e.target === document.getElementById('overlay')) closeOvBtn(); }
+function closeOvBtn() { document.getElementById('overlay').classList.remove('show'); window.speechSynthesis.cancel(); }
+
+function speak(text) {
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
+
+function showMode(mode) {
+  document.getElementById('meet-mode').style.display = mode === 'meet' ? 'block' : 'none';
+  document.getElementById('quiz-mode').style.display = mode === 'quiz' ? 'block' : 'none';
+  document.querySelectorAll('.mode-tab').forEach(function(t, i) {
+    t.classList.toggle('active', (mode === 'meet' && i === 0) || (mode === 'quiz' && i === 1));
+  });
+  if (mode === 'quiz' && qIdx === 0 && !qAnswered) startQuiz();
+}
+
+function startQuiz() {
+  qIdx = 0; qScore = 0; qAnswered = false;
+  // Rebuild quiz box if it was replaced with result
+  var box = document.getElementById('quiz-box');
+  if (!document.getElementById('q-prog')) {
+    box.innerHTML = '<div class="q-prog" id="q-prog"></div><div class="q-bar"><div class="q-fill" id="q-fill" style="width:0%"></div></div><div class="q-question" id="q-question"></div><div class="q-opts" id="q-opts"></div><div class="q-fb" id="q-fb"></div><button class="q-next" id="q-next" onclick="nextQ()">Next ➡️</button>';
+  }
+  showQ();
+}
+
+function showQ() {
+  var q = quizQs[qIdx];
+  document.getElementById('q-prog').textContent = 'Question '+(qIdx+1)+' of '+quizQs.length;
+  document.getElementById('q-fill').style.width = (qIdx/quizQs.length*100)+'%';
+  document.getElementById('q-question').textContent = q.q;
+  document.getElementById('q-fb').textContent = '';
+  document.getElementById('q-fb').className = 'q-fb';
+  document.getElementById('q-next').style.display = 'none';
+  qAnswered = false;
+  var optsEl = document.getElementById('q-opts');
+  optsEl.innerHTML = '';
+  q.opts.forEach(function(opt) {
+    var fObj = family.find(function(f) { return f.name === opt; });
+    var btn = document.createElement('button');
+    btn.className = 'q-opt';
+    btn.innerHTML = (fObj ? fObj.emoji : '') + '<br><span style="font-size:16px;font-weight:800">' + opt + '</span>';
+    btn.onclick = function() { checkQ(opt, btn); };
+    optsEl.appendChild(btn);
+  });
+  speak(q.q);
+}
+
+function checkQ(chosen, btn) {
+  if (qAnswered) return;
+  qAnswered = true;
+  var correct = quizQs[qIdx].answer;
+  var fb = document.getElementById('q-fb');
+  if (chosen === correct) {
+    qScore++;
+    btn.classList.add('correct');
+    fb.textContent = '⭐ Correct! Great job!';
+    fb.className = 'q-fb good';
+    speak('Correct! Great job!');
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.q-opt').forEach(function(b) {
+      if (b.textContent.includes(correct)) b.classList.add('correct');
+    });
+    fb.textContent = '❌ The answer is ' + correct + '!';
+    fb.className = 'q-fb bad';
+    speak('The answer is ' + correct);
+  }
+  document.getElementById('q-next').style.display = 'block';
+}
+
+function nextQ() {
+  qIdx++;
+  if (qIdx >= quizQs.length) showResult();
+  else showQ();
+}
+
+function showResult() {
+  var stars = qScore>=7?'🌟🌟🌟':qScore>=5?'⭐⭐⭐':qScore>=3?'⭐⭐':'⭐';
+  var msg = qScore>=7?'Amazing! You know your family!':qScore>=5?'Well done! Great job!':qScore>=3?'Good try! Keep learning!':'Keep practising!';
+  document.getElementById('quiz-box').innerHTML =
+    '<div class="result-box"><div class="res-emoji">'+stars+'</div>' +
+    '<div class="res-title">You got '+qScore+' out of '+quizQs.length+'!</div>' +
+    '<div class="res-score">'+msg+'</div>' +
+    '<button class="restart-btn" onclick="startQuiz()">🔄 Try Again</button></div>';
+  speak(msg + '. You got ' + qScore + ' out of ' + quizQs.length);
+}
+
+buildGrid();
+</script>
+
+<div id="font-fab" onclick="document.getElementById('font-panel').classList.toggle('open')" style="position:fixed;bottom:24px;right:24px;z-index:9999;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(102,126,234,0.5);transition:transform .2s;user-select:none;">Aa</div>
+<div id="font-panel" style="position:fixed;bottom:88px;right:24px;z-index:9998;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px;width:240px;display:none;flex-direction:column;gap:10px;">
+  <div style="font-size:13px;font-weight:700;color:#666;margin-bottom:4px;">CHOOSE FONT</div>
+  <button onclick="setFont('Nunito')" data-font="Nunito" style="font-family:'Nunito',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:700;">Nunito — Hello World!</button>
+  <button onclick="setFont('Fredoka One')" data-font="Fredoka One" style="font-family:'Fredoka One',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">Fredoka — Hello World!</button>
+  <button onclick="setFont('Patrick Hand')" data-font="Patrick Hand" style="font-family:'Patrick Hand',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">Patrick Hand — Hello!</button>
+  <button onclick="setFont('ABeeZee')" data-font="ABeeZee" style="font-family:'ABeeZee',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">ABeeZee — Hello World!</button>
+  <button onclick="setFont('Poppins')" data-font="Poppins" style="font-family:'Poppins',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:600;">Poppins — Hello World!</button>
+</div>
+<style>#font-panel.open{display:flex!important;}body,button,input,select,textarea{font-family:var(--app-font,'Nunito'),sans-serif!important;}</style>
+<script>(function(){var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};Object.values(fonts).forEach(function(href){if(!document.querySelector('link[href="'+href+'"]')){var l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l);}});var current=localStorage.getItem('dhanu-font')||'Nunito';document.querySelectorAll('#font-panel button[data-font]').forEach(function(b){if(b.getAttribute('data-font')===current){b.style.borderColor='#667eea';b.style.background='#f0f0ff';}});})();function setFont(name){localStorage.setItem('dhanu-font',name);location.reload();}</script>
+<script src="/tts.js"></script>
+</body>
+</html>

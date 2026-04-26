@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};var chosen=localStorage.getItem('dhanu-font')||'Nunito';if(fonts[chosen]){var l=document.createElement('link');l.rel='stylesheet';l.href=fonts[chosen];document.head.appendChild(l);}document.documentElement.style.setProperty('--app-font',chosen);})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rhymes & Songs</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+    background: linear-gradient(135deg, #f72585, #b5179e);
+    min-height: 100vh;
+    color: #fff;
+  }
+  .topbar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 20px;
+    background: rgba(0,0,0,0.25);
+    font-size: 18px; font-weight: 700;
+  }
+  .topbar a {
+    color: #fff; text-decoration: none;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 16px; white-space: nowrap;
+  }
+  .topbar span { font-size: 20px; }
+
+  .rhyme-card {
+    background: #fff;
+    border-radius: 32px;
+    margin: 20px auto;
+    max-width: 500px;
+    padding: 28px 24px 24px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    text-align: center;
+  }
+  .rhyme-emoji {
+    font-size: 90px; margin-bottom: 10px;
+    display: block; line-height: 1.1;
+    animation: bounce 2s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-8px);}
+  }
+  .rhyme-title {
+    font-size: 26px; font-weight: 800; color: #b5179e;
+    margin-bottom: 18px;
+  }
+  .rhyme-num {
+    font-size: 14px; font-weight: 700; color: #f72585;
+    margin-bottom: 10px; letter-spacing: 1px; text-transform: uppercase;
+  }
+
+  .rhyme-text {
+    background: #fff5fb;
+    border-radius: 20px;
+    padding: 20px 18px;
+    margin-bottom: 22px;
+    border: 3px solid #fce7f3;
+    text-align: left;
+  }
+  .rhyme-line {
+    font-size: 19px; font-weight: 600; color: #1e1b4b;
+    line-height: 1.8;
+    padding: 4px 0;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    padding-left: 6px;
+  }
+  .rhyme-line.highlight {
+    background: linear-gradient(90deg, #fce7f3, #fdf4ff);
+    color: #b5179e;
+    font-weight: 800;
+  }
+
+  .btn-row {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .read-btn {
+    background: linear-gradient(135deg, #f72585, #b5179e);
+    color: #fff; border: none;
+    padding: 16px 24px; border-radius: 24px;
+    font-size: 20px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(247,37,133,0.4);
+    min-height: 56px; transition: transform 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .read-btn:active { transform: scale(0.96); }
+  .line-btn {
+    background: linear-gradient(135deg, #7209b7, #480ca8);
+    color: #fff; border: none;
+    padding: 16px 24px; border-radius: 24px;
+    font-size: 20px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(114,9,183,0.4);
+    min-height: 56px; transition: transform 0.15s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+  }
+  .line-btn:active { transform: scale(0.96); }
+  .stop-btn {
+    background: #fff; color: #f72585;
+    border: 3px solid #f72585;
+    padding: 12px 24px; border-radius: 24px;
+    font-size: 18px; font-weight: 700; cursor: pointer;
+    min-height: 52px; display: none;
+    align-items: center; justify-content: center; gap: 8px;
+  }
+
+  .nav-row {
+    display: flex; justify-content: center; align-items: center;
+    gap: 24px; padding: 0 20px 20px;
+    max-width: 500px; margin: 0 auto;
+  }
+  .nav-btn {
+    background: rgba(255,255,255,0.2);
+    border: 3px solid rgba(255,255,255,0.5);
+    color: #fff; border-radius: 50%;
+    width: 64px; height: 64px;
+    font-size: 28px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; font-weight: 800;
+  }
+  .nav-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.35); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+  .progress-label { font-size: 20px; font-weight: 800; }
+
+  .dots-row {
+    display: flex; justify-content: center; gap: 12px;
+    padding-bottom: 24px;
+  }
+  .dot {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: rgba(255,255,255,0.35); cursor: pointer;
+    transition: all 0.2s;
+  }
+  .dot.active { background: #fff; transform: scale(1.3); }
+  .dot.visited { background: rgba(255,255,255,0.65); }
+
+  .status-bar {
+    background: rgba(0,0,0,0.2);
+    border-radius: 20px;
+    padding: 10px 20px;
+    margin: 0 auto 8px;
+    max-width: 500px;
+    text-align: center;
+    font-size: 17px; font-weight: 700;
+    min-height: 44px; display: flex;
+    align-items: center; justify-content: center;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span>🎵 Rhymes &amp; Songs</span>
+</div>
+
+<div class="status-bar" id="status-bar">Tap a button below to start! 🎶</div>
+
+<div class="rhyme-card" id="rhyme-card">
+  <div class="rhyme-num" id="rhyme-num">Rhyme 1 of 6</div>
+  <span class="rhyme-emoji" id="rhyme-emoji">🌟</span>
+  <div class="rhyme-title" id="rhyme-title">Twinkle Twinkle</div>
+  <div class="rhyme-text" id="rhyme-text"></div>
+  <div class="btn-row">
+    <button class="read-btn" id="read-all-btn" onclick="readAll()">🔊 Read Aloud</button>
+    <button class="line-btn" id="line-btn" onclick="readLineByLine()">▶ Line by Line</button>
+    <button class="stop-btn" id="stop-btn" onclick="stopReading()">⏹ Stop</button>
+  </div>
+</div>
+
+<div class="nav-row">
+  <button class="nav-btn" id="prev-btn" onclick="goRhyme(-1)">◀</button>
+  <span class="progress-label" id="progress-label">1 / 6</span>
+  <button class="nav-btn" id="next-btn" onclick="goRhyme(1)">▶</button>
+</div>
+<div class="dots-row" id="dots-row"></div>
+
+<!-- FONT PICKER -->
+<div id="font-fab" onclick="document.getElementById('font-panel').classList.toggle('open')" style="position:fixed;bottom:24px;right:24px;z-index:9999;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(102,126,234,0.5);transition:transform .2s;user-select:none;">Aa</div>
+<div id="font-panel" style="position:fixed;bottom:88px;right:24px;z-index:9998;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px;width:240px;display:none;flex-direction:column;gap:10px;">
+  <div style="font-size:13px;font-weight:700;color:#666;margin-bottom:4px;">CHOOSE FONT</div>
+  <button onclick="setFont('Nunito')" data-font="Nunito" style="font-family:'Nunito',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:700;">Nunito — Hello World!</button>
+  <button onclick="setFont('Fredoka One')" data-font="Fredoka One" style="font-family:'Fredoka One',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">Fredoka — Hello World!</button>
+  <button onclick="setFont('Patrick Hand')" data-font="Patrick Hand" style="font-family:'Patrick Hand',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">Patrick Hand — Hello!</button>
+  <button onclick="setFont('ABeeZee')" data-font="ABeeZee" style="font-family:'ABeeZee',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">ABeeZee — Hello World!</button>
+  <button onclick="setFont('Poppins')" data-font="Poppins" style="font-family:'Poppins',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:600;">Poppins — Hello World!</button>
+</div>
+<style>#font-panel.open{display:flex!important;}body,button,input,select,textarea{font-family:var(--app-font,'Nunito'),sans-serif!important;}</style>
+<script>(function(){var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};Object.values(fonts).forEach(function(href){if(!document.querySelector('link[href="'+href+'"]')){var l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l);}});var current=localStorage.getItem('dhanu-font')||'Nunito';document.querySelectorAll('#font-panel button[data-font]').forEach(function(b){if(b.getAttribute('data-font')===current){b.style.borderColor='#667eea';b.style.background='#f0f0ff';}});})();function setFont(name){localStorage.setItem('dhanu-font',name);location.reload();}</script>
+
+<script>
+var rhymes = [
+  {
+    emoji: '🌟',
+    title: 'Twinkle Twinkle',
+    text: 'Twinkle, twinkle, little star,\nHow I wonder what you are!\nUp above the world so high,\nLike a diamond in the sky.\nTwinkle, twinkle, little star,\nHow I wonder what you are!'
+  },
+  {
+    emoji: '🐑',
+    title: 'Baa Baa Black Sheep',
+    text: 'Baa, baa, black sheep,\nHave you any wool?\nYes sir, yes sir,\nThree bags full!\nOne for the master,\nOne for the dame,\nAnd one for the little boy\nWho lives down the lane.'
+  },
+  {
+    emoji: '🥚',
+    title: 'Humpty Dumpty',
+    text: 'Humpty Dumpty sat on a wall,\nHumpty Dumpty had a great fall.\nAll the king\'s horses\nAnd all the king\'s men\nCouldn\'t put Humpty together again.'
+  },
+  {
+    emoji: '🪣',
+    title: 'Jack and Jill',
+    text: 'Jack and Jill went up the hill\nTo fetch a pail of water.\nJack fell down and broke his crown,\nAnd Jill came tumbling after.'
+  },
+  {
+    emoji: '🚌',
+    title: 'Wheels on the Bus',
+    text: 'The wheels on the bus go round and round,\nRound and round, round and round.\nThe wheels on the bus go round and round,\nAll through the town!\nThe wipers on the bus go swish, swish, swish...\nAll through the town!'
+  },
+  {
+    emoji: '🐄',
+    title: 'Old MacDonald',
+    text: 'Old MacDonald had a farm, E-I-E-I-O!\nAnd on his farm he had a cow, E-I-E-I-O!\nWith a moo moo here, and a moo moo there,\nHere a moo, there a moo, everywhere a moo moo!\nOld MacDonald had a farm, E-I-E-I-O!'
+  }
+];
+
+var idx = 0;
+var isPlaying = false;
+
+function renderLines() {
+  var lines = rhymes[idx].text.split('\n');
+  var box = document.getElementById('rhyme-text');
+  box.innerHTML = '';
+  lines.forEach(function(line, i) {
+    var div = document.createElement('div');
+    div.className = 'rhyme-line';
+    div.id = 'line-' + i;
+    div.textContent = line;
+    box.appendChild(div);
+  });
+}
+
+function showRhyme() {
+  stopReading();
+  var r = rhymes[idx];
+  document.getElementById('rhyme-num').textContent = 'Rhyme ' + (idx+1) + ' of 6';
+  document.getElementById('rhyme-emoji').textContent = r.emoji;
+  document.getElementById('rhyme-title').textContent = r.title;
+  document.getElementById('progress-label').textContent = (idx+1) + ' / 6';
+  document.getElementById('prev-btn').disabled = idx === 0;
+  document.getElementById('next-btn').disabled = idx === 5;
+  renderLines();
+  document.getElementById('status-bar').textContent = 'Tap a button below to start! 🎶';
+  var dots = document.querySelectorAll('.dot');
+  dots.forEach(function(d, i) {
+    d.className = 'dot' + (i < idx ? ' visited' : '') + (i === idx ? ' active' : '');
+  });
+}
+
+function goRhyme(dir) {
+  idx = Math.max(0, Math.min(5, idx + dir));
+  showRhyme();
+}
+
+function setPlaying(on) {
+  isPlaying = on;
+  document.getElementById('read-all-btn').style.display = on ? 'none' : 'flex';
+  document.getElementById('line-btn').style.display = on ? 'none' : 'flex';
+  document.getElementById('stop-btn').style.display = on ? 'flex' : 'none';
+  if (!on) clearHighlights();
+}
+
+function clearHighlights() {
+  document.querySelectorAll('.rhyme-line').forEach(function(el) {
+    el.classList.remove('highlight');
+  });
+}
+
+function highlightLine(i) {
+  clearHighlights();
+  var el = document.getElementById('line-' + i);
+  if (el) {
+    el.classList.add('highlight');
+    el.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+}
+
+function stopReading() {
+  window.speechSynthesis.cancel();
+  setPlaying(false);
+  document.getElementById('status-bar').textContent = 'Tap a button below to start! 🎶';
+}
+
+function readAll() {
+  window.speechSynthesis.cancel();
+  setPlaying(true);
+  var r = rhymes[idx];
+  document.getElementById('status-bar').textContent = '🔊 Reading: ' + r.title + '...';
+  var u = new SpeechSynthesisUtterance(r.text.replace(/\n/g, '. '));
+  u.lang = 'en-US'; u.rate = 0.82;
+  u.onend = function() { setPlaying(false); document.getElementById('status-bar').textContent = '✅ Done! Great listening! 🌟'; };
+  u.onerror = function() { setPlaying(false); };
+  window.speechSynthesis.speak(u);
+}
+
+function readLineByLine() {
+  window.speechSynthesis.cancel();
+  setPlaying(true);
+  var lines = rhymes[idx].text.split('\n');
+  var lineIdx = 0;
+
+  document.getElementById('status-bar').textContent = '▶ Reading line by line...';
+
+  function speakNext() {
+    if (!isPlaying || lineIdx >= lines.length) {
+      setPlaying(false);
+      clearHighlights();
+      document.getElementById('status-bar').textContent = '✅ All done! Wonderful! 🎉';
+      return;
+    }
+    highlightLine(lineIdx);
+    var u = new SpeechSynthesisUtterance(lines[lineIdx]);
+    u.lang = 'en-US'; u.rate = 0.82;
+    u.onend = function() {
+      lineIdx++;
+      if (isPlaying) setTimeout(speakNext, 900);
+    };
+    u.onerror = function() { setPlaying(false); };
+    window.speechSynthesis.speak(u);
+  }
+
+  speakNext();
+}
+
+function buildDots() {
+  var row = document.getElementById('dots-row');
+  row.innerHTML = '';
+  for (var i = 0; i < 6; i++) {
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    (function(i2){ d.onclick = function(){ idx = i2; showRhyme(); }; })(i);
+    row.appendChild(d);
+  }
+}
+
+buildDots();
+showRhyme();
+</script>
+<script src="/tts.js"></script>
+</body>
+</html>

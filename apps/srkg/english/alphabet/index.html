@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>(function(){var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};var chosen=localStorage.getItem('dhanu-font')||'Nunito';if(fonts[chosen]){var l=document.createElement('link');l.rel='stylesheet';l.href=fonts[chosen];document.head.appendChild(l);}document.documentElement.style.setProperty('--app-font',chosen);})();</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alphabet Fun</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--app-font, 'Nunito'), sans-serif;
+    background: linear-gradient(135deg, #0096c7, #023e8a);
+    min-height: 100vh;
+    color: #fff;
+  }
+  .topbar {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 20px;
+    background: rgba(0,0,0,0.25);
+    font-size: 18px; font-weight: 700;
+  }
+  .topbar a {
+    color: #fff; text-decoration: none;
+    background: rgba(255,255,255,0.2);
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 16px;
+    white-space: nowrap;
+  }
+  .topbar span { font-size: 20px; }
+
+  .mode-btns {
+    display: flex; justify-content: center; gap: 16px;
+    padding: 18px 20px 0;
+  }
+  .mode-btn {
+    padding: 14px 36px; border-radius: 30px; border: 3px solid rgba(255,255,255,0.5);
+    font-size: 20px; font-weight: 800; cursor: pointer;
+    background: rgba(255,255,255,0.15); color: #fff;
+    transition: all 0.2s;
+    min-width: 140px;
+  }
+  .mode-btn.active {
+    background: #fff; color: #0096c7;
+    border-color: #fff;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  }
+
+  /* LEARN MODE */
+  #learn-mode { display: block; }
+  #quiz-mode { display: none; }
+
+  .learn-card {
+    background: #fff;
+    border-radius: 32px;
+    margin: 24px auto;
+    max-width: 480px;
+    padding: 36px 28px 28px;
+    text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    position: relative;
+  }
+  .big-letter {
+    font-size: 120px; font-weight: 800; line-height: 1;
+    background: linear-gradient(135deg, #0096c7, #023e8a);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 4px;
+  }
+  .small-letter {
+    font-size: 52px; font-weight: 700; color: #48cae4;
+    margin-bottom: 16px;
+  }
+  .letter-emoji {
+    font-size: 80px; margin-bottom: 12px;
+    display: block; line-height: 1.1;
+  }
+  .letter-word {
+    font-size: 36px; font-weight: 800; color: #023e8a;
+    margin-bottom: 24px;
+  }
+  .hear-btn {
+    background: linear-gradient(135deg, #0096c7, #023e8a);
+    color: #fff; border: none;
+    padding: 16px 36px; border-radius: 30px;
+    font-size: 22px; font-weight: 700; cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,150,199,0.4);
+    transition: transform 0.15s;
+    min-height: 56px;
+  }
+  .hear-btn:active { transform: scale(0.95); }
+
+  .nav-row {
+    display: flex; justify-content: center; align-items: center;
+    gap: 20px; padding: 0 20px 16px;
+    max-width: 480px; margin: 0 auto;
+  }
+  .nav-btn {
+    background: rgba(255,255,255,0.2);
+    border: 3px solid rgba(255,255,255,0.5);
+    color: #fff; border-radius: 50%;
+    width: 64px; height: 64px;
+    font-size: 28px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; font-weight: 800;
+  }
+  .nav-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.35); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  .dots-row {
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;
+    padding: 4px 20px 24px; max-width: 480px; margin: 0 auto;
+  }
+  .dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transition: background 0.2s; cursor: pointer;
+  }
+  .dot.active { background: #fff; }
+  .dot.visited { background: rgba(255,255,255,0.6); }
+
+  /* QUIZ MODE */
+  .quiz-card {
+    background: #fff; border-radius: 32px;
+    margin: 24px auto; max-width: 480px;
+    padding: 32px 24px; text-align: center;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .quiz-emoji { font-size: 90px; margin-bottom: 12px; display: block; }
+  .quiz-word { font-size: 32px; font-weight: 800; color: #023e8a; margin-bottom: 8px; }
+  .quiz-question { font-size: 20px; color: #555; margin-bottom: 24px; font-weight: 600; }
+  .options-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px; margin-bottom: 24px;
+  }
+  .opt-btn {
+    padding: 20px 10px; border-radius: 20px;
+    border: 3px solid #e0e0e0; background: #f5f5ff;
+    font-size: 44px; font-weight: 800; color: #023e8a;
+    cursor: pointer; transition: all 0.15s;
+    min-height: 80px;
+  }
+  .opt-btn:active { transform: scale(0.93); }
+  .opt-btn.correct { background: #d4f7d4; border-color: #22c55e; color: #166534; }
+  .opt-btn.wrong { background: #ffe4e4; border-color: #ef4444; color: #991b1b; }
+  @keyframes shake {
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-8px);}
+    40%{transform:translateX(8px);}
+    60%{transform:translateX(-6px);}
+    80%{transform:translateX(6px);}
+  }
+  .opt-btn.shake { animation: shake 0.4s ease; }
+
+  .score-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.15); border-radius: 16px;
+    padding: 10px 20px; margin: 0 auto 16px;
+    max-width: 480px; font-size: 18px; font-weight: 700;
+  }
+  .score-star { font-size: 22px; }
+  .feedback-msg {
+    font-size: 22px; font-weight: 800; margin-top: 8px;
+    min-height: 32px;
+  }
+  .feedback-msg.ok { color: #22c55e; }
+  .feedback-msg.err { color: #ef4444; }
+
+  .round-done {
+    display: none; text-align: center;
+    background: #fff; border-radius: 32px;
+    margin: 24px auto; max-width: 480px;
+    padding: 40px 28px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .round-done h2 { font-size: 32px; color: #023e8a; margin-bottom: 12px; }
+  .round-done p { font-size: 22px; color: #555; margin-bottom: 24px; }
+  .play-again-btn {
+    background: linear-gradient(135deg, #0096c7, #023e8a);
+    color: #fff; border: none;
+    padding: 16px 40px; border-radius: 30px;
+    font-size: 22px; font-weight: 700; cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="../../../../index.html">🏠 Home</a>
+  <span>🔡 Alphabet Fun</span>
+</div>
+
+<div class="mode-btns">
+  <button class="mode-btn active" id="btn-learn" onclick="switchMode('learn')">📖 Learn</button>
+  <button class="mode-btn" id="btn-quiz" onclick="switchMode('quiz')">🎯 Quiz</button>
+</div>
+
+<!-- LEARN MODE -->
+<div id="learn-mode">
+  <div class="learn-card">
+    <div class="big-letter" id="learn-upper">A</div>
+    <div class="small-letter" id="learn-lower">a</div>
+    <span class="letter-emoji" id="learn-emoji">🍎</span>
+    <div class="letter-word" id="learn-word">Apple</div>
+    <button class="hear-btn" onclick="hearLetter()">🔊 Hear it!</button>
+  </div>
+
+  <div class="nav-row">
+    <button class="nav-btn" id="prev-btn" onclick="goLearn(-1)">◀</button>
+    <span style="font-size:18px;font-weight:700;" id="learn-progress">1 / 26</span>
+    <button class="nav-btn" id="next-btn" onclick="goLearn(1)">▶</button>
+  </div>
+  <div class="dots-row" id="dots-row"></div>
+</div>
+
+<!-- QUIZ MODE -->
+<div id="quiz-mode">
+  <div class="score-bar">
+    <span class="score-star">⭐ Score: <span id="score">0</span></span>
+    <span>Question <span id="q-num">1</span> / 10</span>
+  </div>
+
+  <div class="quiz-card" id="quiz-card">
+    <span class="quiz-emoji" id="q-emoji">🍎</span>
+    <div class="quiz-word" id="q-word">Apple</div>
+    <div class="quiz-question">Which letter does it start with?</div>
+    <div class="options-grid" id="options-grid"></div>
+    <div class="feedback-msg" id="feedback"></div>
+  </div>
+
+  <div class="round-done" id="round-done">
+    <h2>🎉 Round Done!</h2>
+    <p>You scored <strong id="final-score">0</strong> out of 10!</p>
+    <button class="play-again-btn" onclick="startQuiz()">▶ Play Again</button>
+  </div>
+</div>
+
+<!-- FONT PICKER -->
+<div id="font-fab" onclick="document.getElementById('font-panel').classList.toggle('open')" style="position:fixed;bottom:24px;right:24px;z-index:9999;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;font-size:20px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(102,126,234,0.5);transition:transform .2s;user-select:none;">Aa</div>
+<div id="font-panel" style="position:fixed;bottom:88px;right:24px;z-index:9998;background:#fff;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.18);padding:20px;width:240px;display:none;flex-direction:column;gap:10px;">
+  <div style="font-size:13px;font-weight:700;color:#666;margin-bottom:4px;">CHOOSE FONT</div>
+  <button onclick="setFont('Nunito')" data-font="Nunito" style="font-family:'Nunito',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:700;">Nunito — Hello World!</button>
+  <button onclick="setFont('Fredoka One')" data-font="Fredoka One" style="font-family:'Fredoka One',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">Fredoka — Hello World!</button>
+  <button onclick="setFont('Patrick Hand')" data-font="Patrick Hand" style="font-family:'Patrick Hand',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">Patrick Hand — Hello!</button>
+  <button onclick="setFont('ABeeZee')" data-font="ABeeZee" style="font-family:'ABeeZee',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;">ABeeZee — Hello World!</button>
+  <button onclick="setFont('Poppins')" data-font="Poppins" style="font-family:'Poppins',sans-serif;padding:12px 16px;border-radius:12px;border:2px solid #e0e0e0;background:#f9f9f9;cursor:pointer;text-align:left;font-size:16px;font-weight:600;">Poppins — Hello World!</button>
+</div>
+<style>#font-panel.open{display:flex!important;}body,button,input,select,textarea{font-family:var(--app-font,'Nunito'),sans-serif!important;}</style>
+<script>(function(){var fonts={'Nunito':'https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap','Fredoka One':'https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap','Patrick Hand':'https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap','ABeeZee':'https://fonts.googleapis.com/css2?family=ABeeZee&display=swap','Poppins':'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap'};Object.values(fonts).forEach(function(href){if(!document.querySelector('link[href="'+href+'"]')){var l=document.createElement('link');l.rel='stylesheet';l.href=href;document.head.appendChild(l);}});var current=localStorage.getItem('dhanu-font')||'Nunito';document.querySelectorAll('#font-panel button[data-font]').forEach(function(b){if(b.getAttribute('data-font')===current){b.style.borderColor='#667eea';b.style.background='#f0f0ff';}});})();function setFont(name){localStorage.setItem('dhanu-font',name);location.reload();}</script>
+
+<script>
+var letters = [
+  {l:'A', e:'🍎', w:'Apple'},
+  {l:'B', e:'⚽', w:'Ball'},
+  {l:'C', e:'🐱', w:'Cat'},
+  {l:'D', e:'🐶', w:'Dog'},
+  {l:'E', e:'🐘', w:'Elephant'},
+  {l:'F', e:'🐟', w:'Fish'},
+  {l:'G', e:'🍇', w:'Grapes'},
+  {l:'H', e:'🎩', w:'Hat'},
+  {l:'I', e:'🍦', w:'Ice cream'},
+  {l:'J', e:'🫙', w:'Jar'},
+  {l:'K', e:'🪁', w:'Kite'},
+  {l:'L', e:'🦁', w:'Lion'},
+  {l:'M', e:'🐒', w:'Monkey'},
+  {l:'N', e:'🐦', w:'Nest'},
+  {l:'O', e:'🍊', w:'Orange'},
+  {l:'P', e:'🦜', w:'Parrot'},
+  {l:'Q', e:'👑', w:'Queen'},
+  {l:'R', e:'🐰', w:'Rabbit'},
+  {l:'S', e:'☀️', w:'Sun'},
+  {l:'T', e:'🐯', w:'Tiger'},
+  {l:'U', e:'☂️', w:'Umbrella'},
+  {l:'V', e:'🚐', w:'Van'},
+  {l:'W', e:'🐋', w:'Whale'},
+  {l:'X', e:'🎵', w:'Xylophone'},
+  {l:'Y', e:'🧶', w:'Yarn'},
+  {l:'Z', e:'🦓', w:'Zebra'}
+];
+
+var learnIdx = 0;
+
+function buildDots() {
+  var row = document.getElementById('dots-row');
+  row.innerHTML = '';
+  for (var i = 0; i < 26; i++) {
+    var d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('data-i', i);
+    (function(idx){
+      d.onclick = function(){ learnIdx = idx; showLetter(); };
+    })(i);
+    row.appendChild(d);
+  }
+}
+
+function showLetter() {
+  var item = letters[learnIdx];
+  document.getElementById('learn-upper').textContent = item.l;
+  document.getElementById('learn-lower').textContent = item.l.toLowerCase();
+  document.getElementById('learn-emoji').textContent = item.e;
+  document.getElementById('learn-word').textContent = item.w;
+  document.getElementById('learn-progress').textContent = (learnIdx + 1) + ' / 26';
+  document.getElementById('prev-btn').disabled = (learnIdx === 0);
+  document.getElementById('next-btn').disabled = (learnIdx === 25);
+  var dots = document.querySelectorAll('.dot');
+  dots.forEach(function(d, i) {
+    d.className = 'dot' + (i < learnIdx ? ' visited' : '') + (i === learnIdx ? ' active' : '');
+  });
+}
+
+function goLearn(dir) {
+  learnIdx = Math.max(0, Math.min(25, learnIdx + dir));
+  showLetter();
+}
+
+function hearLetter() {
+  var item = letters[learnIdx];
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(item.l + '. ' + item.w + '. ' + item.l + ' for ' + item.w + '.');
+  u.lang = 'en-US'; u.rate = 0.8;
+  window.speechSynthesis.speak(u);
+}
+
+// QUIZ
+var quizScore = 0, quizQ = 0, quizAnswered = false, quizItem = null;
+
+function switchMode(mode) {
+  document.getElementById('learn-mode').style.display = mode === 'learn' ? 'block' : 'none';
+  document.getElementById('quiz-mode').style.display = mode === 'quiz' ? 'block' : 'none';
+  document.getElementById('btn-learn').classList.toggle('active', mode === 'learn');
+  document.getElementById('btn-quiz').classList.toggle('active', mode === 'quiz');
+  if (mode === 'quiz') startQuiz();
+}
+
+function shuffle(arr) {
+  var a = arr.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+
+function startQuiz() {
+  quizScore = 0; quizQ = 0; quizAnswered = false;
+  document.getElementById('score').textContent = '0';
+  document.getElementById('q-num').textContent = '1';
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('round-done').style.display = 'none';
+  document.getElementById('quiz-card').style.display = 'block';
+  nextQuestion();
+}
+
+function nextQuestion() {
+  if (quizQ >= 10) {
+    endQuiz(); return;
+  }
+  quizQ++;
+  quizAnswered = false;
+  document.getElementById('q-num').textContent = quizQ;
+  document.getElementById('feedback').textContent = '';
+  document.getElementById('feedback').className = 'feedback-msg';
+
+  quizItem = letters[Math.floor(Math.random() * 26)];
+  document.getElementById('q-emoji').textContent = quizItem.e;
+  document.getElementById('q-word').textContent = quizItem.w;
+
+  // 4 options
+  var others = shuffle(letters.filter(function(l){ return l.l !== quizItem.l; })).slice(0, 3);
+  var options = shuffle([quizItem].concat(others));
+
+  var grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  options.forEach(function(opt) {
+    var btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt.l;
+    btn.onclick = function(){ checkAnswer(opt.l, btn); };
+    grid.appendChild(btn);
+  });
+}
+
+function checkAnswer(chosen, btn) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  var correct = quizItem.l;
+  if (chosen === correct) {
+    btn.classList.add('correct');
+    document.getElementById('feedback').textContent = '✅ Correct! ' + correct + ' for ' + quizItem.w + '!';
+    document.getElementById('feedback').className = 'feedback-msg ok';
+    quizScore++;
+    document.getElementById('score').textContent = quizScore;
+    speak('Correct! ' + correct + ' for ' + quizItem.w + '!');
+    setTimeout(nextQuestion, 1400);
+  } else {
+    btn.classList.add('wrong');
+    btn.classList.add('shake');
+    document.getElementById('feedback').textContent = '❌ Try again!';
+    document.getElementById('feedback').className = 'feedback-msg err';
+    speak('Try again!');
+    setTimeout(function(){
+      btn.classList.remove('wrong','shake');
+      quizAnswered = false;
+    }, 700);
+  }
+}
+
+function speak(text) {
+  window.speechSynthesis.cancel();
+  var u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
+
+function endQuiz() {
+  document.getElementById('quiz-card').style.display = 'none';
+  document.getElementById('round-done').style.display = 'block';
+  document.getElementById('final-score').textContent = quizScore;
+  speak('Great job! You scored ' + quizScore + ' out of 10!');
+}
+
+buildDots();
+showLetter();
+</script>
+<script src="/tts.js"></script>
+</body>
+</html>
