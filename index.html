@@ -430,7 +430,7 @@ body {
 
   <!-- ============ HERO ============ -->
   <header class="hero">
-    <div class="hero-badge" id="hero-badge">🌸 Sr KG · IGCSE · Age 4–5</div>
+    <div class="hero-badge" id="hero-badge">⭐ Grade 1 · IGCSE · Age 5–6</div>
     <div class="hero-stars">⭐ 🌟 ⭐</div>
     <h1>My <span>Learning</span> World</h1>
     <p>Books, Games &amp; Fun Activities — all in one place!</p>
@@ -443,13 +443,13 @@ body {
 
   <!-- ============ GRADE TAB SWITCHER ============ -->
   <div class="grade-tabs">
-    <button class="grade-tab active" id="tab-skg" onclick="switchGrade('skg')" aria-pressed="true">
-      🌸 Sr KG
-      <span class="grade-tab-desc">Age 4–5</span>
-    </button>
-    <button class="grade-tab g1" id="tab-g1" onclick="switchGrade('g1')" aria-pressed="false">
+    <button class="grade-tab g1 active" id="tab-g1" onclick="switchGrade('g1')" aria-pressed="true">
       ⭐ Grade 1
       <span class="grade-tab-desc">Age 5–6</span>
+    </button>
+    <button class="grade-tab" id="tab-skg" onclick="switchGrade('skg')" aria-pressed="false">
+      🌸 Sr KG
+      <span class="grade-tab-desc">Age 4–5</span>
     </button>
   </div>
 
@@ -457,12 +457,14 @@ body {
   <nav class="subject-nav" id="subject-nav">
     <!-- Updated by JS on tab switch -->
     <div class="subject-nav-inner" id="nav-inner">
-      <a class="nav-pill english" href="#skg-english"> 🔤 English </a>
-      <a class="nav-pill maths"   href="#skg-maths">   🔢 Maths   </a>
-      <a class="nav-pill science" href="#skg-science"> 🔬 Science </a>
-      <a class="nav-pill evs"     href="#skg-evs">     🌍 EVS     </a>
-      <a class="nav-pill tamil"   href="#skg-tamil">   🔤 Tamil   </a>
-      <a class="nav-pill hindi"   href="#skg-hindi">   🔤 Hindi   </a>
+      <a class="nav-pill books"   href="#g1-books">    📚 Books   </a>
+      <a class="nav-pill english" href="#g1-english">  🔤 English </a>
+      <a class="nav-pill maths"   href="#g1-maths">    🔢 Maths   </a>
+      <a class="nav-pill science" href="#g1-science">  🔬 Science </a>
+      <a class="nav-pill evs"     href="#g1-evs">      🌍 EVS     </a>
+      <a class="nav-pill ict"     href="#g1-ict">      💻 ICT     </a>
+      <a class="nav-pill tamil"   href="#g1-tamil">    🔤 Tamil   </a>
+      <a class="nav-pill hindi"   href="#g1-hindi">    🔤 Hindi   </a>
     </div>
   </nav>
 
@@ -472,7 +474,7 @@ body {
     <!-- =====================================================
          SR KG CONTENT
          ===================================================== -->
-    <div id="skg-content" class="grade-content active">
+    <div id="skg-content" class="grade-content">
 
       <!-- ===== SKG ENGLISH ===== -->
       <section class="section" id="skg-english">
@@ -771,7 +773,7 @@ body {
     <!-- =====================================================
          GRADE 1 CONTENT
          ===================================================== -->
-    <div id="g1-content" class="grade-content">
+    <div id="g1-content" class="grade-content active">
 
       <!-- ===== BOOKS ===== -->
       <section class="section" id="g1-books">
